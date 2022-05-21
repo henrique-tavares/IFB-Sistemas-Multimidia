@@ -4,14 +4,7 @@ import Direction from './direction';
 export default class Tulio {
   readonly sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   readonly animations: Phaser.Types.Animations.Animation[];
-  readonly key = 'tulio';
-
-  static loadSpritesheet(scene: Phaser.Scene) {
-    scene.load.spritesheet('tulio', 'assets/Tulio.png', {
-      frameWidth: 24,
-      frameHeight: 32,
-    });
-  }
+  readonly key = 'characters:tulio';
 
   constructor(scene: Phaser.Scene) {
     this.sprite = scene.physics.add.sprite(100, 100, this.key);

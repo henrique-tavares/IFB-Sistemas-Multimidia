@@ -1,5 +1,7 @@
 import 'phaser';
 import Start from './scenes/start';
+import Graveyard from './scenes/graveyard';
+import Preloader from './utils/preloader';
 
 const config = {
   type: Phaser.AUTO,
@@ -14,9 +16,13 @@ const config = {
       debug: true,
     },
   },
-  width: 800,
-  height: 600,
-  scene: Start,
+  scale: {
+    mode: Phaser.Scale.FIT,
+    width: 800,
+    height: 600,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
+  scene: [Preloader, Start, ...Graveyard],
 };
 
 const game = new Phaser.Game(config);
