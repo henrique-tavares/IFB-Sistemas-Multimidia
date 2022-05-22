@@ -1,30 +1,26 @@
 import 'phaser';
-import AudioHandler from '../../utils/audioHandler';
-import Direction from '../../utils/direction';
-import Tulio from '../../utils/tulio';
+import BaseRoom from './baseRoom';
 
-export default class Room_00 extends Phaser.Scene {
-  player: Tulio;
-  direction: Direction;
-
+export default class Room_00 extends BaseRoom {
   constructor() {
-    super('graveyard:room_00');
+    super(
+      'graveyard:room_00',
+      {
+        top: 8,
+        left: 6,
+      },
+      {
+        right: 'graveyerd:room_01',
+        down: 'graveyard:room_10',
+      }
+    );
   }
 
-  preload() {}
-
   create() {
-    this.player = new Tulio(this);
-    this.player.sprite.setCollideWorldBounds(true);
-    this.player.sprite.setScale(2);
-
-    this.direction = new Direction(this);
-
-    const audioHandler = this.cache.custom['handlers'].get('audioHandler') as AudioHandler;
-    audioHandler.handleBackgroundMusic(this);
+    super.create();
   }
 
   update() {
-    this.player.handleSpriteAnimation(this.direction);
+    super.update();
   }
 }

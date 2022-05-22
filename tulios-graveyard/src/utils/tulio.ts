@@ -8,6 +8,7 @@ export default class Tulio {
 
   constructor(scene: Phaser.Scene) {
     this.sprite = scene.physics.add.sprite(100, 100, this.key);
+
     this.animations = [
       {
         key: 'walkRight',
@@ -82,6 +83,8 @@ export default class Tulio {
     } else {
       this.sprite.setVelocityY(0);
     }
+
+    this.sprite.body.velocity.limit(120);
 
     if (this.sprite.body.velocity.x == 0 && this.sprite.body.velocity.y == 0) {
       this.sprite.play('idle');
