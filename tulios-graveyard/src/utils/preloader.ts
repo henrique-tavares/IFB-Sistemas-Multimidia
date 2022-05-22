@@ -61,6 +61,29 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('graveyard:room_47:bg', 'assets/graveyard/Room - [4,7]_ Mausoleum.png');
     this.load.image('graveyard:room_54:bg', 'assets/graveyard/Room - [5,4].png');
 
+    this.load.image('dungeon:room_00:bg', 'assets/dungeon/Room 0.png');
+    this.load.image('dungeon:room_01:bg', 'assets/dungeon/Room 1.png');
+    this.load.image('dungeon:room_02:bg', 'assets/dungeon/Room 1.1.png');
+    this.load.image('dungeon:room_03:bg', 'assets/dungeon/Room 2L.png');
+    this.load.image('dungeon:room_04:bg', 'assets/dungeon/Room 3L.png');
+    this.load.image('dungeon:room_05:bg', 'assets/dungeon/Room 4L.png');
+    this.load.image('dungeon:room_06:bg', 'assets/dungeon/Room 5L.png');
+    this.load.image('dungeon:room_07:bg', 'assets/dungeon/Room 5L.1.png');
+    this.load.image('dungeon:room_08:bg', 'assets/dungeon/Room 6L.png');
+    this.load.image('dungeon:room_09:bg', 'assets/dungeon/Room 7L.png');
+    this.load.image('dungeon:room_10:bg', 'assets/dungeon/Room 8L.png');
+    this.load.image('dungeon:room_11:bg', 'assets/dungeon/Room 2R.png');
+    this.load.image('dungeon:room_12:bg', 'assets/dungeon/Room 3R.png');
+    this.load.image('dungeon:room_13:bg', 'assets/dungeon/Room 4R.png');
+    this.load.image('dungeon:room_14:bg', 'assets/dungeon/Room 5R.png');
+    this.load.image('dungeon:room_15:bg', 'assets/dungeon/Room 6R.png');
+    this.load.image('dungeon:room_16:bg', 'assets/dungeon/Room 7R.png');
+    this.load.image('dungeon:room_17:bg', 'assets/dungeon/Room 8R.png');
+    this.load.image('dungeon:room_18:bg', 'assets/dungeon/Room 9.png');
+    this.load.image('dungeon:room_19:bg', 'assets/dungeon/Room 10.png');
+    this.load.image('dungeon:room_20:bg', 'assets/dungeon/Room 11.png');
+    this.load.image('dungeon:room_21:bg', 'assets/dungeon/Room 12.png');
+
     this.load.spritesheet('characters:tulio', 'assets/characters/Tulio.png', {
       frameWidth: 24,
       frameHeight: 32,
@@ -68,6 +91,8 @@ export default class Preloader extends Phaser.Scene {
 
     this.load.audio('bg_start_music', 'audio/bg_start_music.wav');
     this.load.audio('bg_graveyard_music', 'audio/bg_graveyard_music.wav');
+    this.load.audio('bg_dungeon_music', 'audio/bg_dungeon_music.wav');
+    this.load.audio('bg_marina_music', 'audio/bg_marina_music.wav');
 
     this.cache.addCustom('handlers').add('audioHandler', new AudioHandler());
 
