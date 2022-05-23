@@ -41,6 +41,7 @@ export default class AudioHandler {
       }
 
       scene.sound.removeByKey('bg_graveyard_music');
+      scene.sound.removeByKey('bg_dungeon_music');
 
       scene.sound.add('bg_start_music', { volume: 0.1, loop: true }).play();
       return;
@@ -52,8 +53,21 @@ export default class AudioHandler {
       }
 
       scene.sound.removeByKey('bg_start_music');
+      scene.sound.removeByKey('bg_dungeon_music');
 
       scene.sound.add('bg_graveyard_music', { volume: 0.1, loop: true }).play();
+      return;
+    }
+
+    if (sceneKey.startsWith('dungeon:')) {
+      if (scene.sound.get('bg_dungeon_music')) {
+        return;
+      }
+
+      scene.sound.removeByKey('bg_start_music');
+      scene.sound.removeByKey('bg_graveyard_music');
+
+      scene.sound.add('bg_dungeon_music', { volume: 0.1, loop: true }).play();
       return;
     }
   }
