@@ -11,10 +11,10 @@ export default class Direction {
 
   constructor(scene: Phaser.Scene) {
     this.keys = {
-      w: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
-      a: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
-      s: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
-      d: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
+      w: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W, true),
+      a: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A, true),
+      s: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S, true),
+      d: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D, true),
     };
 
     this.cursors = scene.input.keyboard.createCursorKeys();

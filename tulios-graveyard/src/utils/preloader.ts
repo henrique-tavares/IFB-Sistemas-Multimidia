@@ -4,23 +4,54 @@ import Screen from './screen';
 export default class Preloader extends Phaser.Scene {
   progressBox: Phaser.GameObjects.Graphics;
   progressBar: Phaser.GameObjects.Graphics;
-  bgSolid: Phaser.GameObjects.Graphics;
+  loadingText: Phaser.GameObjects.Text;
 
   constructor() {
     super('preloader');
   }
 
   preload() {
-    // const screen = new Screen(this.scale);
+    const screen = new Screen(this.scale);
 
-    // this.bgSolid = this.add.graphics().fillStyle(0x323232).fillRect(0, 0, screen.width, screen.height);
+    this.progressBox = this.add.graphics().fillStyle(0xffffff).fillRect(90, 420, 620, 50);
 
-    // this.progressBox = this.add
-    //   .graphics()
-    //   .fillStyle(0xfff)
-    //   .fillRoundedRect(screen.relativeX(25), screen.relativeY(60), screen.width * 0.5, 50, 5);
+    this.progressBar = this.add.graphics();
 
-    // this.progressBar = this.add.graphics();
+    this.loadingText = this.add
+      .text(screen.relativeX(50), screen.relativeY(50), 'Loading .    ', {
+        fontFamily: 'MinimalPixel',
+        fontSize: '62px',
+        color: '#fff',
+      })
+      .setOrigin(0.5);
+
+    this.tweens.addCounter({
+      from: 0,
+      to: 299,
+      onUpdate: tween => {
+        if (tween.getValue() < 100) {
+          this.loadingText.setText('Loading .    ');
+          return;
+        }
+        if (tween.getValue() < 200) {
+          this.loadingText.setText('Loading . .  ');
+          return;
+        }
+
+        this.loadingText.setText('Loading . . .');
+      },
+      loop: -1,
+    });
+
+    this.load.on('progress', (progress: number) => {
+      this.progressBar.clear();
+      this.progressBar.fillStyle(0x4f2494);
+      this.progressBar.fillRect(100, 430, 600 * progress, 30);
+    });
+
+    this.load.on('complete', () => {
+      this.scene.start('start');
+    });
 
     this.load.image('title-screen:background', 'assets/title_screen/background.png');
     this.load.image('title-screen:title', 'assets/title_screen/title.png');
@@ -70,17 +101,6 @@ export default class Preloader extends Phaser.Scene {
     this.load.audio('bg_graveyard_music', 'audio/bg_graveyard_music.wav');
 
     this.cache.addCustom('handlers').add('audioHandler', new AudioHandler());
-
-    // this.load.on('progress', (progress: number) => {
-    //   this.progressBar.clear();
-    //   this.progressBar.fillStyle(0xfff);
-    //   this.progressBar.fillRect(250, 280, 300 * progress, 30);
-    // });
-
-    this.load.on('complete', () => {
-      // console.log('complete');
-      this.scene.start('start');
-    });
   }
 
   create() {}

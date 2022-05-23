@@ -2,10 +2,11 @@ import 'phaser';
 import Start from './scenes/start';
 import Graveyard from './scenes/graveyard';
 import Preloader from './utils/preloader';
+import UiScene from './scenes/ui';
 
 const config = {
   type: Phaser.AUTO,
-  backgroundColor: '#f9f9f9',
+  backgroundColor: '#000',
   pixelArt: true,
   physics: {
     default: 'arcade',
@@ -22,7 +23,7 @@ const config = {
     height: 600,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [Preloader, Start, ...Graveyard],
+  scene: [Preloader, Start, UiScene, ...Graveyard],
 };
 
 const game = new Phaser.Game(config);

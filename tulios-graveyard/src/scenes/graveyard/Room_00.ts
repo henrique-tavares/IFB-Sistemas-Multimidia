@@ -6,11 +6,11 @@ export default class Room_00 extends BaseRoom {
     super(
       'graveyard:room_00',
       {
-        top: 8,
-        left: 6,
+        hasTop: true,
+        hasLeft: true,
       },
       {
-        right: 'graveyerd:room_01',
+        right: 'graveyard:room_01',
         down: 'graveyard:room_10',
       }
     );

@@ -83,7 +83,10 @@ export default class Start extends Phaser.Scene {
           duration: 200,
         });
       })
-      .on('pointerdown', () => this.scene.start('graveyard:room_00'));
+      .on('pointerdown', () => {
+        this.scene.run('ui-scene');
+        this.scene.start('graveyard:room_00');
+      });
 
     const buttonCreditos = this.add
       .image(0, 0, 'title-screen:button_creditos')

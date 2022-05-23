@@ -5,6 +5,7 @@ export default class Tulio {
   readonly sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   readonly animations: Phaser.Types.Animations.Animation[];
   readonly key = 'characters:tulio';
+  private direction: Direction;
 
   constructor(scene: Phaser.Scene) {
     this.sprite = scene.physics.add.sprite(100, 100, this.key);
@@ -45,21 +46,27 @@ export default class Tulio {
     this.animations.forEach(animation => {
       scene.anims.create(animation);
     });
+
+    this.direction = scene.scene.get('ui-scene').data.get('direction') as Direction;
   }
 
   public get currentAnimation(): string {
     return this.sprite.anims.currentAnim?.key ?? '';
   }
 
-  handleSpriteAnimation(direction: Direction) {
-    if (direction.isLeft) {
-      if (this.currentAnimation !== 'walkLeft' && !direction.isVertical) {
+  setPosition(x: number, y: number) {
+    this.sprite.setPosition(x, y);
+  }
+
+  handleSpriteAnimation() {
+    if (this.direction.isLeft) {
+      if (this.currentAnimation !== 'walkLeft' && !this.direction.isVertical) {
         this.sprite.play('walkLeft');
       }
 
       this.sprite.setVelocityX(-120);
-    } else if (direction.isRight) {
-      if (this.currentAnimation !== 'walkRight' && !direction.isVertical) {
+    } else if (this.direction.isRight) {
+      if (this.currentAnimation !== 'walkRight' && !this.direction.isVertical) {
         this.sprite.play('walkRight');
       }
 
@@ -68,14 +75,14 @@ export default class Tulio {
       this.sprite.setVelocityX(0);
     }
 
-    if (direction.isUp) {
-      if (this.currentAnimation !== 'walkUp' && !direction.isHorizontal) {
+    if (this.direction.isUp) {
+      if (this.currentAnimation !== 'walkUp' && !this.direction.isHorizontal) {
         this.sprite.play('walkUp');
       }
 
       this.sprite.setVelocityY(-120);
-    } else if (direction.isDown) {
-      if (this.currentAnimation !== 'walkDown' && !direction.isHorizontal) {
+    } else if (this.direction.isDown) {
+      if (this.currentAnimation !== 'walkDown' && !this.direction.isHorizontal) {
         this.sprite.play('walkDown');
       }
 
