@@ -3,3 +3,8 @@ body {
   background-color: #323232;
   overflow: hidden;
 }
+
+@font-face {
+  font-family: MinimalPixel;
+  src: url('../fonts/MinimalPixel\ v2.ttf');
+}
