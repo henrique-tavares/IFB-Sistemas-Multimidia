@@ -6,6 +6,7 @@ export default class Tulio {
   readonly animations: Phaser.Types.Animations.Animation[];
   readonly key = 'characters:tulio';
   private direction: Direction;
+  private frozen = false;
 
   constructor(scene: Phaser.Scene) {
     this.sprite = scene.physics.add.sprite(100, 100, this.key);
@@ -58,7 +59,19 @@ export default class Tulio {
     this.sprite.setPosition(x, y);
   }
 
+  freeze() {
+    this.frozen = true;
+  }
+
+  unfreeze() {
+    this.frozen = false;
+  }
+
   handleSpriteAnimation() {
+    if (this.frozen) {
+      return;
+    }
+
     if (this.direction.isLeft) {
       if (this.currentAnimation !== 'walkLeft' && !this.direction.isVertical) {
         this.sprite.play('walkLeft');

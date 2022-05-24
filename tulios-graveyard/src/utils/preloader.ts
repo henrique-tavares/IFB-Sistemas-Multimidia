@@ -116,8 +116,8 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('dungeon:room_21:bg', 'assets/dungeon/Room 12.png');
 
     this.load.spritesheet('characters:tulio', 'assets/characters/Tulio.png', {
-      frameWidth: 24,
-      frameHeight: 32,
+      frameWidth: 16,
+      frameHeight: 28,
     });
 
     this.load.audio('bg_start_music', 'audio/bg_start_music.wav');

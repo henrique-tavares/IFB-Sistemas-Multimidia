@@ -12,6 +12,26 @@ export default class Room_00 extends BaseRoom {
       {
         right: 'graveyard:room_01',
         down: 'graveyard:room_10',
+      },
+      {
+        right: {
+          x: {
+            relative: true,
+            value: 0,
+          },
+          y: {
+            relative: false,
+          },
+        },
+        down: {
+          x: {
+            relative: false,
+          },
+          y: {
+            relative: true,
+            value: 0,
+          },
+        },
       }
     );
   }
