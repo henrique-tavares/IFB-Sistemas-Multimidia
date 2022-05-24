@@ -11,7 +11,7 @@ import { clamp, isEmpty } from '../../utils/misc';
 import NextRoomArrow from '../../utils/nextRoomArrow';
 import Screen from '../../utils/screen';
 import Tulio from '../../utils/tulio';
-import Background from './background';
+import Background from '../../utils/background';
 
 export default abstract class BaseRoom extends Phaser.Scene {
   protected key: string;
