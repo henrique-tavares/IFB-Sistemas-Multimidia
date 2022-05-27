@@ -51,9 +51,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
   }
 
   create() {
-    this.screen = new Screen(this.scale);
-
-    this.bg = new Background(this, this.screen, `${this.key}:bg`, this.bgBorder);
+    this.bg = new Background(this, `${this.key}:bg`, this.bgBorder);
+    this.screen = new Screen(this.bg.image.width, this.bg.image.height);
 
     this.player = new Tulio(this);
     this.player.sprite.body.setCollideWorldBounds(true, null, null, true);
@@ -61,20 +60,22 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.events.emit('reposition-player');
 
+    this.cameras.main.startFollow(this.player);
     this.bg.applyBoundsOnSprite(this.player.sprite);
 
     const audioHandler = this.cache.custom['handlers'].get('audioHandler') as AudioHandler;
     audioHandler.handleBackgroundMusic(this);
 
-    const nextRoomArrows = Object.keys(this.nextRoom).map(
-      key => new NextRoomArrow(this, this.screen, key as Orientation)
+    const nextRoomArrows = Object.entries(this.nextRoom).map(
+      ([key, value]) =>
+        new NextRoomArrow(this, this.screen, key as Orientation, Array.isArray(value) ? value.length : 1)
     );
 
-    this.physics.world.on(`${this.key}:concluded`, () =>
-      nextRoomArrows.forEach(arrow => {
-        arrow.toggleVisible();
-      })
-    );
+    // this.physics.world.on(`${this.key}:concluded`, () =>
+    //   nextRoomArrows.forEach(arrow => {
+    //     arrow.toggleVisible();
+    //   })
+    // );
 
     this.events.on('wake', this.wake, this);
 
@@ -93,8 +94,18 @@ export default abstract class BaseRoom extends Phaser.Scene {
         return;
       }
 
-      // this.scene.sleep();
-      const data = this.nextRoomData[orientation];
+      let data = this.nextRoomData[orientation];
+
+      const half =
+        (['up', 'down'].includes(orientation) && this.player.sprite.x > this.screen.relativeX(50)) ||
+        (['left', 'right'].includes(orientation) && this.player.sprite.y > this.screen.relativeY(50))
+          ? 'first'
+          : 'second';
+
+      if (Array.isArray(data)) {
+        data = half == 'first' ? data[0] : data[1];
+      }
+
       const parsedData: PlayerCoordinate = {
         x: {
           relative: data.x.relative,
@@ -111,7 +122,11 @@ export default abstract class BaseRoom extends Phaser.Scene {
       this.time.delayedCall(this.fadeDuration, () => {
         this.player.unfreeze();
         this.scene.transition({
-          target: this.nextRoom[orientation],
+          target: Array.isArray(this.nextRoom[orientation])
+            ? half == 'first'
+              ? this.nextRoom[orientation][0]
+              : this.nextRoom[orientation][1]
+            : (this.nextRoom[orientation] as string),
           data: parsedData,
           sleep: true,
           duration: 0,

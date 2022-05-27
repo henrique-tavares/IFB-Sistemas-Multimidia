@@ -15,7 +15,7 @@ export default class Start extends Phaser.Scene {
   preload() {}
 
   create() {
-    this.screen = new Screen(this.scale);
+    this.screen = new Screen(this.scale.width, this.scale.height);
 
     this.bg = this.add
       .image(this.screen.relativeX(50), this.screen.relativeY(50), 'title-screen:background')
@@ -117,7 +117,7 @@ export default class Start extends Phaser.Scene {
         this.time.delayedCall(500, () => {
           this.scene.run('ui-scene');
           this.scene.start('dungeon:room_00');
-        })
+        });
       });
   }
 

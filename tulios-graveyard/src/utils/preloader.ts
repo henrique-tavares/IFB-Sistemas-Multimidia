@@ -11,7 +11,7 @@ export default class Preloader extends Phaser.Scene {
   }
 
   preload() {
-    const screen = new Screen(this.scale);
+    const screen = new Screen(this.scale.width, this.scale.height);
 
     this.progressBox = this.add.graphics().fillStyle(0xffffff).fillRect(90, 420, 620, 50);
 
@@ -77,17 +77,19 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('graveyard:room_20_30:bg', 'assets/graveyard/Room - ([2,0], [3,0]).png');
     this.load.image('graveyard:room_21:bg', 'assets/graveyard/Room - [2,1].png');
     this.load.image('graveyard:room_22:bg', 'assets/graveyard/Room - [2,2].png');
-    this.load.image('graveyard:room_23_33_34:bg', 'assets/graveyard/Room - ([2,3], [3,3], [3,4]).png');
+    this.load.image('graveyard:room_23_33:bg', 'assets/graveyard/Room - ([2,3], [3,3]).png');
     this.load.image('graveyard:room_24:bg', 'assets/graveyard/Room - [2,4].png');
     this.load.image('graveyard:room_25:bg', 'assets/graveyard/Room - [2,5].png');
     this.load.image('graveyard:room_26:bg', 'assets/graveyard/Room - [2,6].png');
     this.load.image('graveyard:room_27:bg', 'assets/graveyard/Room - [2,7].png');
     this.load.image('graveyard:room_31_32:bg', 'assets/graveyard/Room - ([3,1], [3,2]).png');
-    this.load.image('graveyard:room_35_36_45:bg', 'assets/graveyard/Room - ([3,5], [4,5], [3,6]).png');
+    this.load.image('graveyard:room_34:bg', 'assets/graveyard/Room - [3,4].png');
+    this.load.image('graveyard:room_35_36:bg', 'assets/graveyard/Room - ([3,5], [3,6]).png');
     this.load.image('graveyard:room_40_50_41_51:bg', 'assets/graveyard/Room - ([4,0], [5,0], [4,1], [5,1])_ Key.png');
     this.load.image('graveyard:room_42:bg', 'assets/graveyard/Room - [4,2].png');
     this.load.image('graveyard:room_43:bg', 'assets/graveyard/Room - [4,3].png');
     this.load.image('graveyard:room_44_54:bg', 'assets/graveyard/Room - ([4,4], [5,4]).png');
+    this.load.image('graveyard:room_45:bg', 'assets/graveyard/Room - [4,5].png');
     this.load.image('graveyard:room_46:bg', 'assets/graveyard/Room - [4,6].png');
     this.load.image('graveyard:room_47:bg', 'assets/graveyard/Room - [4,7]_ Mausoleum.png');
     this.load.image('graveyard:room_54:bg', 'assets/graveyard/Room - [5,4].png');

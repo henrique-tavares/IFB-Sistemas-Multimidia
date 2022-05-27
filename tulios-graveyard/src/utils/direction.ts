@@ -20,27 +20,31 @@ export default class Direction {
     this.cursors = scene.input.keyboard.createCursorKeys();
   }
 
-  public get isLeft(): boolean {
+  get isLeft(): boolean {
     return this.cursors.left.isDown || this.keys.a.isDown;
   }
 
-  public get isRight(): boolean {
+  get isRight(): boolean {
     return this.cursors.right.isDown || this.keys.d.isDown;
   }
 
-  public get isUp(): boolean {
+  get isUp(): boolean {
     return this.cursors.up.isDown || this.keys.w.isDown;
   }
 
-  public get isDown(): boolean {
+  get isDown(): boolean {
     return this.cursors.down.isDown || this.keys.s.isDown;
   }
 
-  public get isVertical(): boolean {
+  get isVertical(): boolean {
     return this.isUp || this.isDown;
   }
 
-  public get isHorizontal(): boolean {
+  get isHorizontal(): boolean {
     return this.isLeft || this.isRight;
+  }
+
+  get shift(): boolean {
+    return this.cursors.shift.isDown;
   }
 }

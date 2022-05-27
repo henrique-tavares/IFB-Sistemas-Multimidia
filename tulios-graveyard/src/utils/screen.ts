@@ -1,33 +1,27 @@
 import 'phaser';
 
 export default class Screen {
-  private scale: Phaser.Scale.ScaleManager;
+  readonly width: number;
+  readonly height: number;
 
-  constructor(scale: Phaser.Scale.ScaleManager) {
-    this.scale = scale;
-  }
-
-  public get height(): number {
-    return this.scale.height;
-  }
-
-  public get width(): number {
-    return this.scale.width;
+  constructor(width: number, height: number) {
+    this.width = width;
+    this.height = height;
   }
 
   relativeY(percentage: number): number {
-    return (this.scale.height * percentage) / 100;
+    return (this.height * percentage) / 100;
   }
 
   relativeX(percentage: number): number {
-    return (this.scale.width * percentage) / 100;
+    return (this.width * percentage) / 100;
   }
 
   heightRatio(height: number): number {
-    return this.scale.height / height;
+    return this.height / height;
   }
 
   widthRatio(width: number): number {
-    return this.scale.width / width;
+    return this.width / width;
   }
 }

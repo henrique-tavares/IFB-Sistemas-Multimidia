@@ -106,6 +106,11 @@ export default class Tulio {
 
     this.sprite.body.velocity.limit(120);
 
+    if (this.direction.shift) {
+      this.sprite.setVelocity(this.sprite.body.velocity.x * 2, this.sprite.body.velocity.y * 2);
+      this.sprite.body.velocity.limit(120 * 2);
+    }
+
     if (this.sprite.body.velocity.x == 0 && this.sprite.body.velocity.y == 0) {
       this.sprite.play('idle');
     }

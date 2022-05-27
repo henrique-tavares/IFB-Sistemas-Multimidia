@@ -1,4 +1,5 @@
 import 'phaser';
+import { generateNextRoomData } from '../../utils/graveyard';
 import BaseRoom from './baseRoom';
 
 export default class Room_01 extends BaseRoom {
@@ -13,35 +14,17 @@ export default class Room_01 extends BaseRoom {
         right: 'graveyerd:room_02_03',
         down: 'graveyard:room_11',
       },
-      {
+      generateNextRoomData({
         left: {
-          x: {
-            relative: true,
-            value: 100,
-          },
-          y: {
-            relative: false,
-          },
+          mode: 'single',
         },
         right: {
-          x: {
-            relative: true,
-            value: 0,
-          },
-          y: {
-            relative: false,
-          },
+          mode: 'single',
         },
         down: {
-          x: {
-            relative: false,
-          },
-          y: {
-            relative: true,
-            value: 0,
-          },
+          mode: 'single',
         },
-      }
+      })
     );
   }
 
