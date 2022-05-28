@@ -8,6 +8,7 @@ export default class Room_00 extends BaseRoom {
       {
         hasTop: true,
         hasLeft: true,
+        hasRight: true,
       },
       {
         down: 'dungeon:room_01',

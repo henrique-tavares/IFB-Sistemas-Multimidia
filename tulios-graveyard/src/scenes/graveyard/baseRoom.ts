@@ -21,7 +21,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected bgBorder: BackgroundBorder;
   protected nextRoom: NextRoom;
   protected nextRoomData: NextRoomData;
-  protected fadeDuration = 500;
+  protected fadeDuration: integer = 500;
 
   constructor(key: string, borderConfig: BackgroundBorderConfig, nextRoom: NextRoom, nextRoomData: NextRoomData) {
     super(key);
@@ -58,6 +58,10 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.player = new Tulio(this);
     this.player.sprite.body.setCollideWorldBounds(true, null, null, true);
     this.player.sprite.setScale(2);
+
+    // Testing basic inventory
+    // this.player.insertItemToInventory(new Weapon('weapon:shovel', WeaponType.shovel, 2));
+    // console.log(this.player.getInventory());
 
     this.events.emit('reposition-player');
 

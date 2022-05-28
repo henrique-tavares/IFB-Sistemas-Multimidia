@@ -19,11 +19,15 @@ export default class AudioHandler {
     return this.soundEnabled;
   }
 
-  turnOffMusic() {
+  turnOffMusic(scene: Phaser.Scene) {
+    scene.sound.removeByKey('bg_graveyard_music');
+    scene.sound.removeByKey('bg_dungeon_music');
+    scene.sound.removeByKey('bg_start_music');
     this.musicEnabled = false;
   }
 
-  turnOnMusic() {
+  turnOnMusic(scene: Phaser.Scene) {
+    this.handleBackgroundMusic(scene);
     this.musicEnabled = true;
   }
 
