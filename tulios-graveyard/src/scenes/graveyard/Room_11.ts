@@ -2,7 +2,7 @@ import 'phaser';
 import { generateNextRoomData } from '../../utils/graveyard';
 import BaseRoom from './baseRoom';
 
-export default class Room_00 extends BaseRoom {
+export default class Room_11 extends BaseRoom {
   constructor() {
     super(
       'graveyard:room_11',

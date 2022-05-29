@@ -2,27 +2,31 @@ import 'phaser';
 import { generateNextRoomData } from '../../utils/graveyard';
 import BaseRoom from './baseRoom';
 
-export default class Room_10 extends BaseRoom {
+export default class Room_23_33 extends BaseRoom {
   constructor() {
     super(
-      'graveyard:room_10',
+      'graveyard:room_23_33',
+      {},
       {
-        hasLeft: true,
-      },
-      {
-        up: 'graveyard:room_00',
-        right: 'graveyard:room_11',
-        down: 'graveyard:room_20_30',
+        up: 'graveyard:room_13',
+        right: ['graveyard:room_24', 'graveyard:room_34'],
+        down: 'graveyard:room_43',
+        left: ['graveyard:room_22', 'graveyard:room_31_32'],
       },
       generateNextRoomData({
         up: {
           mode: 'single',
         },
         right: {
-          mode: 'single',
+          mode: 'double',
+          offsets: [0, -100],
         },
         down: {
           mode: 'single',
+        },
+        left: {
+          mode: 'double',
+          offsets: [0, -100],
         },
       })
     );

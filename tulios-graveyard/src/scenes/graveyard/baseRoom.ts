@@ -38,6 +38,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
   }
 
   init(coordinate: PlayerCoordinate) {
+    console.log(this.constructor.name);
     this.fadeIn(this.fadeDuration);
     if (isEmpty(coordinate)) {
       this.physics.world.once('worldbounds', this.onWorldBounds, this);
@@ -97,8 +98,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
       let data = this.nextRoomData[orientation];
 
       const half =
-        (['up', 'down'].includes(orientation) && this.player.sprite.x > this.screen.relativeX(50)) ||
-        (['left', 'right'].includes(orientation) && this.player.sprite.y > this.screen.relativeY(50))
+        (['up', 'down'].includes(orientation) && this.player.sprite.x < this.screen.relativeX(50)) ||
+        (['left', 'right'].includes(orientation) && this.player.sprite.y < this.screen.relativeY(50))
           ? 'first'
           : 'second';
 
@@ -138,6 +139,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
   }
 
   wake(sys: Phaser.Scenes.Systems, data: PlayerCoordinate) {
+    console.log(this.constructor.name);
     this.fadeIn(this.fadeDuration);
     this.repositionPlayer(data);
     this.physics.world.once('worldbounds', this.onWorldBounds, this);
@@ -147,11 +149,14 @@ export default abstract class BaseRoom extends Phaser.Scene {
     const minX = this.player.sprite.width + 10;
     const maxX = this.screen.width - this.player.sprite.width - 10;
 
-    const minY = this.player.sprite.height + 10;
-    const maxY = this.screen.height - this.player.sprite.height - 10;
+    const minY = this.player.sprite.height + 5;
+    const maxY = this.screen.height - this.player.sprite.height - 5;
 
-    const newX = x.relative ? this.screen.relativeX(x.value) : x.value;
-    const newY = y.relative ? this.screen.relativeY(y.value) : y.value;
+    const newX = x.relative ? this.screen.relativeX(x.value) : x.value + this.screen.relativeX(x.offset ?? 0);
+    const newY = y.relative ? this.screen.relativeY(y.value) : y.value + this.screen.relativeY(y.offset ?? 0);
+
+    console.log({ x, y });
+    // console.log({ x: clamp(newX, minX, maxX), y: clamp(newY, minY, maxY) });
 
     this.player.sprite.setX(clamp(newX, minX, maxX));
     this.player.sprite.setY(clamp(newY, minY, maxY));

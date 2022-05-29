@@ -92,7 +92,8 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('graveyard:room_45:bg', 'assets/graveyard/Room - [4,5].png');
     this.load.image('graveyard:room_46:bg', 'assets/graveyard/Room - [4,6].png');
     this.load.image('graveyard:room_47:bg', 'assets/graveyard/Room - [4,7]_ Mausoleum.png');
-    this.load.image('graveyard:room_54:bg', 'assets/graveyard/Room - [5,4].png');
+    this.load.image('graveyard:room_55:bg', 'assets/graveyard/Room - [5,5].png');
+    this.load.image('graveyard:room_56_57:bg', 'assets/graveyard/Room - ([5,6], [5,7]).png');
 
     this.load.image('dungeon:room_00:bg', 'assets/dungeon/Room 0.png');
     this.load.image('dungeon:room_01:bg', 'assets/dungeon/Room 1.png');

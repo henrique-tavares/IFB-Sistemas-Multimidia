@@ -61,10 +61,12 @@ export default class Tulio {
 
   freeze() {
     this.frozen = true;
+    this.sprite.body.velocity.limit(0);
   }
 
   unfreeze() {
     this.frozen = false;
+    this.sprite.body.velocity.limit(120);
   }
 
   handleSpriteAnimation() {

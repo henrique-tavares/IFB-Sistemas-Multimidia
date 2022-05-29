@@ -9,7 +9,7 @@ export function generateNextRoomData(config: { [Key in Orientation]?: NextRoomDe
       },
       y: {
         relative: true,
-        value: 0,
+        value: 100,
       },
     }),
     right: (offset?: number): PlayerCoordinate => ({
@@ -29,7 +29,7 @@ export function generateNextRoomData(config: { [Key in Orientation]?: NextRoomDe
       },
       y: {
         relative: true,
-        value: 100,
+        value: 0,
       },
     }),
     left: (offset?: number): PlayerCoordinate => ({
