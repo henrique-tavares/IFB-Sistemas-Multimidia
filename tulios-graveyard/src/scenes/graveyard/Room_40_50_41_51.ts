@@ -21,6 +21,7 @@ export default class Room_40_50_41_51 extends BaseRoom {
         },
         right: {
           mode: 'double',
+          offsets: [0, 0],
         },
       })
     );
