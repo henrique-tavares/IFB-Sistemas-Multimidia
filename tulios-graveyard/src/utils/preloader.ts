@@ -85,6 +85,7 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('graveyard:room_31_32:bg', 'assets/graveyard/Room - ([3,1], [3,2]).png');
     this.load.image('graveyard:room_34:bg', 'assets/graveyard/Room - [3,4].png');
     this.load.image('graveyard:room_35_36:bg', 'assets/graveyard/Room - ([3,5], [3,6]).png');
+    this.load.image('graveyard:room_37:bg', 'assets/graveyard/Room - [3,7].png');
     this.load.image('graveyard:room_40_50_41_51:bg', 'assets/graveyard/Room - ([4,0], [5,0], [4,1], [5,1])_ Key.png');
     this.load.image('graveyard:room_42:bg', 'assets/graveyard/Room - [4,2].png');
     this.load.image('graveyard:room_43:bg', 'assets/graveyard/Room - [4,3].png');
@@ -92,6 +93,7 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('graveyard:room_45:bg', 'assets/graveyard/Room - [4,5].png');
     this.load.image('graveyard:room_46:bg', 'assets/graveyard/Room - [4,6].png');
     this.load.image('graveyard:room_47:bg', 'assets/graveyard/Room - [4,7]_ Mausoleum.png');
+    this.load.image('graveyard:room_52_53:bg', 'assets/graveyard/Room - ([5,2], [5,3]).png');
     this.load.image('graveyard:room_55:bg', 'assets/graveyard/Room - [5,5].png');
     this.load.image('graveyard:room_56_57:bg', 'assets/graveyard/Room - ([5,6], [5,7]).png');
 
