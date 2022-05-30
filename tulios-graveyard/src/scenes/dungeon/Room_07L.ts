@@ -15,9 +15,9 @@ export default class Room_07L extends BaseRoom {
         down: 'dungeon:room_09L',
       },
       generateNextRoomData({
-        up: 50,
+        up: 0,
         down: 0,
-        left: -100,
+        left: 0,
       })
     );
   }

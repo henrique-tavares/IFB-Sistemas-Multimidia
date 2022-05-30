@@ -11,8 +11,8 @@ export default class Room_13R extends BaseRoom {
         hasBottom: true,
       },
       {
-        left: 'dungeon:room_03L',
-        right: 'dungeon:room_03R',
+        left: 'dungeon:room_15',
+        right: 'dungeon:room_11R',
       },
       generateNextRoomData({
         left: 50,

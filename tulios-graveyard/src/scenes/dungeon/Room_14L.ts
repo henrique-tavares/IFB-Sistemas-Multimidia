@@ -12,10 +12,10 @@ export default class Room_14L extends BaseRoom {
       },
       {
         left: 'dungeon:room_13L',
-        right: 'dungeon:room_14',
+        right: 'dungeon:room_15',
       },
       generateNextRoomData({
-        left: 50,
+        left: 0,
         right: 50
       })
     );

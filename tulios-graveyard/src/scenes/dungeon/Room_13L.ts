@@ -16,7 +16,7 @@ export default class Room_13L extends BaseRoom {
       },
       generateNextRoomData({
         up: 0,
-        right: 50
+        right: 0
       })
     );
   }

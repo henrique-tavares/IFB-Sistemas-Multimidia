@@ -16,7 +16,7 @@ export default class Room_04R extends BaseRoom {
       },
       generateNextRoomData({
         down: 0,
-        left: -100,
+        left: 0,
       })
     );
   }
