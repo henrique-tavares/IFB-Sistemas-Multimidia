@@ -22,6 +22,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected nextRoom: NextRoom;
   protected nextRoomData: NextRoomData;
   protected fadeDuration = 500;
+  private isThereNextRoom: boolean; 
 
   constructor(key: string, borderConfig: BackgroundBorderConfig, nextRoom: NextRoom, nextRoomData: NextRoomData) {
     super(key);
@@ -92,48 +93,56 @@ export default abstract class BaseRoom extends Phaser.Scene {
   onWorldBounds(body: Phaser.Physics.Arcade.Body) {
     ['up', 'right', 'left', 'down'].forEach((orientation: Orientation) => {
       if (!(body.blocked[orientation] && this.nextRoom[orientation] && this.nextRoomData[orientation])) {
+        this.isThereNextRoom = false;
         return;
-      }
+      } 
+      this.isThereNextRoom = true;
+      this.handleTransition(orientation);
+    });
+    if(!this.isThereNextRoom){
+      this.physics.world.once('worldbounds', this.onWorldBounds, this);
+    }
+  }
 
-      let data = this.nextRoomData[orientation];
+  handleTransition(orientation: Orientation){
+    let data = this.nextRoomData[orientation];
 
-      const half =
-        (['up', 'down'].includes(orientation) && this.player.sprite.x < this.screen.relativeX(50)) ||
-        (['left', 'right'].includes(orientation) && this.player.sprite.y < this.screen.relativeY(50))
-          ? 'first'
-          : 'second';
+    const half =
+      (['up', 'down'].includes(orientation) && this.player.sprite.x < this.screen.relativeX(50)) ||
+      (['left', 'right'].includes(orientation) && this.player.sprite.y < this.screen.relativeY(50))
+        ? 'first'
+        : 'second';
 
-      if (Array.isArray(data)) {
-        data = half == 'first' ? data[0] : data[1];
-      }
+    if (Array.isArray(data)) {
+      data = half == 'first' ? data[0] : data[1];
+    }
 
-      const parsedData: PlayerCoordinate = {
-        x: {
-          relative: data.x.relative,
-          value: data.x.value ?? this.player.sprite.x,
-          offset: data.x.offset,
-        },
-        y: {
-          relative: data.y.relative,
-          value: data.y.value ?? this.player.sprite.y,
-          offset: data.y.offset,
-        },
-      };
+    const parsedData: PlayerCoordinate = {
+      x: {
+        relative: data.x.relative,
+        value: data.x.value ?? this.player.sprite.x,
+        offset: data.x.offset,
+      },
+      y: {
+        relative: data.y.relative,
+        value: data.y.value ?? this.player.sprite.y,
+        offset: data.y.offset,
+      },
+    };
 
-      this.fadeOut(this.fadeDuration);
-      this.player.freeze();
-      this.time.delayedCall(this.fadeDuration, () => {
-        this.player.unfreeze();
-        this.scene.transition({
-          target: Array.isArray(this.nextRoom[orientation])
-            ? half == 'first'
-              ? this.nextRoom[orientation][0]
-              : this.nextRoom[orientation][1]
-            : (this.nextRoom[orientation] as string),
-          data: parsedData,
-          sleep: true,
-          duration: 0,
-        });
+    this.fadeOut(this.fadeDuration);
+    this.player.freeze();
+    this.time.delayedCall(this.fadeDuration, () => {
+      this.player.unfreeze();
+      this.scene.transition({
+        target: Array.isArray(this.nextRoom[orientation])
+          ? half == 'first'
+            ? this.nextRoom[orientation][0]
+            : this.nextRoom[orientation][1]
+          : (this.nextRoom[orientation] as string),
+        data: parsedData,
+        sleep: true,
+        duration: 0,
       });
     });
   }

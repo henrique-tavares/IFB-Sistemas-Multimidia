@@ -8,13 +8,13 @@ export default class NextRoomArrow {
   screen: Screen;
   imageDimensions: { width: number; height: number };
 
-  constructor(scene: Phaser.Scene, screen: Screen, orientation: Orientation, quantity: 1 | 2) {
+  constructor(scene: Phaser.Scene, screen: Screen, orientation: Orientation, quantity: 1 | 2, position?: (-1)| 0 | 1) {
     this.scene = scene;
     this.screen = screen;
     this.orientation = orientation;
     this.imageDimensions = this.getImageDimensions();
-
-    const spawnPositions = this.getSpawnPosition(quantity);
+    
+    const spawnPositions = this.getSpawnPosition(quantity, position);
 
     this.imageGroup = this.scene.add.group(
       spawnPositions.map(pos => this.scene.add.image(pos.x, pos.y, `gui:arrow-${orientation}`).setVisible(false))
@@ -31,8 +31,8 @@ export default class NextRoomArrow {
     return { width, height };
   }
 
-  private getSpawnPosition(quantity: 1 | 2) {
-    const spawnPosition = (orientation: Orientation, offset: number = 0) => {
+  private getSpawnPosition(quantity: 1 | 2, position: (-1) | 0 | 1 = 0) {
+    const spawnPosition = (orientation: Orientation, offset: number = 0 + 25 * position) => {
       switch (orientation) {
         case 'up':
           return {

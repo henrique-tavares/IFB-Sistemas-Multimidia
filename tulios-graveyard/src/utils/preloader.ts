@@ -99,26 +99,36 @@ export default class Preloader extends Phaser.Scene {
 
     this.load.image('dungeon:room_00:bg', 'assets/dungeon/Room 0.png');
     this.load.image('dungeon:room_01:bg', 'assets/dungeon/Room 1.png');
-    this.load.image('dungeon:room_02:bg', 'assets/dungeon/Room 1.1.png');
-    this.load.image('dungeon:room_03:bg', 'assets/dungeon/Room 2L.png');
-    this.load.image('dungeon:room_04:bg', 'assets/dungeon/Room 3L.png');
-    this.load.image('dungeon:room_05:bg', 'assets/dungeon/Room 4L.png');
-    this.load.image('dungeon:room_06:bg', 'assets/dungeon/Room 5L.png');
-    this.load.image('dungeon:room_07:bg', 'assets/dungeon/Room 5L.1.png');
-    this.load.image('dungeon:room_08:bg', 'assets/dungeon/Room 6L.png');
-    this.load.image('dungeon:room_09:bg', 'assets/dungeon/Room 7L.png');
-    this.load.image('dungeon:room_10:bg', 'assets/dungeon/Room 8L.png');
-    this.load.image('dungeon:room_11:bg', 'assets/dungeon/Room 2R.png');
-    this.load.image('dungeon:room_12:bg', 'assets/dungeon/Room 3R.png');
-    this.load.image('dungeon:room_13:bg', 'assets/dungeon/Room 4R.png');
-    this.load.image('dungeon:room_14:bg', 'assets/dungeon/Room 5R.png');
-    this.load.image('dungeon:room_15:bg', 'assets/dungeon/Room 6R.png');
-    this.load.image('dungeon:room_16:bg', 'assets/dungeon/Room 7R.png');
-    this.load.image('dungeon:room_17:bg', 'assets/dungeon/Room 8R.png');
-    this.load.image('dungeon:room_18:bg', 'assets/dungeon/Room 9.png');
-    this.load.image('dungeon:room_19:bg', 'assets/dungeon/Room 10.png');
-    this.load.image('dungeon:room_20:bg', 'assets/dungeon/Room 11.png');
-    this.load.image('dungeon:room_21:bg', 'assets/dungeon/Room 12.png');
+    this.load.image('dungeon:room_02:bg', 'assets/dungeon/Room 2.png');
+    this.load.image('dungeon:room_03R:bg', 'assets/dungeon/Room 3R.png');
+    this.load.image('dungeon:room_04R:bg', 'assets/dungeon/Room 4R.png');
+    this.load.image('dungeon:room_05R:bg', 'assets/dungeon/Room 5_9_10R-9L.png');
+    this.load.image('dungeon:room_06R:bg', 'assets/dungeon/Room 6R.png');
+    this.load.image('dungeon:room_07R:bg', 'assets/dungeon/Room 7R.png');
+    this.load.image('dungeon:room_08R:bg', 'assets/dungeon/Room 8R-7L.png');
+    this.load.image('dungeon:room_09R:bg', 'assets/dungeon/Room 5_9_10R-9L.png');
+    this.load.image('dungeon:room_10R:bg', 'assets/dungeon/Room 5_9_10R-9L.png');
+    this.load.image('dungeon:room_11R:bg', 'assets/dungeon/Room 11R.png');
+    this.load.image('dungeon:room_12R:bg', 'assets/dungeon/Room 12R.png');
+    this.load.image('dungeon:room_13R:bg', 'assets/dungeon/Room 13R-3_14L.png');
+    this.load.image('dungeon:room_03L:bg', 'assets/dungeon/Room 13R-3_14L.png');
+    this.load.image('dungeon:room_04L:bg', 'assets/dungeon/Room 4L.png');
+    this.load.image('dungeon:room_05L:bg', 'assets/dungeon/Room 5L.png');
+    this.load.image('dungeon:room_06L:bg', 'assets/dungeon/Room 6L.png');
+    this.load.image('dungeon:room_07L:bg', 'assets/dungeon/Room 8R-7L.png');
+    this.load.image('dungeon:room_08L:bg', 'assets/dungeon/Room 8L.png');
+    this.load.image('dungeon:room_09L:bg', 'assets/dungeon/Room 5_9_10R-9L.png');
+    this.load.image('dungeon:room_10L:bg', 'assets/dungeon/Room 10L.png');
+    this.load.image('dungeon:room_11L:bg', 'assets/dungeon/Room 11L.png');
+    this.load.image('dungeon:room_12L:bg', 'assets/dungeon/Room 12L.png');
+    this.load.image('dungeon:room_13L:bg', 'assets/dungeon/Room 13L.png');
+    this.load.image('dungeon:room_14L:bg', 'assets/dungeon/Room 13R-3_14L.png');
+    this.load.image('dungeon:room_15:bg', 'assets/dungeon/Room 15.png');
+    this.load.image('dungeon:room_16:bg', 'assets/dungeon/Room 16.png');
+    this.load.image('dungeon:room_17:bg', 'assets/dungeon/Room 17.png');
+    this.load.image('dungeon:room_18:bg', 'assets/dungeon/Room 18.png');
+  
+    
 
     this.load.spritesheet('characters:tulio', 'assets/characters/Tulio.png', {
       frameWidth: 16,

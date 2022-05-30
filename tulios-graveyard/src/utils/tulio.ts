@@ -1,4 +1,5 @@
 import 'phaser';
+import { PlayerCoordinate } from '../types';
 import Direction from './direction';
 
 export default class Tulio {
@@ -8,8 +9,8 @@ export default class Tulio {
   private direction: Direction;
   private frozen = false;
 
-  constructor(scene: Phaser.Scene) {
-    this.sprite = scene.physics.add.sprite(100, 100, this.key);
+  constructor(scene: Phaser.Scene, x: number = 100, y: number = 100) {
+    this.sprite = scene.physics.add.sprite(x, y, this.key);
 
     this.animations = [
       {

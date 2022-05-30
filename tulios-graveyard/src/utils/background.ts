@@ -11,18 +11,21 @@ export default class Background {
     scene.cameras.main.setBounds(0, 0, this.image.width, this.image.height, true);
     this.border = borderConfig ?? {};
 
-    if (borderConfig) {
-      this.bounds = this.setBounds();
-    }
+    this.bounds = this.setBounds();
   }
 
   private setBounds(): Phaser.Geom.Rectangle {
-    const x = (this.image.width * (this.border.left ?? 0)) / 100;
-    const y = (this.image.height * (this.border.top ?? 0)) / 100;
-    const width = this.image.width - x;
-    const height = this.image.height - y;
+    console.log("og: ", this.image.width, this.image.height);
+    const xl = (this.image.width * (this.border?.left)) / 100;
+    const yl = (this.image.height * (this.border?.top)) / 100;
+    const xr = (this.image.width * (this.border?.right)) / 100;
+    const yr = (this.image.height * (this.border?.bottom)) / 100;
 
-    return new Phaser.Geom.Rectangle(x, y, width, height);
+    const width = this.image.width - xl - xr;
+    const height = this.image.height - yl - yr;
+    console.log("bounded: ", width, height);
+
+    return new Phaser.Geom.Rectangle(xl, yl, width, height);
   }
 
   applyBoundsOnSprite(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
