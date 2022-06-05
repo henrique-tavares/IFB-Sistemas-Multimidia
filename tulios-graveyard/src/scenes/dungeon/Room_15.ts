@@ -26,7 +26,7 @@ export default class Room_15 extends BaseRoom {
     super.create();
 
     addCustomBounds(
-      this.player.sprite, 
+      this.player.getSprite, 
       this,
       this.screen,
       generateCustomBounds(

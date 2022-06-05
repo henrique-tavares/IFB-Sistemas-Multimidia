@@ -4,6 +4,7 @@ import Graveyard from './scenes/graveyard';
 import Dungeon from './scenes/dungeon';
 import Preloader from './utils/preloader';
 import UiScene from './scenes/ui';
+import GUIScene from './scenes/gui';
 
 const config = {
   type: Phaser.AUTO,
@@ -24,7 +25,7 @@ const config = {
     height: 600,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [Preloader, Start, UiScene, ...Graveyard, ...Dungeon],
+  scene: [Preloader, Start, UiScene, GUIScene, ...Graveyard, ...Dungeon],
 };
 
 const game = new Phaser.Game(config);

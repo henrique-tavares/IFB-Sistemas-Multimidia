@@ -65,13 +65,13 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.screen = new Screen(this.bg.image.width, this.bg.image.height);
 
     this.player = new Tulio(this, 400, 175);
-    this.player.sprite.body.setCollideWorldBounds(true, null, null, true);
-    this.player.sprite.setScale(2);
+    this.player.getSprite.body.setCollideWorldBounds(true, null, null, true);
+    this.player.getSprite.setScale(2);
 
     this.events.emit('reposition-player');
 
-    this.cameras.main.startFollow(this.player.sprite);
-    this.bg.applyBoundsOnSprite(this.player.sprite);
+    this.cameras.main.startFollow(this.player.getSprite);
+    this.bg.applyBoundsOnSprite(this.player.getSprite);
 
     const audioHandler = this.cache.custom['handlers'].get('audioHandler') as AudioHandler;
     audioHandler.handleBackgroundMusic(this);
@@ -105,8 +105,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
     let data = this.nextRoomData[orientation];
 
     const half =
-      (['up', 'down'].includes(orientation) && this.player.sprite.x < this.screen.relativeX(50)) ||
-      (['left', 'right'].includes(orientation) && this.player.sprite.y < this.screen.relativeY(50))
+      (['up', 'down'].includes(orientation) && this.player.getSprite.x < this.screen.relativeX(50)) ||
+      (['left', 'right'].includes(orientation) && this.player.getSprite.y < this.screen.relativeY(50))
         ? 'first'
         : 'second';
 
@@ -117,12 +117,12 @@ export default abstract class BaseRoom extends Phaser.Scene {
     const parsedData: PlayerCoordinate = {
       x: {
         relative: data.x.relative,
-        value: data.x.value ?? this.player.sprite.x,
+        value: data.x.value ?? this.player.getSprite.x,
         offset: data.x.offset,
       },
       y: {
         relative: data.y.relative,
-        value: data.y.value ?? this.player.sprite.y,
+        value: data.y.value ?? this.player.getSprite.y,
         offset: data.y.offset,
       },
     };
@@ -151,11 +151,11 @@ export default abstract class BaseRoom extends Phaser.Scene {
   }
 
   repositionPlayer({ x, y }: PlayerCoordinate) {
-    const minX = this.player.sprite.width + 10;
-    const maxX = this.screen.width - this.player.sprite.width - 10;
+    const minX = this.player.getSprite.width + 10;
+    const maxX = this.screen.width - this.player.getSprite.width - 10;
 
-    const minY = this.player.sprite.height + 5;
-    const maxY = this.screen.height - this.player.sprite.height - 5;
+    const minY = this.player.getSprite.height + 5;
+    const maxY = this.screen.height - this.player.getSprite.height - 5;
 
     const newX = x.relative ? this.screen.relativeX(x.value) : x.value + this.screen.relativeX(x.offset ?? 0);
     const newY = y.relative ? this.screen.relativeY(y.value) : y.value + this.screen.relativeY(y.offset ?? 0);
@@ -163,8 +163,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
     // console.log({ x, y });
     // console.log({ x: clamp(newX, minX, maxX), y: clamp(newY, minY, maxY) });
 
-    this.player.sprite.setX(clamp(newX, minX, maxX));
-    this.player.sprite.setY(clamp(newY, minY, maxY));
+    this.player.getSprite.setX(clamp(newX, minX, maxX));
+    this.player.getSprite.setY(clamp(newY, minY, maxY));
   }
 
   fadeIn(ms: number) {

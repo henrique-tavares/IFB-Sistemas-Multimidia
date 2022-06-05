@@ -62,6 +62,23 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('gui:arrow-right', 'assets/gui/arrow_right.png');
     this.load.image('gui:arrow-down', 'assets/gui/arrow_down.png');
     this.load.image('gui:arrow-left', 'assets/gui/arrow_left.png');
+    this.load.image('gui:bullet', 'assets/gui/bullet.png');
+    this.load.image('gui:button_default_down', 'assets/gui/button_default_down.png');
+    this.load.image('gui:button_default_up', 'assets/gui/button_default_up.png');
+    this.load.image('gui:button_pause', 'assets/gui/button_pause.png');
+    this.load.image('gui:infinity', 'assets/gui/infinity.png');
+    this.load.image('gui:inventory_bg', 'assets/gui/inventory_bg.png');
+    this.load.image('gui:music_icon_on', 'assets/gui/music_icon_on.png');
+    this.load.image('gui:music_icon_off', 'assets/gui/music_icon_off.png');
+    
+    this.load.spritesheet('gui:hearts', 'assets/gui/hearts.png', {
+      frameWidth: 17,
+      frameHeight: 17,
+    });
+
+    this.load.image('weapon:shovel', 'assets/items/shovel.png');
+    this.load.image('weapon:pistol', 'assets/items/pistol.png');
+    this.load.image('weapon:shotgun', 'assets/items/shotgun.png');
 
     this.load.image('graveyard:room_00:bg', 'assets/graveyard/Room - [0,0]_ House.png');
     this.load.image('graveyard:room_01:bg', 'assets/graveyard/Room - [0,1].png');
@@ -128,8 +145,6 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('dungeon:room_17:bg', 'assets/dungeon/Room 17.png');
     this.load.image('dungeon:room_18:bg', 'assets/dungeon/Room 18.png');
   
-    
-
     this.load.spritesheet('characters:tulio', 'assets/characters/Tulio.png', {
       frameWidth: 16,
       frameHeight: 28,

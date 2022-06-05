@@ -1,3 +1,5 @@
+import { Scene } from "phaser";
+
 export default class AudioHandler {
   private soundEnabled: boolean;
   private musicEnabled: boolean;
@@ -19,11 +21,15 @@ export default class AudioHandler {
     return this.soundEnabled;
   }
 
-  turnOffMusic() {
+  turnOffMusic(scene: Scene) {
+    scene.sound.removeByKey('bg_graveyard_music');
+    scene.sound.removeByKey('bg_dungeon_music');
+    scene.sound.removeByKey('bg_start_music');
     this.musicEnabled = false;
   }
 
-  turnOnMusic() {
+  turnOnMusic(scene: Scene) {
+    this.handleBackgroundMusic(scene);
     this.musicEnabled = true;
   }
 
@@ -31,7 +37,7 @@ export default class AudioHandler {
     return this.musicEnabled;
   }
 
-  handleBackgroundMusic(scene: Phaser.Scene) {
+  handleBackgroundMusic(scene: Scene) {
     const sceneKey = scene.sys.config as string;
     scene.sound.pauseOnBlur = false;
 

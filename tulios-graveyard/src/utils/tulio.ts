@@ -1,16 +1,17 @@
-import 'phaser';
-import { PlayerCoordinate } from '../types';
+import { Scene } from 'phaser';
 import Direction from './direction';
+import Entity from './entity';
+import Weapon, { WeaponType } from './weapon';
 
-export default class Tulio {
-  readonly sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-  readonly animations: Phaser.Types.Animations.Animation[];
-  readonly key = 'characters:tulio';
+export default class Tulio extends Entity{
   private direction: Direction;
   private frozen = false;
 
-  constructor(scene: Phaser.Scene, x: number = 100, y: number = 100) {
-    this.sprite = scene.physics.add.sprite(x, y, this.key);
+  constructor(scene: Scene, x: number = 100, y: number = 100) {
+    super('characters:tulio', scene.physics.add.sprite(x, y, 'characters:tulio'), 10, 1);
+
+    // Weapon for gui testing -> TODO Inventory
+    this.weapon = new Weapon('weapon:shovel', WeaponType.shovel, 2);
 
     this.animations = [
       {
@@ -50,10 +51,6 @@ export default class Tulio {
     });
 
     this.direction = scene.scene.get('ui-scene').data.get('direction') as Direction;
-  }
-
-  public get currentAnimation(): string {
-    return this.sprite.anims.currentAnim?.key ?? '';
   }
 
   setPosition(x: number, y: number) {
