@@ -29,37 +29,42 @@ import Room_16 from './Room_16';
 import Room_17 from './Room_17';
 import Room_18 from './Room_18';
 
-
-
-export default [
+// For tests
+export default[
   Room_00, 
   Room_01,
-  Room_02,
-  Room_03R,
-  Room_04R,
-  Room_05R,
-  Room_06R,
-  Room_07R,
-  Room_08R,
-  Room_09R,
-  Room_10R,
-  Room_11R,
-  Room_12R,
-  Room_13R,
-  Room_03L,
-  Room_04L,
-  Room_05L,
-  Room_06L,
-  Room_07L,
-  Room_08L,
-  Room_09L,
-  Room_10L,
-  Room_11L,
-  Room_12L,
-  Room_13L,
-  Room_14L,
-  Room_15,
-  Room_16,
-  Room_17,
-  Room_18,
 ];
+
+// For finished game map
+// export default [
+//   Room_00, 
+//   Room_01,
+//   Room_02,
+//   Room_03R,
+//   Room_04R,
+//   Room_05R,
+//   Room_06R,
+//   Room_07R,
+//   Room_08R,
+//   Room_09R,
+//   Room_10R,
+//   Room_11R,
+//   Room_12R,
+//   Room_13R,
+//   Room_03L,
+//   Room_04L,
+//   Room_05L,
+//   Room_06L,
+//   Room_07L,
+//   Room_08L,
+//   Room_09L,
+//   Room_10L,
+//   Room_11L,
+//   Room_12L,
+//   Room_13L,
+//   Room_14L,
+//   Room_15,
+//   Room_16,
+//   Room_17,
+//   Room_18,
+// ];

@@ -1,5 +1,5 @@
 import 'phaser';
-import { generateNextRoomData, handleNextRoomArrows } from '../../utils/dungeon';
+import { addCustomBounds, generateCustomBounds, generateNextRoomData, handleNextRoomArrows } from '../../utils/dungeon';
 import BaseRoom from './baseRoom';
 
 export default class Room_05L extends BaseRoom {
@@ -24,13 +24,26 @@ export default class Room_05L extends BaseRoom {
   create() {
     super.create();
 
-    handleNextRoomArrows(this.key, this, this.screen, this.nextRoom, 1);
-    
-    this.events.on('wake', this.wake, this);
+    addCustomBounds(
+      this.player.sprite, 
+      this,
+      this.screen,
+      generateCustomBounds(
+        this.screen, 
+        {
+          top: this.topPadding,
+          bottom: this.bottomPadding, 
+          horizontal: this.horizontalPadding
+        },
+        {
+          left: 0,
+        }
+      )
+    );
 
-    setTimeout(() => {
-      this.physics.world.emit(`${this.key}:concluded`);
-    }, 1000);
+    handleNextRoomArrows(this.key, this, this.screen, this.nextRoom, {
+      left: 1
+    });
   }
 
   update() {

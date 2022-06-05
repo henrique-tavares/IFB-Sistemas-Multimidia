@@ -1,5 +1,4 @@
-import { BackgroundBorder, BackgroundBorderConfig } from '../types';
-import Screen from './screen';
+import { BackgroundBorder } from '../types';
 
 export default class Background {
   readonly image: Phaser.GameObjects.Image;
@@ -15,15 +14,13 @@ export default class Background {
   }
 
   private setBounds(): Phaser.Geom.Rectangle {
-    console.log("og: ", this.image.width, this.image.height);
-    const xl = (this.image.width * (this.border?.left)) / 100;
-    const yl = (this.image.height * (this.border?.top)) / 100;
-    const xr = (this.image.width * (this.border?.right)) / 100;
-    const yr = (this.image.height * (this.border?.bottom)) / 100;
+    const xl = (800 * this.border?.left) / 100;
+    const yl = (600 * this.border?.top) / 100;
+    const xr = (800 * this.border?.right) / 100;
+    const yr = (600 * this.border?.bottom) / 100;
 
     const width = this.image.width - xl - xr;
     const height = this.image.height - yl - yr;
-    console.log("bounded: ", width, height);
 
     return new Phaser.Geom.Rectangle(xl, yl, width, height);
   }

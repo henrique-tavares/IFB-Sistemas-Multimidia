@@ -22,13 +22,7 @@ export default class Room_00 extends BaseRoom {
     super.create();
 
     // console.log("Room 00 - nextRoom", Object.entries(this.nextRoom));
-    handleNextRoomArrows(this.key, this, this.screen, this.nextRoom, 0);
-    
-    this.events.on('wake', this.wake, this);
-
-    setTimeout(() => {
-      this.physics.world.emit(`${this.key}:concluded`);
-    }, 1000);
+    handleNextRoomArrows(this.key, this, this.screen, this.nextRoom, {});
   }
 
   update() {

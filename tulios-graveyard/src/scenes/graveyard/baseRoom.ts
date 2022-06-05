@@ -31,7 +31,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.bgBorder = {
       top: borderConfig.hasTop ? 9 : null,
       right: borderConfig.hasRight ? 6.5 : null,
-      bottom: borderConfig.hasBottom ? 9 : null,
+      bottom: borderConfig.hasBottom ? 17 : null,
       left: borderConfig.hasLeft ? 6.5 : null,
     };
     this.nextRoom = nextRoom;

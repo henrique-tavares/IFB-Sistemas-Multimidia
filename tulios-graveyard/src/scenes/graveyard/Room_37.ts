@@ -11,7 +11,6 @@ export default class Room_37 extends BaseRoom {
       },
       {
         up: 'graveyard:room_27',
-        right: 'graveyard:room_37',
         down: 'graveyard:room_47',
         left: 'graveyard:room_35_36',
       },

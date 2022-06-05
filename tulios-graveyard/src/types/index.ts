@@ -38,3 +38,23 @@ export interface NextRoomDest {
   offset?: number;
   offsets?: [number, number];
 }
+
+export type CustomBoundConfig = {
+  x: number; 
+  y: number; 
+  padding: number;
+}
+
+export interface CustomBounds {
+  up?: CustomBoundConfig;
+  right?: CustomBoundConfig;
+  down?: CustomBoundConfig;
+  left?: CustomBoundConfig;
+}
+
+export interface NextRoomArrowPosition {
+  up?: (-1) | 1;
+  right?: (-1) | 1;
+  down?: (-1) | 1;
+  left?: (-1) | 1;
+}

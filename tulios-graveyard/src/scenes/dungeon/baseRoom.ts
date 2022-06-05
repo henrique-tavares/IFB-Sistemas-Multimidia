@@ -28,16 +28,19 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected nextRoomData: NextRoomData;
   protected fadeDuration = 500;
   private isThereNextRoom: boolean; 
+  readonly topPadding = 5;
+  readonly bottomPadding = 15;
+  readonly horizontalPadding = 7.5;
 
   constructor(key: string, borderConfig: BackgroundBorderConfig, nextRoom: NextRoom, nextRoomData: NextRoomData) {
     super(key);
 
     this.key = key;
     this.bgBorder = {
-      top: borderConfig.hasTop ? 5 : null,
-      right: borderConfig.hasRight ? 7.5 : null,
-      bottom: borderConfig.hasBottom ? 5 : null,
-      left: borderConfig.hasLeft ? 7.5 : null,
+      top: borderConfig.hasTop ? this.topPadding : null,
+      right: borderConfig.hasRight ? this.horizontalPadding : null,
+      bottom: borderConfig.hasBottom ? this.bottomPadding : null,
+      left: borderConfig.hasLeft ? this.horizontalPadding : null,
     };
     this.nextRoom = nextRoom;
     this.nextRoomData = nextRoomData;
@@ -72,6 +75,12 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     const audioHandler = this.cache.custom['handlers'].get('audioHandler') as AudioHandler;
     audioHandler.handleBackgroundMusic(this);
+
+    this.events.on('wake', this.wake, this);
+
+    setTimeout(() => {
+      this.physics.world.emit(`${this.key}:concluded`);
+    }, 1000);
   }
 
   update() {
