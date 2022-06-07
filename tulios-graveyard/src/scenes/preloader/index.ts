@@ -1,5 +1,5 @@
-import AudioHandler from './audioHandler';
-import Screen from './screen';
+import AudioHandler from '../../handlers/audioHandler';
+import Screen from '../utils/screen';
 
 export default class Preloader extends Phaser.Scene {
   progressBox: Phaser.GameObjects.Graphics;
@@ -70,7 +70,7 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('gui:inventory_bg', 'assets/gui/inventory_bg.png');
     this.load.image('gui:music_icon_on', 'assets/gui/music_icon_on.png');
     this.load.image('gui:music_icon_off', 'assets/gui/music_icon_off.png');
-    
+
     this.load.spritesheet('gui:hearts', 'assets/gui/hearts.png', {
       frameWidth: 17,
       frameHeight: 17,
@@ -144,7 +144,7 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('dungeon:room_16:bg', 'assets/dungeon/Room 16.png');
     this.load.image('dungeon:room_17:bg', 'assets/dungeon/Room 17.png');
     this.load.image('dungeon:room_18:bg', 'assets/dungeon/Room 18.png');
-  
+
     this.load.spritesheet('characters:tulio', 'assets/characters/Tulio.png', {
       frameWidth: 16,
       frameHeight: 28,

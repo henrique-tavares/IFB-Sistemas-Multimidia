@@ -1,9 +1,9 @@
 import { Scene } from 'phaser';
-import Direction from './direction';
+import Direction from '../scenes/gui/direction';
 import Entity from './entity';
-import Weapon, { WeaponType } from './weapon';
+import Weapon, { WeaponType } from '../items/weapon';
 
-export default class Tulio extends Entity{
+export default class Tulio extends Entity {
   private direction: Direction;
   private frozen = false;
 

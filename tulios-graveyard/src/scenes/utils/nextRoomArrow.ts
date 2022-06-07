@@ -1,4 +1,4 @@
-import { BackgroundBorder, BackgroundBorderConfig, Orientation } from '../types';
+import { BackgroundBorder, BackgroundBorderConfig, Orientation } from '../../types';
 import Screen from './screen';
 
 export default class NextRoomArrow {
@@ -8,12 +8,12 @@ export default class NextRoomArrow {
   screen: Screen;
   imageDimensions: { width: number; height: number };
 
-  constructor(scene: Phaser.Scene, screen: Screen, orientation: Orientation, quantity: 1 | 2, position?: (-1)| 0 | 1) {
+  constructor(scene: Phaser.Scene, screen: Screen, orientation: Orientation, quantity: 1 | 2, position?: -1 | 0 | 1) {
     this.scene = scene;
     this.screen = screen;
     this.orientation = orientation;
     this.imageDimensions = this.getImageDimensions();
-    
+
     const spawnPositions = this.getSpawnPosition(quantity, position);
 
     this.imageGroup = this.scene.add.group(
@@ -31,7 +31,7 @@ export default class NextRoomArrow {
     return { width, height };
   }
 
-  private getSpawnPosition(quantity: 1 | 2, position: (-1) | 0 | 1 = 0) {
+  private getSpawnPosition(quantity: 1 | 2, position: -1 | 0 | 1 = 0) {
     const spawnPosition = (orientation: Orientation, offset: number = 0 + 25 * position) => {
       switch (orientation) {
         case 'up':

@@ -1,12 +1,12 @@
 import 'phaser';
-import { generateNextRoomData, handleNextRoomArrows } from '../../utils/dungeon';
+import { generateNextRoomData, handleNextRoomArrows } from '../utils/dungeon';
 import BaseRoom from './baseRoom';
 
 export default class Room_08R extends BaseRoom {
   constructor() {
     super(
       'dungeon:room_08R',
-      { },
+      {},
       {
         up: 'dungeon:room_05R',
         left: 'dungeon:room_06R',
@@ -17,7 +17,7 @@ export default class Room_08R extends BaseRoom {
         up: 0,
         down: 0,
         left: -100,
-        right: -100
+        right: -100,
       })
     );
   }
@@ -27,7 +27,7 @@ export default class Room_08R extends BaseRoom {
 
     handleNextRoomArrows(this.key, this, this.screen, this.nextRoom, {
       left: -1,
-      right: -1
+      right: -1,
     });
   }
 

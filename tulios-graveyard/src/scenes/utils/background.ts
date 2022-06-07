@@ -1,4 +1,4 @@
-import { BackgroundBorder } from '../types';
+import { BackgroundBorder } from '../../types';
 
 export default class Background {
   readonly image: Phaser.GameObjects.Image;

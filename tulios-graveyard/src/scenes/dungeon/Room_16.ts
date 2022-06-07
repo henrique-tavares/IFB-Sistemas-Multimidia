@@ -1,5 +1,5 @@
 import 'phaser';
-import { generateNextRoomData, handleNextRoomArrows } from '../../utils/dungeon';
+import { generateNextRoomData, handleNextRoomArrows } from '../utils/dungeon';
 import BaseRoom from './baseRoom';
 
 export default class Room_16 extends BaseRoom {
@@ -17,7 +17,7 @@ export default class Room_16 extends BaseRoom {
       generateNextRoomData({
         up: 25,
         down: 0,
-        right: 0
+        right: 0,
       })
     );
   }

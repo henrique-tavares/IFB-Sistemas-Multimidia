@@ -1,5 +1,5 @@
 import 'phaser';
-import { addCustomBounds, generateCustomBounds, generateNextRoomData, handleNextRoomArrows } from '../../utils/dungeon';
+import { addCustomBounds, generateCustomBounds, generateNextRoomData, handleNextRoomArrows } from '../utils/dungeon';
 import BaseRoom from './baseRoom';
 
 export default class Room_05L extends BaseRoom {
@@ -25,15 +25,15 @@ export default class Room_05L extends BaseRoom {
     super.create();
 
     addCustomBounds(
-      this.player.getSprite, 
+      this.player.sprite,
       this,
       this.screen,
       generateCustomBounds(
-        this.screen, 
+        this.screen,
         {
           top: this.topPadding,
-          bottom: this.bottomPadding, 
-          horizontal: this.horizontalPadding
+          bottom: this.bottomPadding,
+          horizontal: this.horizontalPadding,
         },
         {
           left: 0,
@@ -42,7 +42,7 @@ export default class Room_05L extends BaseRoom {
     );
 
     handleNextRoomArrows(this.key, this, this.screen, this.nextRoom, {
-      left: 1
+      left: 1,
     });
   }
 

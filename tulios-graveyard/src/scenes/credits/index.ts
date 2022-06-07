@@ -1,5 +1,5 @@
 import 'phaser';
-import Screen from '../../utils/screen';
+import Screen from '../utils/screen';
 
 export default class Credits extends Phaser.Scene {
   screen: Screen;
@@ -15,7 +15,7 @@ export default class Credits extends Phaser.Scene {
   }
 
   create() {
-    this.screen = new Screen(this.scale);
+    this.screen = new Screen(this.scale.width, this.scale.height);
 
     this.bg = this.add.image(0, 0, 'background').setOrigin(0.5);
     this.bg

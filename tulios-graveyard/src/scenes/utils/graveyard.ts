@@ -1,4 +1,4 @@
-import { NextRoomData, NextRoomDest, NextRoomPlayerCoordinate, Orientation, PlayerCoordinate } from '../types';
+import { NextRoomData, NextRoomDest, NextRoomPlayerCoordinate, Orientation, PlayerCoordinate } from '../../types';
 
 export function generateNextRoomData(config: { [Key in Orientation]?: NextRoomDest }): NextRoomData {
   const directions: { [Key in Orientation]: (offset?: number) => PlayerCoordinate } = {

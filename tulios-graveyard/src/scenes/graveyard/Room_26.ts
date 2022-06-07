@@ -1,5 +1,5 @@
 import 'phaser';
-import { generateNextRoomData } from '../../utils/graveyard';
+import { generateNextRoomData } from '../utils/graveyard';
 import BaseRoom from './baseRoom';
 
 export default class Room_26 extends BaseRoom {
