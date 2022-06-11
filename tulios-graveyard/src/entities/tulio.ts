@@ -9,8 +9,12 @@ export default class Tulio extends Entity {
 
   constructor(scene: Scene, x: number = 100, y: number = 100) {
     super('characters:tulio', scene.physics.add.sprite(x, y, 'characters:tulio'), 10, 1);
-
+    this.sprite
+      .setSize(this.sprite.width, this.sprite.height * 0.2)
+      .setOffset(0, this.sprite.height * 0.8)
+      .setScale(2.5);
     // Weapon for gui testing -> TODO Inventory
+
     this.weapon = new Weapon('weapon:shovel', WeaponType.shovel, 2);
 
     this.animations = [
@@ -50,7 +54,7 @@ export default class Tulio extends Entity {
       scene.anims.create(animation);
     });
 
-    this.direction = scene.scene.get('ui-scene').data.get('direction') as Direction;
+    this.direction = scene.scene.get('gui-scene').data.get('direction') as Direction;
   }
 
   setPosition(x: number, y: number) {

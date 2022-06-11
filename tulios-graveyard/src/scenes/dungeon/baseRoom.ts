@@ -66,7 +66,6 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.player = new Tulio(this, 400, 175);
     this.player.sprite.body.setCollideWorldBounds(true, null, null, true);
-    this.player.sprite.setScale(2);
 
     this.events.emit('reposition-player');
 

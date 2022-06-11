@@ -29,7 +29,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.key = key;
     this.bgBorder = {
-      top: borderConfig.hasTop ? 9 : null,
+      top: borderConfig.hasTop ? 17 : null,
       right: borderConfig.hasRight ? 6.5 : null,
       bottom: borderConfig.hasBottom ? 17 : null,
       left: borderConfig.hasLeft ? 6.5 : null,
@@ -58,7 +58,6 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.player = new Tulio(this);
     this.player.sprite.body.setCollideWorldBounds(true, null, null, true);
-    this.player.sprite.setScale(2);
 
     this.events.emit('reposition-player');
 
