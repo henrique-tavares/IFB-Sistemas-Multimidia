@@ -1,4 +1,6 @@
+import House from '../../props/house';
 import Tombstone from '../../props/tombstone';
+import Tree from '../../props/tree';
 import { generateNextRoomData } from '../utils/graveyard';
 import BaseRoom from './baseRoom';
 
@@ -31,31 +33,15 @@ export default class Room_00 extends BaseRoom {
   create() {
     super.create();
 
-    this.staticProps = this.physics.add.staticGroup();
-    this.staticProps.add(new Tombstone(this, this.screen.relativeX(50), this.screen.relativeY(50), 1));
-
-    this.physics.add.collider(this.player.sprite, this.staticProps);
-
-    this.staticProps.getChildren().forEach((prop: Phaser.Physics.Arcade.Sprite) => {
-      prop.setDepth(prop.y);
-    });
-
-    this.dynamicSprites = this.children.list.filter(
-      child => child.body instanceof Phaser.Physics.Arcade.Body
-    ) as Phaser.Physics.Arcade.Sprite[];
+    super.addProps(
+      new House(this, this.screen.relativeX(28), this.screen.relativeY(32)),
+      new Tree(this, this.screen.relativeX(15), this.screen.relativeY(90), 1),
+      new Tree(this, this.screen.relativeX(60), this.screen.relativeY(25), 2),
+      new Tree(this, this.screen.relativeX(80), this.screen.relativeY(40), 3)
+    );
   }
 
   update() {
     super.update();
-
-    this.dynamicSprites.forEach(sprite => {
-      sprite.setDepth(sprite.y);
-    });
-
-    // this.children.list
-    //   .filter(child => child instanceof Phaser.Physics.Arcade.Sprite)
-    //   .forEach((child: Phaser.Physics.Arcade.Sprite) => {
-    //     console.log(child.constructor.name, child.y);
-    //   });
   }
 }

@@ -12,6 +12,7 @@ import NextRoomArrow from '../utils/nextRoomArrow';
 import Screen from '../utils/screen';
 import Tulio from '../../entities/tulio';
 import Background from '../utils/background';
+import BaseProp from '../../props/baseProp';
 
 export default abstract class BaseRoom extends Phaser.Scene {
   protected key: string;
@@ -23,6 +24,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected nextRoomData: NextRoomData;
   protected fadeDuration = 500;
   private isThereNextRoom: boolean;
+  protected staticProps: Phaser.Physics.Arcade.StaticGroup;
+  protected dynamicSprites: Phaser.Physics.Arcade.Sprite[];
 
   constructor(key: string, borderConfig: BackgroundBorderConfig, nextRoom: NextRoom, nextRoomData: NextRoomData) {
     super(key);
@@ -64,6 +67,15 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.cameras.main.startFollow(this.player.sprite);
     this.bg.applyBoundsOnSprite(this.player.sprite);
 
+    this.staticProps = this.physics.add.staticGroup();
+
+    this.events.on('add-extra-hitbox', (hitBox: Phaser.GameObjects.GameObject) => {
+      this.staticProps.add(hitBox, true);
+      this.refreshProps();
+    });
+
+    this.physics.add.collider(this.player.sprite, this.staticProps);
+
     const audioHandler = this.cache.custom['handlers'].get('audioHandler') as AudioHandler;
     audioHandler.handleBackgroundMusic(this);
 
@@ -87,6 +99,25 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
   update() {
     this.player.handleSpriteAnimation();
+
+    this.dynamicSprites.forEach(sprite => {
+      sprite.setDepth(sprite.y);
+    });
+  }
+
+  addProps(...props: BaseProp[]) {
+    this.staticProps.addMultiple(props);
+    this.refreshProps();
+  }
+
+  refreshProps() {
+    this.staticProps.getChildren().forEach((prop: Phaser.Physics.Arcade.Sprite) => {
+      prop.setDepth(prop.y);
+    });
+
+    this.dynamicSprites = this.children.list.filter(
+      child => child.body instanceof Phaser.Physics.Arcade.Body
+    ) as Phaser.Physics.Arcade.Sprite[];
   }
 
   onWorldBounds(body: Phaser.Physics.Arcade.Body) {

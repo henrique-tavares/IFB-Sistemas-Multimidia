@@ -148,6 +148,10 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('prop:graveyard:tombstone-1', 'assets/props/graveyard/tombstone-1.png');
     this.load.image('prop:graveyard:tombstone-2', 'assets/props/graveyard/tombstone-2.png');
     this.load.image('prop:graveyard:tombstone-3', 'assets/props/graveyard/tombstone-3.png');
+    this.load.image('prop:graveyard:tree-1', 'assets/props/graveyard/Tree-1.png');
+    this.load.image('prop:graveyard:tree-2', 'assets/props/graveyard/Tree-2.png');
+    this.load.image('prop:graveyard:tree-3', 'assets/props/graveyard/Tree-3.png');
+    this.load.image('prop:graveyard:house', 'assets/props/graveyard/House.png');
 
     this.load.spritesheet('characters:tulio', 'assets/characters/Tulio.png', {
       frameWidth: 16,

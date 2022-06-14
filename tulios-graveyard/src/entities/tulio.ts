@@ -7,12 +7,14 @@ export default class Tulio extends Entity {
   private direction: Direction;
   private frozen = false;
 
-  constructor(scene: Scene, x: number = 100, y: number = 100) {
+  constructor(scene: Scene, x: number = 400, y: number = 300) {
     super('characters:tulio', scene.physics.add.sprite(x, y, 'characters:tulio'), 10, 1);
     this.sprite
       .setSize(this.sprite.width, this.sprite.height * 0.2)
-      .setOffset(0, this.sprite.height * 0.8)
-      .setScale(2.5);
+      .setScale(2.5)
+      .setOrigin(0.5, 0.85)
+      .setOffset(0, this.sprite.height * 0.8);
+
     // Weapon for gui testing -> TODO Inventory
 
     this.weapon = new Weapon('weapon:shovel', WeaponType.shovel, 2);

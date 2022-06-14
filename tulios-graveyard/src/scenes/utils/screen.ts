@@ -9,12 +9,12 @@ export default class Screen {
     this.height = height;
   }
 
-  relativeY(percentage: number): number {
-    return (this.height * percentage) / 100;
+  relativeY(y: number): number {
+    return (this.height * y) / 100;
   }
 
-  relativeX(percentage: number): number {
-    return (this.width * percentage) / 100;
+  relativeX(x: number): number {
+    return (this.width * x) / 100;
   }
 
   heightRatio(height: number): number {
