@@ -9,19 +9,16 @@ export default class House extends BaseProp {
       height: 0.5,
     });
 
-    this.offset({
-      x: 0.08,
-      y: 0.3,
-    });
+    this.setOrigin(0.495, 0.57);
 
     scene.events.emit(
       'add-extra-hitbox',
       new Phaser.GameObjects.Rectangle(
         scene,
-        this.x + this.relativeX(26),
-        this.y + this.relativeY(32),
+        this.x + this.relativeX(27),
+        this.y + this.relativeY(26.5),
         this.relativeX(28),
-        this.relativeY(12),
+        this.relativeY(10),
         0x000,
         0
       )

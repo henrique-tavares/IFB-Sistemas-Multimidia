@@ -1,7 +1,10 @@
+import BaseProp from '../../props/baseProp';
 import House from '../../props/house';
 import Tombstone from '../../props/tombstone';
 import Tree from '../../props/tree';
+import { GraveyardProps, Orientation } from '../../types';
 import { generateNextRoomData } from '../utils/graveyard';
+import { clamp, gameScreen, generateRandomArray } from '../utils/misc';
 import BaseRoom from './baseRoom';
 
 export default class Room_00 extends BaseRoom {
@@ -33,12 +36,8 @@ export default class Room_00 extends BaseRoom {
   create() {
     super.create();
 
-    super.addProps(
-      new House(this, this.screen.relativeX(28), this.screen.relativeY(32)),
-      new Tree(this, this.screen.relativeX(15), this.screen.relativeY(90), 1),
-      new Tree(this, this.screen.relativeX(60), this.screen.relativeY(25), 2),
-      new Tree(this, this.screen.relativeX(80), this.screen.relativeY(40), 3)
-    );
+    super.addFixedProps(new House(this, this.screen.relativeX(28), this.screen.relativeY(32)));
+    super.generateRandomProps(5);
   }
 
   update() {

@@ -1,18 +1,30 @@
 import {
   BackgroundBorder,
   BackgroundBorderConfig,
+  GraveyardProps,
   NextRoom,
   NextRoomData,
   Orientation,
   PlayerCoordinate,
 } from '../../types';
 import AudioHandler from '../../handlers/audioHandler';
-import { clamp, isEmpty } from '../utils/misc';
+import {
+  clamp,
+  gameScreen,
+  generateRandomArray,
+  generateRandomPosition,
+  isEmpty,
+  isPropPositionValid,
+} from '../utils/misc';
 import NextRoomArrow from '../utils/nextRoomArrow';
 import Screen from '../utils/screen';
 import Tulio from '../../entities/tulio';
 import Background from '../utils/background';
 import BaseProp from '../../props/baseProp';
+import Tree from '../../props/tree';
+import Tombstone from '../../props/tombstone';
+import { Physics } from 'phaser';
+import { graveyardPropBuilder } from '../utils/graveyard';
 
 export default abstract class BaseRoom extends Phaser.Scene {
   protected key: string;
@@ -26,6 +38,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
   private isThereNextRoom: boolean;
   protected staticProps: Phaser.Physics.Arcade.StaticGroup;
   protected dynamicSprites: Phaser.Physics.Arcade.Sprite[];
+  protected proplessAreas: Phaser.Physics.Arcade.StaticGroup;
 
   constructor(key: string, borderConfig: BackgroundBorderConfig, nextRoom: NextRoom, nextRoomData: NextRoomData) {
     super(key);
@@ -76,6 +89,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.physics.add.collider(this.player.sprite, this.staticProps);
 
+    this.generateInicialProplessAreas();
+
     const audioHandler = this.cache.custom['handlers'].get('audioHandler') as AudioHandler;
     audioHandler.handleBackgroundMusic(this);
 
@@ -105,9 +120,94 @@ export default abstract class BaseRoom extends Phaser.Scene {
     });
   }
 
-  addProps(...props: BaseProp[]) {
-    this.staticProps.addMultiple(props);
+  addFixedProps(...props: BaseProp[]) {
+    this.staticProps.addMultiple(props, true);
+    this.proplessAreas.addMultiple(
+      props.map(prop => prop.generateOccupiedArea()),
+      true
+    );
     this.refreshProps();
+  }
+
+  addProps(...propKeys: GraveyardProps[]) {
+    propKeys.forEach(propKey => {
+      const newProp = graveyardPropBuilder(this, propKey, 0, 0);
+      do {
+        console.log('pinto', propKey);
+        const randomPosition = generateRandomPosition(this.screen);
+        newProp.updatePosition(randomPosition.x, randomPosition.y);
+      } while (
+        this.proplessAreas.getChildren().some((area: Phaser.GameObjects.Shape) => !isPropPositionValid(newProp, area))
+      );
+
+      this.staticProps.add(newProp, true);
+      this.proplessAreas.add(newProp.generateOccupiedArea(), true);
+    });
+
+    this.refreshProps();
+  }
+
+  generateRandomProps(num: number) {
+    const props = generateRandomArray(num, 0, 6) as GraveyardProps[];
+    this.addProps(...props);
+  }
+
+  private generateInicialProplessAreas() {
+    const initial: { [key: string]: { x: number; y: number; width: number; height: number } } = {
+      top: {
+        x: 50,
+        y: (this.bgBorder['top'] ?? 10) / 2,
+        height: this.bgBorder['top'] ?? 10,
+        width: 100,
+      },
+      right: {
+        x: 95,
+        y: 50,
+        height: 100,
+        width: 10,
+      },
+      bottom: {
+        x: 50,
+        y: 100 - (this.bgBorder['bottom'] ?? 10) / 2,
+        height: this.bgBorder['bottom'] ?? 10,
+        width: 100,
+      },
+      left: {
+        x: 5,
+        y: 50,
+        height: 100,
+        width: 10,
+      },
+      centerHorizontal: {
+        x: 50,
+        y: 50,
+        height: 10,
+        width: 100,
+      },
+      centerVertical: {
+        x: 50,
+        y: 50,
+        height: 100,
+        width: 10,
+      },
+    };
+
+    this.proplessAreas = this.physics.add.staticGroup();
+    this.proplessAreas.addMultiple(
+      Object.values(initial).map(
+        value =>
+          new Phaser.GameObjects.Rectangle(
+            this,
+            this.screen.relativeX(value.x),
+            this.screen.relativeY(value.y),
+            gameScreen.relativeX(value.width),
+            gameScreen.relativeY(value.height),
+            0x000,
+            0.5
+          )
+      ),
+      true
+    );
   }
 
   refreshProps() {

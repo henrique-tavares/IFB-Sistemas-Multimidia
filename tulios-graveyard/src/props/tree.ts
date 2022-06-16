@@ -9,6 +9,6 @@ export default class Tree extends BaseProp {
       height: 0.1,
     });
 
-    this.setOrigin(0.5, 0.95);
+    this.origin(0.5, 0.95);
   }
 }

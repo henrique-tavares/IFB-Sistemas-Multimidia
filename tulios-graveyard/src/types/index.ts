@@ -40,10 +40,10 @@ export interface NextRoomDest {
 }
 
 export type CustomBoundConfig = {
-  x: number; 
-  y: number; 
+  x: number;
+  y: number;
   padding: number;
-}
+};
 
 export interface CustomBounds {
   up?: CustomBoundConfig;
@@ -53,8 +53,17 @@ export interface CustomBounds {
 }
 
 export interface NextRoomArrowPosition {
-  up?: (-1) | 1;
-  right?: (-1) | 1;
-  down?: (-1) | 1;
-  left?: (-1) | 1;
+  up?: -1 | 1;
+  right?: -1 | 1;
+  down?: -1 | 1;
+  left?: -1 | 1;
+}
+
+export enum GraveyardProps {
+  Tree1,
+  Tree2,
+  Tree3,
+  Tombstone1,
+  Tombstone2,
+  Tombstone3,
 }

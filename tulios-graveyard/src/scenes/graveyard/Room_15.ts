@@ -34,6 +34,8 @@ export default class Room_15 extends BaseRoom {
 
   create() {
     super.create();
+
+    super.generateRandomProps(5);
   }
 
   update() {
