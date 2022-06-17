@@ -1,4 +1,5 @@
 import 'phaser';
+import { RoomSize } from '../../types';
 import { generateNextRoomData } from '../utils/graveyard';
 import BaseRoom from './baseRoom';
 
@@ -27,7 +28,8 @@ export default class Room_52_53 extends BaseRoom {
           mode: 'single',
           offset: 50,
         },
-      })
+      }),
+      RoomSize['1x2']
     );
   }
 

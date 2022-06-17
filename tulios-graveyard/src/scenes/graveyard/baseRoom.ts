@@ -1,11 +1,12 @@
 import {
   BackgroundBorder,
   BackgroundBorderConfig,
-  GraveyardProps,
+  GraveyardProp,
   NextRoom,
   NextRoomData,
   Orientation,
   PlayerCoordinate,
+  RoomSize,
 } from '../../types';
 import AudioHandler from '../../handlers/audioHandler';
 import {
@@ -39,19 +40,27 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected staticProps: Phaser.Physics.Arcade.StaticGroup;
   protected dynamicSprites: Phaser.Physics.Arcade.Sprite[];
   protected proplessAreas: Phaser.Physics.Arcade.StaticGroup;
+  readonly roomSize: RoomSize;
 
-  constructor(key: string, borderConfig: BackgroundBorderConfig, nextRoom: NextRoom, nextRoomData: NextRoomData) {
+  constructor(
+    key: string,
+    borderConfig: BackgroundBorderConfig,
+    nextRoom: NextRoom,
+    nextRoomData: NextRoomData,
+    roomSize: RoomSize
+  ) {
     super(key);
 
     this.key = key;
     this.bgBorder = {
-      top: borderConfig.hasTop ? 17 : null,
-      right: borderConfig.hasRight ? 6.5 : null,
-      bottom: borderConfig.hasBottom ? 17 : null,
-      left: borderConfig.hasLeft ? 6.5 : null,
+      top: borderConfig.hasTop ? 17 : undefined,
+      right: borderConfig.hasRight ? 6.5 : undefined,
+      bottom: borderConfig.hasBottom ? 17 : undefined,
+      left: borderConfig.hasLeft ? 6.5 : undefined,
     };
     this.nextRoom = nextRoom;
     this.nextRoomData = nextRoomData;
+    this.roomSize = roomSize;
   }
 
   init(coordinate: PlayerCoordinate) {
@@ -62,7 +71,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
       return;
     }
     this.events.on('reposition-player', () => {
-      this.repositionPlayer(coordinate);
+      const { x, y } = this.repositionPlayer(coordinate);
+      this.player.setPosition(x, y);
 
       this.physics.world.once('worldbounds', this.onWorldBounds, this);
     });
@@ -73,7 +83,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.screen = new Screen(this.bg.image.width, this.bg.image.height);
 
     this.player = new Tulio(this);
-    this.player.sprite.body.setCollideWorldBounds(true, null, null, true);
+    this.player.sprite.body.setCollideWorldBounds(true, undefined, undefined, true);
 
     this.events.emit('reposition-player');
 
@@ -82,10 +92,37 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.staticProps = this.physics.add.staticGroup();
 
-    this.events.on('add-extra-hitbox', (hitBox: Phaser.GameObjects.GameObject) => {
-      this.staticProps.add(hitBox, true);
-      this.refreshProps();
-    });
+    this.events.on(
+      'add-extra-area',
+      (
+        area: Phaser.GameObjects.Shape,
+        proplessArea?: Phaser.GameObjects.Shape,
+        playerColision?: ArcadePhysicsCallback,
+        debug = false
+      ) => {
+        if (playerColision) {
+          this.add.existing(area);
+          this.physics.add.existing(area, true);
+          this.physics.add.overlap(this.player.sprite, area, playerColision, undefined, this);
+        } else {
+          this.staticProps.add(area, true);
+        }
+        this.proplessAreas.add(
+          proplessArea ??
+            new Phaser.GameObjects.Rectangle(
+              this,
+              area.x,
+              area.y,
+              area.width + 50,
+              area.height + 50,
+              0x000,
+              debug ? 0.5 : 0
+            ),
+          true
+        );
+        this.refreshProps();
+      }
+    );
 
     this.physics.add.collider(this.player.sprite, this.staticProps);
 
@@ -129,11 +166,10 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.refreshProps();
   }
 
-  addProps(...propKeys: GraveyardProps[]) {
+  addProps(...propKeys: GraveyardProp[]) {
     propKeys.forEach(propKey => {
       const newProp = graveyardPropBuilder(this, propKey, 0, 0);
       do {
-        console.log('pinto', propKey);
         const randomPosition = generateRandomPosition(this.screen);
         newProp.updatePosition(randomPosition.x, randomPosition.y);
       } while (
@@ -147,63 +183,140 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.refreshProps();
   }
 
-  generateRandomProps(num: number) {
-    const props = generateRandomArray(num, 0, 6) as GraveyardProps[];
+  generateRandomProps(num: number, propsPool: GraveyardProp[] = [0, 1, 2, 3, 4, 5]) {
+    const props = generateRandomArray(num, 0, propsPool.length).map(num => propsPool[num]);
+
     this.addProps(...props);
   }
 
-  private generateInicialProplessAreas() {
-    const initial: { [key: string]: { x: number; y: number; width: number; height: number } } = {
+  private generateInicialProplessAreas(debug = false) {
+    const borders: {
+      [key: string]: {
+        pos: { x: number; y: number };
+        size: { width: number; height: number };
+        origin: { x: number; y: number };
+      };
+    } = {
       top: {
-        x: 50,
-        y: (this.bgBorder['top'] ?? 10) / 2,
-        height: this.bgBorder['top'] ?? 10,
-        width: 100,
+        pos: { x: 50, y: 0 },
+        size: { height: this.bgBorder['top'] ?? 10, width: 100 },
+        origin: {
+          x: 0.5,
+          y: 0,
+        },
       },
       right: {
-        x: 95,
-        y: 50,
-        height: 100,
-        width: 10,
+        pos: { x: 100, y: 50 },
+        size: { height: 100, width: 10 },
+        origin: {
+          x: 1,
+          y: 0.5,
+        },
       },
       bottom: {
-        x: 50,
-        y: 100 - (this.bgBorder['bottom'] ?? 10) / 2,
-        height: this.bgBorder['bottom'] ?? 10,
-        width: 100,
+        pos: { x: 50, y: 100 },
+        size: { height: this.bgBorder['bottom'] ?? 10, width: 100 },
+        origin: {
+          x: 0.5,
+          y: 1,
+        },
       },
       left: {
-        x: 5,
-        y: 50,
-        height: 100,
-        width: 10,
-      },
-      centerHorizontal: {
-        x: 50,
-        y: 50,
-        height: 10,
-        width: 100,
-      },
-      centerVertical: {
-        x: 50,
-        y: 50,
-        height: 100,
-        width: 10,
+        pos: { x: 0, y: 50 },
+        size: { height: 100, width: 10 },
+        origin: {
+          x: 0,
+          y: 0.5,
+        },
       },
     };
 
     this.proplessAreas = this.physics.add.staticGroup();
     this.proplessAreas.addMultiple(
-      Object.values(initial).map(
-        value =>
+      Object.values(borders).map(value =>
+        new Phaser.GameObjects.Rectangle(
+          this,
+          this.screen.relativeX(value.pos.x),
+          this.screen.relativeY(value.pos.y),
+          value.size.width == 100 ? this.screen.width : gameScreen.relativeX(value.size.width),
+          value.size.height == 100 ? this.screen.height : gameScreen.relativeY(value.size.height),
+          0x000,
+          debug ? 0.5 : 0
+        ).setOrigin(value.origin.x, value.origin.y)
+      ),
+      true
+    );
+
+    const generateAxesArea = (roomSize: RoomSize) => {
+      const baseHorizontal = {
+        x: 50,
+        height: 10,
+        width: 100,
+      };
+
+      const horizontal = {
+        center: {
+          ...baseHorizontal,
+          y: 50,
+        },
+        first: {
+          ...baseHorizontal,
+          y: 25,
+        },
+        second: {
+          ...baseHorizontal,
+          y: 75,
+        },
+      };
+
+      const baseVertical = {
+        y: 50,
+        height: 100,
+        width: 10,
+      };
+
+      const vertical = {
+        center: {
+          ...baseVertical,
+          x: 50,
+        },
+        first: {
+          ...baseVertical,
+          x: 25,
+        },
+        second: {
+          ...baseVertical,
+          x: 75,
+        },
+      };
+
+      switch (roomSize) {
+        case RoomSize['1x1']: {
+          return [horizontal.center, vertical.center];
+        }
+        case RoomSize['1x2']: {
+          return [horizontal.center, vertical.first, vertical.second];
+        }
+        case RoomSize['2x1']: {
+          return [horizontal.first, horizontal.second];
+        }
+        case RoomSize['2x2']: {
+          return [horizontal.first, horizontal.second, vertical.first, vertical.second];
+        }
+      }
+    };
+
+    this.proplessAreas.addMultiple(
+      generateAxesArea(this.roomSize).map(
+        axisArea =>
           new Phaser.GameObjects.Rectangle(
             this,
-            this.screen.relativeX(value.x),
-            this.screen.relativeY(value.y),
-            gameScreen.relativeX(value.width),
-            gameScreen.relativeY(value.height),
+            this.screen.relativeX(axisArea.x),
+            this.screen.relativeY(axisArea.y),
+            axisArea.width == 100 ? this.screen.width : gameScreen.relativeX(axisArea.width),
+            axisArea.height == 100 ? this.screen.height : gameScreen.relativeY(axisArea.height),
             0x000,
-            0.5
+            debug ? 0.5 : 0
           )
       ),
       true
@@ -235,7 +348,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
   }
 
   handleTransition(orientation: Orientation) {
-    let data = this.nextRoomData[orientation];
+    let playerCoordinate = this.nextRoomData[orientation]!;
+    const nextRoom = this.nextRoom[orientation]!;
 
     const half =
       (['up', 'down'].includes(orientation) && this.player.sprite.x < this.screen.relativeX(50)) ||
@@ -243,33 +357,29 @@ export default abstract class BaseRoom extends Phaser.Scene {
         ? 'first'
         : 'second';
 
-    if (Array.isArray(data)) {
-      data = half == 'first' ? data[0] : data[1];
+    if (Array.isArray(playerCoordinate)) {
+      playerCoordinate = half == 'first' ? playerCoordinate[0] : playerCoordinate[1];
     }
 
     const parsedData: PlayerCoordinate = {
       x: {
-        relative: data.x.relative,
-        value: data.x.value ?? this.player.sprite.x,
-        offset: data.x.offset,
+        relative: playerCoordinate.x.relative,
+        value: playerCoordinate.x.value ?? this.player.sprite.x,
+        offset: playerCoordinate.x.offset,
       },
       y: {
-        relative: data.y.relative,
-        value: data.y.value ?? this.player.sprite.y,
-        offset: data.y.offset,
+        relative: playerCoordinate.y.relative,
+        value: playerCoordinate.y.value ?? this.player.sprite.y,
+        offset: playerCoordinate.y.offset,
       },
     };
 
     this.fadeOut(this.fadeDuration);
     this.player.freeze();
     this.time.delayedCall(this.fadeDuration, () => {
-      this.player.unfreeze();
+      this.player.sprite.disableBody();
       this.scene.transition({
-        target: Array.isArray(this.nextRoom[orientation])
-          ? half == 'first'
-            ? this.nextRoom[orientation][0]
-            : this.nextRoom[orientation][1]
-          : (this.nextRoom[orientation] as string),
+        target: Array.isArray(nextRoom) ? (half == 'first' ? nextRoom[0] : nextRoom[1]) : (nextRoom as string),
         data: parsedData,
         sleep: true,
         duration: 0,
@@ -280,7 +390,9 @@ export default abstract class BaseRoom extends Phaser.Scene {
   wake(sys: Phaser.Scenes.Systems, data: PlayerCoordinate) {
     console.log(this.constructor.name);
     this.fadeIn(this.fadeDuration);
-    this.repositionPlayer(data);
+    const { x: newX, y: newY } = this.repositionPlayer(data);
+    this.player.sprite.enableBody(true, newX, newY, true, true);
+    this.player.unfreeze();
     this.physics.world.once('worldbounds', this.onWorldBounds, this);
   }
 
@@ -291,14 +403,13 @@ export default abstract class BaseRoom extends Phaser.Scene {
     const minY = this.player.sprite.height + 5;
     const maxY = this.screen.height - this.player.sprite.height - 5;
 
-    const newX = x.relative ? this.screen.relativeX(x.value) : x.value + this.screen.relativeX(x.offset ?? 0);
-    const newY = y.relative ? this.screen.relativeY(y.value) : y.value + this.screen.relativeY(y.offset ?? 0);
+    const newX = x.relative ? this.screen.relativeX(x.value!) : x.value! + this.screen.relativeX(x.offset ?? 0);
+    const newY = y.relative ? this.screen.relativeY(y.value!) : y.value! + this.screen.relativeY(y.offset ?? 0);
 
-    console.log({ x, y });
-    // console.log({ x: clamp(newX, minX, maxX), y: clamp(newY, minY, maxY) });
-
-    this.player.sprite.setX(clamp(newX, minX, maxX));
-    this.player.sprite.setY(clamp(newY, minY, maxY));
+    return {
+      x: clamp(newX, minX, maxX),
+      y: clamp(newY, minY, maxY),
+    };
   }
 
   fadeIn(ms: number) {

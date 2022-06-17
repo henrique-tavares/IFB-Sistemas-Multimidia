@@ -1,3 +1,5 @@
+import Weapon from '../items/weapon';
+
 export interface BackgroundBorderConfig {
   hasLeft?: boolean;
   hasRight?: boolean;
@@ -59,11 +61,23 @@ export interface NextRoomArrowPosition {
   left?: -1 | 1;
 }
 
-export enum GraveyardProps {
+export enum RoomSize {
+  '1x1',
+  '2x1',
+  '1x2',
+  '2x2',
+}
+
+export enum GraveyardProp {
   Tree1,
   Tree2,
   Tree3,
   Tombstone1,
   Tombstone2,
   Tombstone3,
+}
+
+export interface TulioData {
+  health: number;
+  weapon: Weapon;
 }

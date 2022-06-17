@@ -2,6 +2,8 @@ import { Scene } from 'phaser';
 import Direction from '../scenes/gui/direction';
 import Entity from './entity';
 import Weapon, { WeaponType } from '../items/weapon';
+import PlayerHandler from '../handlers/playerHandler';
+import { TulioData } from '../types';
 
 export default class Tulio extends Entity {
   private direction: Direction;
@@ -17,7 +19,18 @@ export default class Tulio extends Entity {
 
     // Weapon for gui testing -> TODO Inventory
 
-    this.weapon = new Weapon('weapon:shovel', WeaponType.shovel, 2);
+    const playerHandler = scene.cache.custom['handlers'].get('playerHandler') as PlayerHandler;
+    const { playerData } = playerHandler;
+
+    this.sprite.on('refresh-player-data', (data: Partial<TulioData>) => {
+      playerHandler.playerData = {
+        ...playerData,
+        ...data,
+      };
+    });
+
+    this.weapon = playerData.weapon;
+    this.currentHealth = playerData.health;
 
     this.animations = [
       {
@@ -65,6 +78,7 @@ export default class Tulio extends Entity {
 
   freeze() {
     this.frozen = true;
+    this.sprite.setVelocity(0);
     this.sprite.body.velocity.limit(0);
   }
 

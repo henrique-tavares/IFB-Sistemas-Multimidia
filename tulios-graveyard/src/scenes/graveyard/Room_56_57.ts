@@ -1,4 +1,6 @@
 import 'phaser';
+import Mausoleum from '../../props/mausoleum';
+import { RoomSize } from '../../types';
 import { generateNextRoomData } from '../utils/graveyard';
 import BaseRoom from './baseRoom';
 
@@ -22,13 +24,15 @@ export default class Room_56_57 extends BaseRoom {
         left: {
           mode: 'single',
         },
-      })
+      }),
+      RoomSize['1x2']
     );
   }
 
   create() {
     super.create();
 
+    super.addFixedProps(new Mausoleum(this, this.screen.relativeX(90), this.screen.relativeY(30)));
     super.generateRandomProps(10);
   }
 

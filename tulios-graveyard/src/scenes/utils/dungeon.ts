@@ -108,7 +108,7 @@ export function addCustomBounds(
   ['up', 'down', 'left', 'right'].forEach((orientation: Orientation) => {
     if (!customBound[orientation]) return;
 
-    const config = customBound[orientation];
+    const config = customBound[orientation]!;
 
     let width = screen.width / 2 + 60;
     let height = screen.height / 2 + 60;

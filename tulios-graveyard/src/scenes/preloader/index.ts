@@ -1,4 +1,5 @@
 import AudioHandler from '../../handlers/audioHandler';
+import PlayerHandler from '../../handlers/playerHandler';
 import Screen from '../utils/screen';
 
 export default class Preloader extends Phaser.Scene {
@@ -152,6 +153,8 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('prop:graveyard:tree-2', 'assets/props/graveyard/Tree-2.png');
     this.load.image('prop:graveyard:tree-3', 'assets/props/graveyard/Tree-3.png');
     this.load.image('prop:graveyard:house', 'assets/props/graveyard/House.png');
+    this.load.image('prop:graveyard:cabin', 'assets/props/graveyard/Cabin.png');
+    this.load.image('prop:graveyard:mausoleum', 'assets/props/graveyard/Mausoleum.png');
 
     this.load.spritesheet('characters:tulio', 'assets/characters/Tulio.png', {
       frameWidth: 16,
@@ -163,7 +166,7 @@ export default class Preloader extends Phaser.Scene {
     this.load.audio('bg_dungeon_music', 'audio/bg_dungeon_music.wav');
     this.load.audio('bg_marina_music', 'audio/bg_marina_music.wav');
 
-    this.cache.addCustom('handlers').add('audioHandler', new AudioHandler());
+    this.cache.addCustom('handlers').add('audioHandler', new AudioHandler()).add('playerHandler', new PlayerHandler());
   }
 
   create() {}

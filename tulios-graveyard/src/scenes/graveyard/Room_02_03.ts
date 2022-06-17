@@ -1,4 +1,6 @@
 import 'phaser';
+import Cabin from '../../props/cabin';
+import { RoomSize } from '../../types';
 import { generateNextRoomData } from '../utils/graveyard';
 import BaseRoom from './baseRoom';
 
@@ -26,13 +28,15 @@ export default class Room_02_03 extends BaseRoom {
           mode: 'double',
           offsets: [0, -100],
         },
-      })
+      }),
+      RoomSize['1x2']
     );
   }
 
   create() {
     super.create();
 
+    super.addFixedProps(new Cabin(this, this.screen.relativeX(15), this.screen.relativeY(30)));
     super.generateRandomProps(10);
   }
 

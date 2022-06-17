@@ -2,7 +2,7 @@ import BaseProp from '../../props/baseProp';
 import Tombstone from '../../props/tombstone';
 import Tree from '../../props/tree';
 import {
-  GraveyardProps,
+  GraveyardProp,
   NextRoomData,
   NextRoomDest,
   NextRoomPlayerCoordinate,
@@ -60,9 +60,9 @@ export function generateNextRoomData(config: { [Key in Orientation]?: NextRoomDe
   ): NextRoomPlayerCoordinate {
     switch (mode) {
       case 'single':
-        return directions[orientation](offset);
+        return directions[orientation](offset!);
       case 'double':
-        return [directions[orientation](offsets[0]), directions[orientation](offsets[1])];
+        return [directions[orientation](offsets![0]), directions[orientation](offsets![1])];
     }
   }
 
@@ -74,24 +74,24 @@ export function generateNextRoomData(config: { [Key in Orientation]?: NextRoomDe
   };
 }
 
-export function graveyardPropBuilder(scene: Phaser.Scene, propKey: GraveyardProps, x: number, y: number): BaseProp {
+export function graveyardPropBuilder(scene: Phaser.Scene, propKey: GraveyardProp, x: number, y: number): BaseProp {
   switch (propKey) {
-    case GraveyardProps.Tree1: {
+    case GraveyardProp.Tree1: {
       return new Tree(scene, x, y, 1);
     }
-    case GraveyardProps.Tree2: {
+    case GraveyardProp.Tree2: {
       return new Tree(scene, x, y, 2);
     }
-    case GraveyardProps.Tree3: {
+    case GraveyardProp.Tree3: {
       return new Tree(scene, x, y, 3);
     }
-    case GraveyardProps.Tombstone1: {
+    case GraveyardProp.Tombstone1: {
       return new Tombstone(scene, x, y, 1);
     }
-    case GraveyardProps.Tombstone2: {
+    case GraveyardProp.Tombstone2: {
       return new Tombstone(scene, x, y, 2);
     }
-    case GraveyardProps.Tombstone3: {
+    case GraveyardProp.Tombstone3: {
       return new Tombstone(scene, x, y, 3);
     }
   }

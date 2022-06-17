@@ -2,7 +2,7 @@ import { BackgroundBorder } from '../../types';
 
 export default class Background {
   readonly image: Phaser.GameObjects.Image;
-  readonly bounds: Phaser.Geom.Rectangle | null = null;
+  readonly bounds: Phaser.Geom.Rectangle;
   readonly border: BackgroundBorder;
 
   constructor(scene: Phaser.Scene, key: string, borderConfig?: BackgroundBorder) {
@@ -14,10 +14,10 @@ export default class Background {
   }
 
   private setBounds(): Phaser.Geom.Rectangle {
-    const xl = (800 * this.border?.left) / 100;
-    const yl = (600 * this.border?.top) / 100;
-    const xr = (800 * this.border?.right) / 100;
-    const yr = (600 * this.border?.bottom) / 100;
+    const xl = (800 * (this.border?.left ?? 0)) / 100;
+    const yl = (600 * (this.border?.top ?? 0)) / 100;
+    const xr = (800 * (this.border?.right ?? 0)) / 100;
+    const yr = (600 * (this.border?.bottom ?? 0)) / 100;
 
     const width = this.image.width - xl - xr;
     const height = this.image.height - yl - yr;

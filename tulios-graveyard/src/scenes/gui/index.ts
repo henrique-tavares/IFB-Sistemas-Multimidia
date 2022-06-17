@@ -1,12 +1,13 @@
 import AudioHandler from '../../handlers/audioHandler';
 import Screen from '../utils/screen';
-import Tulio from '../../entities/tulio';
 import Weapon, { WeaponType } from '../../items/weapon';
 import Direction from './direction';
+import PlayerHandler from '../../handlers/playerHandler';
+import { TulioData } from '../../types';
 
 export default class GUIScene extends Phaser.Scene {
   private screen: Screen;
-  private player: Tulio;
+  private playerData: TulioData;
   private audioHandler: AudioHandler;
 
   private weapon: Weapon;
@@ -31,17 +32,17 @@ export default class GUIScene extends Phaser.Scene {
     this.screen = new Screen(800, 600);
     this.audioHandler = new AudioHandler();
 
-    this.player = new Tulio(this);
-    this.player.sprite.destroy();
+    const playerHandler = this.cache.custom['handlers'].get('playerHandler') as PlayerHandler;
+    this.playerData = playerHandler.playerData;
 
-    this.weapon = this.player.weapon;
+    this.weapon = this.playerData.weapon;
     const weaponBg = this.add.image(this.screen.relativeX(7), this.screen.relativeY(8), 'gui:inventory_bg');
     if (this.weapon) {
       this.add.image(weaponBg.x, weaponBg.y, `${this.weapon.key}`);
       this.createAmmunitionText(weaponBg.x, weaponBg.y);
     }
 
-    this.health = this.player.currentHealth;
+    this.health = this.playerData.health;
     this.handleHealthHearts(weaponBg.x + 30, weaponBg.y);
 
     this.createPauseUI();
@@ -188,7 +189,7 @@ export default class GUIScene extends Phaser.Scene {
           return (
             scene.sys.config.toString().startsWith('graveyard:') || scene.sys.config.toString().startsWith('dungeon:')
           );
-        });
+        })!;
         this.audioHandler.turnOnMusic(playableScene);
       });
 

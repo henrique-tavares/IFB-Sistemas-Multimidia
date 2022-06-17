@@ -21,7 +21,6 @@ export default class Room_00 extends BaseRoom {
   create() {
     super.create();
 
-    // console.log("Room 00 - nextRoom", Object.entries(this.nextRoom));
     handleNextRoomArrows(this.key, this, this.screen, this.nextRoom, {});
   }
 

@@ -37,17 +37,16 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.key = key;
     this.bgBorder = {
-      top: borderConfig.hasTop ? this.topPadding : null,
-      right: borderConfig.hasRight ? this.horizontalPadding : null,
-      bottom: borderConfig.hasBottom ? this.bottomPadding : null,
-      left: borderConfig.hasLeft ? this.horizontalPadding : null,
+      top: borderConfig.hasTop ? this.topPadding : undefined,
+      right: borderConfig.hasRight ? this.horizontalPadding : undefined,
+      bottom: borderConfig.hasBottom ? this.bottomPadding : undefined,
+      left: borderConfig.hasLeft ? this.horizontalPadding : undefined,
     };
     this.nextRoom = nextRoom;
     this.nextRoomData = nextRoomData;
   }
 
   init(coordinate: PlayerCoordinate) {
-    // console.log("init: ", this.constructor.name);
     this.fadeIn(this.fadeDuration);
     if (isEmpty(coordinate)) {
       this.physics.world.once('worldbounds', this.onWorldBounds, this);
@@ -65,7 +64,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.screen = new Screen(this.bg.image.width, this.bg.image.height);
 
     this.player = new Tulio(this, 400, 175);
-    this.player.sprite.body.setCollideWorldBounds(true, null, null, true);
+    this.player.sprite.body.setCollideWorldBounds(true, undefined, undefined, true);
 
     this.events.emit('reposition-player');
 
@@ -101,7 +100,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
   }
 
   handleTransition(orientation: Orientation) {
-    let data = this.nextRoomData[orientation];
+    let playerCoordinate = this.nextRoomData[orientation]!;
+    const nextRoom = this.nextRoom[orientation]!;
 
     const half =
       (['up', 'down'].includes(orientation) && this.player.sprite.x < this.screen.relativeX(50)) ||
@@ -109,20 +109,20 @@ export default abstract class BaseRoom extends Phaser.Scene {
         ? 'first'
         : 'second';
 
-    if (Array.isArray(data)) {
-      data = half == 'first' ? data[0] : data[1];
+    if (Array.isArray(playerCoordinate)) {
+      playerCoordinate = half == 'first' ? playerCoordinate[0] : playerCoordinate[1];
     }
 
     const parsedData: PlayerCoordinate = {
       x: {
-        relative: data.x.relative,
-        value: data.x.value ?? this.player.sprite.x,
-        offset: data.x.offset,
+        relative: playerCoordinate.x.relative,
+        value: playerCoordinate.x.value ?? this.player.sprite.x,
+        offset: playerCoordinate.x.offset,
       },
       y: {
-        relative: data.y.relative,
-        value: data.y.value ?? this.player.sprite.y,
-        offset: data.y.offset,
+        relative: playerCoordinate.y.relative,
+        value: playerCoordinate.y.value ?? this.player.sprite.y,
+        offset: playerCoordinate.y.offset,
       },
     };
 
@@ -131,11 +131,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.time.delayedCall(this.fadeDuration, () => {
       this.player.unfreeze();
       this.scene.transition({
-        target: Array.isArray(this.nextRoom[orientation])
-          ? half == 'first'
-            ? this.nextRoom[orientation][0]
-            : this.nextRoom[orientation][1]
-          : (this.nextRoom[orientation] as string),
+        target: Array.isArray(nextRoom) ? (half == 'first' ? nextRoom[0] : nextRoom[1]) : (nextRoom as string),
         data: parsedData,
         sleep: true,
         duration: 0,
@@ -156,11 +152,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
     const minY = this.player.sprite.height + 5;
     const maxY = this.screen.height - this.player.sprite.height - 5;
 
-    const newX = x.relative ? this.screen.relativeX(x.value) : x.value + this.screen.relativeX(x.offset ?? 0);
-    const newY = y.relative ? this.screen.relativeY(y.value) : y.value + this.screen.relativeY(y.offset ?? 0);
-
-    // console.log({ x, y });
-    // console.log({ x: clamp(newX, minX, maxX), y: clamp(newY, minY, maxY) });
+    const newX = x.relative ? this.screen.relativeX(x.value!) : this.screen.relativeX(x.offset!);
+    const newY = y.relative ? this.screen.relativeY(y.value!) : this.screen.relativeY(y.offset!);
 
     this.player.sprite.setX(clamp(newX, minX, maxX));
     this.player.sprite.setY(clamp(newY, minY, maxY));

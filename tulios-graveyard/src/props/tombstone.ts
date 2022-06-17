@@ -22,6 +22,6 @@ export default class Tombstone extends BaseProp {
 
     this.resize(currentresizeFactor);
 
-    this.origin(0.5, 1 - currentresizeFactor.height + currentresizeFactor.height / 2);
+    this.setOrigin(0.5, 1 - (currentresizeFactor.height ?? 0) + (currentresizeFactor.height ?? 0) / 2);
   }
 }

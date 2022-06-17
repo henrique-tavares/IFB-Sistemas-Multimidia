@@ -5,15 +5,15 @@ export default class Entity {
   readonly sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   protected animations: Phaser.Types.Animations.Animation[];
 
-  public weapon?: Weapon;
+  private _weapon?: Weapon;
   protected baseDamage: number;
 
   protected totalHealth: number;
-  public currentHealth: number;
+  private _currentHealth: number;
   public isAlive: boolean = true;
 
   public get damage() {
-    return this.baseDamage + this.weapon.damage;
+    return this.baseDamage + (this.weapon?.damage ?? 0);
   }
 
   constructor(
@@ -36,5 +36,27 @@ export default class Entity {
   attack(other: Entity) {
     other.currentHealth -= this.damage;
     other.isAlive = other.currentHealth > 0;
+  }
+
+  public get weapon() {
+    return this._weapon;
+  }
+
+  public set weapon(v: Weapon | undefined) {
+    this._weapon = v;
+    this.sprite.emit('refresh-player-data', {
+      weapon: this.weapon,
+    });
+  }
+
+  public get currentHealth() {
+    return this._currentHealth;
+  }
+
+  public set currentHealth(v: number) {
+    this._currentHealth = v;
+    this.sprite.emit('refresh-player-data', {
+      health: this.currentHealth,
+    });
   }
 }

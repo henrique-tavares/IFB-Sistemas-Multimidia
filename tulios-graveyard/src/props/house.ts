@@ -11,8 +11,31 @@ export default class House extends BaseProp {
 
     this.setOrigin(0.495, 0.57);
 
-    scene.events.emit(
-      'add-extra-hitbox',
+    this.addExtraArea(
+      new Phaser.GameObjects.Rectangle(
+        scene,
+        this.x + this.relativeX(-5.5),
+        this.y + this.relativeY(21),
+        this.relativeX(15),
+        this.relativeY(5),
+        0x000,
+        0.5
+      ),
+      new Phaser.GameObjects.Rectangle(
+        scene,
+        this.x + this.relativeX(-5.5),
+        this.y + this.relativeY(21),
+        this.relativeX(20),
+        this.relativeY(50),
+        0x000,
+        0
+      ).setOrigin(0.5, 0.05),
+      (player, door) => {
+        // TODO: Go to house interior
+      }
+    );
+
+    this.addExtraArea(
       new Phaser.GameObjects.Rectangle(
         scene,
         this.x + this.relativeX(27),

@@ -26,11 +26,15 @@ export default abstract class BaseProp extends Phaser.Physics.Arcade.Sprite {
     this.setOffset(this.displayWidth * x, this.displayHeight * y);
   }
 
-  origin(x: number, y: number) {
-    this.setOrigin(x, y);
+  addExtraArea(
+    area: Phaser.GameObjects.Shape,
+    proplessArea?: Phaser.GameObjects.Shape,
+    playerColision?: ArcadePhysicsCallback
+  ) {
+    this.scene.events.emit('add-extra-area', area, proplessArea, playerColision);
   }
 
-  generateOccupiedArea() {
+  generateOccupiedArea(debug = false) {
     return new Phaser.GameObjects.Rectangle(
       this.scene,
       this.x,
@@ -38,7 +42,7 @@ export default abstract class BaseProp extends Phaser.Physics.Arcade.Sprite {
       this.body.width + 50,
       this.body.height + 50,
       0x000,
-      0.5
+      debug ? 0.5 : 0
     );
   }
 
