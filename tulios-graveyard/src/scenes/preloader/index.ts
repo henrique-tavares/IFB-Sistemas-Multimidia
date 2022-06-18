@@ -81,6 +81,9 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('weapon:pistol', 'assets/items/pistol.png');
     this.load.image('weapon:shotgun', 'assets/items/shotgun.png');
 
+    this.load.image('graveyard:mausoleum:bg', 'assets/graveyard/Mausoleum.png');
+    this.load.image('graveyard:tool_shed:bg', 'assets/graveyard/Tool Shed.png');
+    this.load.image('graveyard:house:bg', 'assets/graveyard/Tulios House.png');
     this.load.image('graveyard:room_00:bg', 'assets/graveyard/Room - [0,0]_ House.png');
     this.load.image('graveyard:room_01:bg', 'assets/graveyard/Room - [0,1].png');
     this.load.image('graveyard:room_02_03:bg', 'assets/graveyard/Room - ([0,2], [0,3]).png');
