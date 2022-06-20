@@ -5,7 +5,7 @@ import { Configuration } from 'webpack';
 const config: Configuration = {
   entry: './src/game.ts',
   output: {
-    path: path.join(__dirname, 'dist'),
+    path: path.join(__dirname, '..', 'dist'),
     filename: 'game.js',
   },
   resolve: {
