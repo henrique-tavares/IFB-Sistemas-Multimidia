@@ -71,6 +71,8 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('gui:inventory_bg', 'assets/gui/inventory_bg.png');
     this.load.image('gui:music_icon_on', 'assets/gui/music_icon_on.png');
     this.load.image('gui:music_icon_off', 'assets/gui/music_icon_off.png');
+    this.load.image('gui:crosshair', 'assets/gui/cursor_crosshair_white.png');
+    this.load.image('gui:cursor', 'assets/gui/cursor_white.png');
 
     this.load.spritesheet('gui:hearts', 'assets/gui/hearts.png', {
       frameWidth: 17,
@@ -160,6 +162,11 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('prop:graveyard:mausoleum', 'assets/props/graveyard/Mausoleum.png');
 
     this.load.spritesheet('characters:tulio', 'assets/characters/Tulio.png', {
+      frameWidth: 16,
+      frameHeight: 28,
+    });
+
+    this.load.spritesheet('characters:zombie', 'assets/characters/Zombie.png', {
       frameWidth: 16,
       frameHeight: 28,
     });

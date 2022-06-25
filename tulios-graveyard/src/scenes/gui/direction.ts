@@ -7,9 +7,8 @@ export default class Direction {
     s: Phaser.Input.Keyboard.Key;
     d: Phaser.Input.Keyboard.Key;
   };
+  readonly pointer: Phaser.Input.Pointer;
   private shiftKey: Phaser.Input.Keyboard.Key;
-  private keycount: number = 0;
-  private capped: boolean = false;
 
   constructor(scene: Phaser.Scene) {
     this.keys = {
@@ -19,36 +18,9 @@ export default class Direction {
       d: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D, true),
     };
 
+    this.pointer = scene.input.mousePointer;
+
     this.shiftKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT, true);
-
-    scene.input.keyboard.addListener('keycount', (count: number) => {
-      this.keycount += count;
-
-      if (this.keycount == 2) {
-        scene.input.keyboard.emit('capKeys');
-        this.capped = true;
-        return;
-      }
-
-      if (this.keycount < 2 && this.capped) {
-        scene.input.keyboard.emit('freeKeys');
-      }
-    });
-
-    Object.values(this.keys).forEach(key => {
-      key.addListener('capKeys', () => {
-        if (key.isUp) {
-          key.enabled = false;
-        }
-      });
-      key.addListener('freeKeys', () => {
-        if (!key.enabled) {
-          key.enabled = true;
-        }
-      });
-      key.on('down', () => key.emit('keycount', 1));
-      key.on('up', () => key.emit('keycount', -1));
-    });
   }
 
   get isLeft(): boolean {
@@ -77,5 +49,9 @@ export default class Direction {
 
   get shift(): boolean {
     return this.shiftKey.isDown;
+  }
+
+  get isPressed(): boolean {
+    return Object.values(this.keys).some(key => key.isDown);
   }
 }

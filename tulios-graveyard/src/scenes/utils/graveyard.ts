@@ -96,3 +96,7 @@ export function graveyardPropBuilder(scene: Phaser.Scene, propKey: GraveyardProp
     }
   }
 }
+
+export const allGraveyardProps: GraveyardProp[] = Object.keys(GraveyardProp)
+  .filter(key => typeof GraveyardProp[key] === 'number')
+  .map(key => GraveyardProp[key]);

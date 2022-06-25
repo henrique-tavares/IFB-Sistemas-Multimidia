@@ -1,13 +1,14 @@
 import { Scene } from 'phaser';
-import Direction from '../scenes/gui/direction';
-import Entity from './entity';
-import Weapon, { WeaponType } from '../items/weapon';
 import PlayerHandler from '../handlers/playerHandler';
-import { TulioData } from '../types';
+import Direction from '../scenes/gui/direction';
+import { angleToDirection, correctAngle, isBetween } from '../scenes/utils/misc';
+import { Orientation, TulioData } from '../types';
+import Entity from './entity';
 
 export default class Tulio extends Entity {
   private direction: Direction;
   private frozen = false;
+  private baseVelocity = 120;
 
   constructor(scene: Scene, x: number = 400, y: number = 300) {
     super('characters:tulio', scene.physics.add.sprite(x, y, 'characters:tulio'), 10, 1);
@@ -34,31 +35,49 @@ export default class Tulio extends Entity {
 
     this.animations = [
       {
-        key: 'walkRight',
+        key: `${this.key}-walk-right`,
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [3, 4, 5] }),
         frameRate: 8,
         repeat: -1,
       },
       {
-        key: 'walkLeft',
+        key: `${this.key}-idle-right`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [4] }),
+        frameRate: 8,
+        repeat: -1,
+      },
+      {
+        key: `${this.key}-walk-left`,
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [9, 10, 11] }),
         frameRate: 8,
         repeat: -1,
       },
       {
-        key: 'walkUp',
+        key: `${this.key}-idle-left`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [10] }),
+        frameRate: 8,
+        repeat: -1,
+      },
+      {
+        key: `${this.key}-walk-up`,
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [0, 1, 2] }),
         frameRate: 8,
         repeat: -1,
       },
       {
-        key: 'walkDown',
+        key: `${this.key}-idle-up`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [1] }),
+        frameRate: 8,
+        repeat: -1,
+      },
+      {
+        key: `${this.key}-walk-down`,
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [6, 7, 8] }),
         frameRate: 8,
         repeat: -1,
       },
       {
-        key: 'idle',
+        key: `${this.key}-idle-down`,
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [7] }),
         frameRate: 8,
         repeat: -1,
@@ -70,6 +89,20 @@ export default class Tulio extends Entity {
     });
 
     this.direction = scene.scene.get('gui-scene').data.get('direction') as Direction;
+  }
+
+  public get facingDirection(): Orientation {
+    const playerToCursorLine = new Phaser.Geom.Line(
+      this.sprite.x,
+      this.sprite.y,
+      this.direction.pointer.x,
+      this.direction.pointer.y
+    );
+
+    const angle = Phaser.Geom.Line.Angle(playerToCursorLine);
+    const correctedAngle = correctAngle(angle);
+
+    return angleToDirection(correctedAngle);
   }
 
   setPosition(x: number, y: number) {
@@ -87,52 +120,49 @@ export default class Tulio extends Entity {
     this.sprite.body.velocity.limit(120);
   }
 
-  handleSpriteAnimation() {
+  update() {
     if (this.frozen) {
       return;
     }
 
+    const { x: velX, y: velY } = this.calculateVelocity();
+    this.sprite.setVelocity(velX, velY);
+
+    const anim = `${this.key}-${this.direction.isPressed && this.sprite.body.speed > 0 ? 'walk' : 'idle'}-${
+      this.facingDirection
+    }`;
+    if (this.currentAnimation != anim) {
+      this.sprite.play(anim);
+    }
+
+    this.sprite.body.velocity.limit(this.baseVelocity);
+
+    if (this.direction.shift && this.sprite.body.speed > 0) {
+      this.sprite.setVelocity(velX * 2, velY * 2);
+      this.sprite.body.velocity.limit(this.baseVelocity * 2);
+    }
+  }
+
+  calculateVelocity(): { x: number; y: number } {
+    let x = 0;
+    let y = 0;
+
     if (this.direction.isLeft) {
-      if (this.currentAnimation !== 'walkLeft' && !this.direction.isVertical) {
-        this.sprite.play('walkLeft');
-      }
+      x -= this.baseVelocity;
+    }
 
-      this.sprite.setVelocityX(-120);
-    } else if (this.direction.isRight) {
-      if (this.currentAnimation !== 'walkRight' && !this.direction.isVertical) {
-        this.sprite.play('walkRight');
-      }
-
-      this.sprite.setVelocityX(120);
-    } else {
-      this.sprite.setVelocityX(0);
+    if (this.direction.isRight) {
+      x += this.baseVelocity;
     }
 
     if (this.direction.isUp) {
-      if (this.currentAnimation !== 'walkUp' && !this.direction.isHorizontal) {
-        this.sprite.play('walkUp');
-      }
-
-      this.sprite.setVelocityY(-120);
-    } else if (this.direction.isDown) {
-      if (this.currentAnimation !== 'walkDown' && !this.direction.isHorizontal) {
-        this.sprite.play('walkDown');
-      }
-
-      this.sprite.setVelocityY(120);
-    } else {
-      this.sprite.setVelocityY(0);
+      y -= this.baseVelocity;
     }
 
-    this.sprite.body.velocity.limit(120);
-
-    if (this.direction.shift) {
-      this.sprite.setVelocity(this.sprite.body.velocity.x * 2, this.sprite.body.velocity.y * 2);
-      this.sprite.body.velocity.limit(120 * 2);
+    if (this.direction.isDown) {
+      y += this.baseVelocity;
     }
 
-    if (this.sprite.body.velocity.x == 0 && this.sprite.body.velocity.y == 0) {
-      this.sprite.play('idle');
-    }
+    return { x, y };
   }
 }

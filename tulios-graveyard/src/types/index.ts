@@ -81,3 +81,15 @@ export interface TulioData {
   health: number;
   weapon: Weapon;
 }
+
+export enum RoomDifficulty {
+  Easy = 1,
+  Medium,
+  Hard,
+}
+
+export interface BorderSideArea {
+  pos: { x: number; y: number };
+  size: { width: number; height: number };
+  origin: { x: number; y: number };
+}

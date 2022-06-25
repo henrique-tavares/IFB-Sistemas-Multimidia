@@ -9,6 +9,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@types/lodash": "^4.14.182",
     "css-loader": "^6.7.1",
     "esbuild-loader": "^2.19.0",
     "phaser": "^3.50.0",
@@ -19,5 +20,8 @@
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.9.2",
     "webpack-merge": "^5.8.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
   }
 }

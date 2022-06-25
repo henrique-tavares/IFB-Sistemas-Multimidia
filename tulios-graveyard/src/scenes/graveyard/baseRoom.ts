@@ -1,31 +1,33 @@
+import Tulio from '../../entities/tulio';
+import Zombie from '../../entities/zombie';
+import AudioHandler from '../../handlers/audioHandler';
+import BaseProp from '../../props/baseProp';
 import {
   BackgroundBorder,
   BackgroundBorderConfig,
+  BorderSideArea,
   GraveyardProp,
   NextRoom,
   NextRoomData,
   Orientation,
   PlayerCoordinate,
+  RoomDifficulty,
   RoomSize,
 } from '../../types';
-import AudioHandler from '../../handlers/audioHandler';
+import Background from '../utils/background';
+import { allGraveyardProps, graveyardPropBuilder } from '../utils/graveyard';
 import {
   clamp,
   gameScreen,
   generateRandomArray,
   generateRandomPosition,
   isEmpty,
-  isPropPositionValid,
+  isSpritePositionValid,
+  randomInRange,
 } from '../utils/misc';
 import NextRoomArrow from '../utils/nextRoomArrow';
 import Screen from '../utils/screen';
-import Tulio from '../../entities/tulio';
-import Background from '../utils/background';
-import BaseProp from '../../props/baseProp';
-import Tree from '../../props/tree';
-import Tombstone from '../../props/tombstone';
-import { Physics } from 'phaser';
-import { graveyardPropBuilder } from '../utils/graveyard';
+import _ from 'lodash';
 
 export default abstract class BaseRoom extends Phaser.Scene {
   protected key: string;
@@ -33,21 +35,27 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected screen: Screen;
   protected bg: Background;
   protected bgBorder: BackgroundBorder;
+  protected borderArea: {
+    [key in 'top' | 'right' | 'bottom' | 'left']: BorderSideArea;
+  };
   protected nextRoom: NextRoom;
   protected nextRoomData: NextRoomData;
   protected fadeDuration = 500;
   private isThereNextRoom: boolean;
+  protected enemiesGroup: Phaser.Physics.Arcade.Group;
   protected staticProps: Phaser.Physics.Arcade.StaticGroup;
   protected dynamicSprites: Phaser.Physics.Arcade.Sprite[];
   protected proplessAreas: Phaser.Physics.Arcade.StaticGroup;
   readonly roomSize: RoomSize;
+  readonly difficulty: RoomDifficulty;
 
   constructor(
     key: string,
     borderConfig: BackgroundBorderConfig,
     nextRoom: NextRoom,
     nextRoomData: NextRoomData,
-    roomSize: RoomSize
+    roomSize: RoomSize,
+    difficulty: RoomDifficulty
   ) {
     super(key);
 
@@ -61,142 +69,9 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.nextRoom = nextRoom;
     this.nextRoomData = nextRoomData;
     this.roomSize = roomSize;
-  }
+    this.difficulty = difficulty;
 
-  init(coordinate: PlayerCoordinate) {
-    console.log(this.constructor.name);
-    this.fadeIn(this.fadeDuration);
-    if (isEmpty(coordinate)) {
-      this.physics.world.once('worldbounds', this.onWorldBounds, this);
-      return;
-    }
-    this.events.on('reposition-player', () => {
-      const { x, y } = this.repositionPlayer(coordinate);
-      this.player.setPosition(x, y);
-
-      this.physics.world.once('worldbounds', this.onWorldBounds, this);
-    });
-  }
-
-  create() {
-    this.bg = new Background(this, `${this.key}:bg`, this.bgBorder);
-    this.screen = new Screen(this.bg.image.width, this.bg.image.height);
-
-    this.player = new Tulio(this);
-    this.player.sprite.body.setCollideWorldBounds(true, undefined, undefined, true);
-
-    this.events.emit('reposition-player');
-
-    this.cameras.main.startFollow(this.player.sprite);
-    this.bg.applyBoundsOnSprite(this.player.sprite);
-
-    this.staticProps = this.physics.add.staticGroup();
-
-    this.events.on(
-      'add-extra-area',
-      (
-        area: Phaser.GameObjects.Shape,
-        proplessArea?: Phaser.GameObjects.Shape,
-        playerColision?: ArcadePhysicsCallback,
-        debug = false
-      ) => {
-        if (playerColision) {
-          this.add.existing(area);
-          this.physics.add.existing(area, true);
-          this.physics.add.overlap(this.player.sprite, area, playerColision, undefined, this);
-        } else {
-          this.staticProps.add(area, true);
-        }
-        this.proplessAreas.add(
-          proplessArea ??
-            new Phaser.GameObjects.Rectangle(
-              this,
-              area.x,
-              area.y,
-              area.width + 50,
-              area.height + 50,
-              0x000,
-              debug ? 0.5 : 0
-            ),
-          true
-        );
-        this.refreshProps();
-      }
-    );
-
-    this.physics.add.collider(this.player.sprite, this.staticProps);
-
-    this.generateInicialProplessAreas();
-
-    const audioHandler = this.cache.custom['handlers'].get('audioHandler') as AudioHandler;
-    audioHandler.handleBackgroundMusic(this);
-
-    const nextRoomArrows = Object.entries(this.nextRoom).map(
-      ([key, value]) =>
-        new NextRoomArrow(this, this.screen, key as Orientation, Array.isArray(value) ? value.length : 1)
-    );
-
-    this.physics.world.on(`${this.key}:concluded`, () =>
-      nextRoomArrows.forEach(arrow => {
-        arrow.toggleVisible();
-      })
-    );
-
-    this.events.on('wake', this.wake, this);
-
-    setTimeout(() => {
-      this.physics.world.emit(`${this.key}:concluded`);
-    }, 1000);
-  }
-
-  update() {
-    this.player.handleSpriteAnimation();
-
-    this.dynamicSprites.forEach(sprite => {
-      sprite.setDepth(sprite.y);
-    });
-  }
-
-  addFixedProps(...props: BaseProp[]) {
-    this.staticProps.addMultiple(props, true);
-    this.proplessAreas.addMultiple(
-      props.map(prop => prop.generateOccupiedArea()),
-      true
-    );
-    this.refreshProps();
-  }
-
-  addProps(...propKeys: GraveyardProp[]) {
-    propKeys.forEach(propKey => {
-      const newProp = graveyardPropBuilder(this, propKey, 0, 0);
-      do {
-        const randomPosition = generateRandomPosition(this.screen);
-        newProp.updatePosition(randomPosition.x, randomPosition.y);
-      } while (
-        this.proplessAreas.getChildren().some((area: Phaser.GameObjects.Shape) => !isPropPositionValid(newProp, area))
-      );
-
-      this.staticProps.add(newProp, true);
-      this.proplessAreas.add(newProp.generateOccupiedArea(), true);
-    });
-
-    this.refreshProps();
-  }
-
-  generateRandomProps(num: number, propsPool: GraveyardProp[] = [0, 1, 2, 3, 4, 5]) {
-    const props = generateRandomArray(num, 0, propsPool.length).map(num => propsPool[num]);
-
-    this.addProps(...props);
-  }
-
-  private generateInicialProplessAreas(debug = false) {
-    const borders: {
-      [key: string]: {
-        pos: { x: number; y: number };
-        size: { width: number; height: number };
-        origin: { x: number; y: number };
-      };
-    } = {
+    this.borderArea = {
       top: {
         pos: { x: 50, y: 0 },
         size: { height: this.bgBorder['top'] ?? 10, width: 100 },
@@ -230,10 +105,147 @@ export default abstract class BaseRoom extends Phaser.Scene {
         },
       },
     };
+  }
+
+  init(coordinate: PlayerCoordinate) {
+    console.log(this.constructor.name);
+    this.fadeIn(this.fadeDuration);
+    if (isEmpty(coordinate)) {
+      this.physics.world.once('worldbounds', this.onWorldBounds, this);
+      return;
+    }
+    this.events.on('reposition-player', () => {
+      const { x, y } = this.repositionPlayer(coordinate);
+      this.player.setPosition(x, y);
+
+      this.physics.world.once('worldbounds', this.onWorldBounds, this);
+    });
+  }
+
+  create() {
+    this.bg = new Background(this, `${this.key}:bg`, this.bgBorder);
+    this.screen = new Screen(this.bg.image.width, this.bg.image.height);
+
+    this.player = new Tulio(this);
+    this.player.sprite.body.setCollideWorldBounds(true, undefined, undefined, true);
+    this.data.set('player', this.player);
+
+    this.events.emit('reposition-player');
+
+    this.cameras.main.startFollow(this.player.sprite);
+    this.bg.applyBoundsOnSprite(this.player.sprite);
+
+    this.staticProps = this.physics.add.staticGroup();
+
+    this.events.on('add-extra-area', this.addExtraArea, this);
+
+    this.physics.add.collider(this.player.sprite, this.staticProps);
+
+    this.enemiesGroup = this.physics.add.group();
+    this.physics.add.collider(this.enemiesGroup, this.enemiesGroup);
+    this.physics.add.collider(this.player.sprite, this.enemiesGroup);
+    this.physics.add.collider(this.staticProps, this.enemiesGroup);
 
     this.proplessAreas = this.physics.add.staticGroup();
+
+    this.generateInicialProplessAreas();
+    this.refreshProps();
+
+    this.addEnemies();
+
+    const audioHandler = this.cache.custom['handlers'].get('audioHandler') as AudioHandler;
+    audioHandler.handleBackgroundMusic(this);
+
+    const nextRoomArrows = Object.entries(this.nextRoom).map(
+      ([key, value]) =>
+        new NextRoomArrow(this, this.screen, key as Orientation, Array.isArray(value) ? value.length : 1)
+    );
+
+    this.physics.world.on(`${this.key}:concluded`, () =>
+      nextRoomArrows.forEach(arrow => {
+        arrow.toggleVisible();
+      })
+    );
+
+    this.events.on('wake', this.wake, this);
+
+    this.time.delayedCall(1000, () => {
+      this.physics.world.emit(`${this.key}:concluded`);
+    });
+  }
+
+  update() {
+    this.player.update();
+
+    this.dynamicSprites.forEach(sprite => {
+      sprite.setDepth(sprite.y);
+    });
+  }
+
+  addFixedProps(...props: BaseProp[]) {
+    this.staticProps.addMultiple(props, true);
     this.proplessAreas.addMultiple(
-      Object.values(borders).map(value =>
+      props.map(prop => prop.generateOccupiedArea()),
+      true
+    );
+    this.refreshProps();
+  }
+
+  addProps(...propKeys: GraveyardProp[]) {
+    propKeys.forEach(propKey => {
+      const newProp = graveyardPropBuilder(this, propKey, 0, 0);
+      do {
+        const randomPosition = generateRandomPosition(this.screen);
+        newProp.updatePosition(randomPosition.x, randomPosition.y);
+      } while (
+        this.proplessAreas.getChildren().some((area: Phaser.GameObjects.Shape) => !isSpritePositionValid(newProp, area))
+      );
+
+      this.staticProps.add(newProp, true);
+      this.proplessAreas.add(newProp.generateOccupiedArea(), true);
+    });
+
+    this.refreshProps();
+  }
+
+  generateRandomProps(num: number, propsPool: GraveyardProp[] = allGraveyardProps) {
+    const props = generateRandomArray(num, 0, propsPool.length).map(num => propsPool[num]);
+
+    this.addProps(...props);
+  }
+
+  addExtraArea(
+    area: Phaser.GameObjects.Shape,
+    proplessArea?: Phaser.GameObjects.Shape,
+    playerColision?: ArcadePhysicsCallback,
+    debug = false
+  ) {
+    if (playerColision) {
+      this.add.existing(area);
+      this.physics.add.existing(area, true);
+      this.physics.add.overlap(this.player.sprite, area, playerColision, undefined, this);
+    } else {
+      this.staticProps.add(area, true);
+    }
+    this.proplessAreas.add(
+      proplessArea ??
+        new Phaser.GameObjects.Rectangle(
+          this,
+          area.x,
+          area.y,
+          area.width + 50,
+          area.height + 50,
+          0x000,
+          debug ? 0.5 : 0
+        ),
+      true
+    );
+    this.refreshProps();
+  }
+
+  private generateInicialProplessAreas(debug = false) {
+    this.proplessAreas.addMultiple(
+      Object.values(this.borderArea).map(value =>
         new Phaser.GameObjects.Rectangle(
           this,
           this.screen.relativeX(value.pos.x),
@@ -331,6 +343,80 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.dynamicSprites = this.children.list.filter(
       child => child.body instanceof Phaser.Physics.Arcade.Body
     ) as Phaser.Physics.Arcade.Sprite[];
+  }
+
+  addEnemies() {
+    const enemiesNum = _.random(3, 5) * this.difficulty;
+
+    const directionTranslator = {
+      up: 'top',
+      right: 'right',
+      down: 'bottom',
+      left: 'left',
+    };
+
+    const spawnableArea: BorderSideArea[] = Object.keys(this.nextRoom).map(
+      key => this.borderArea[directionTranslator[key]]
+    );
+
+    const handleZombieSpawnPositionOffscreen = (
+      pos: number,
+      orientation: 'vertical' | 'horizontal',
+      zombie: Zombie
+    ) => {
+      switch (orientation) {
+        case 'horizontal': {
+          if (pos == this.screen.relativeX(0)) {
+            return -zombie.sprite.width * zombie.sprite.scaleX;
+          }
+          if (pos == this.screen.relativeX(100)) {
+            return pos + zombie.sprite.width * zombie.sprite.scaleX;
+          }
+          return pos;
+        }
+        case 'vertical': {
+          if (pos == this.screen.relativeY(0)) {
+            return -zombie.sprite.height * zombie.sprite.scaleY;
+          }
+          if (pos == this.screen.relativeY(100)) {
+            return pos + zombie.sprite.height * zombie.sprite.scaleY;
+          }
+          return pos;
+        }
+      }
+    };
+
+    for (const _x of _.range(enemiesNum)) {
+      const side = _.sample(spawnableArea)!.origin;
+
+      this.time.delayedCall(_.random(1000, 5000, true), () => {
+        const zombie = new Zombie(this, 0, 0);
+
+        do {
+          const randomPosition = {
+            x: [0, 1].includes(side.x)
+              ? this.screen.relativeX(side.x * 100)
+              : this.screen.relativeX(_.random(this.bgBorder['left'] ?? 0, 100 - (this.bgBorder['right'] ?? 0), true)),
+            y: [0, 1].includes(side.y)
+              ? this.screen.relativeY(side.y * 100)
+              : this.screen.relativeY(_.random(this.bgBorder['top'] ?? 0, 100 - (this.bgBorder['bottom'] ?? 0), true)),
+          };
+
+          zombie.sprite.setPosition(
+            handleZombieSpawnPositionOffscreen(randomPosition.x, 'horizontal', zombie),
+            handleZombieSpawnPositionOffscreen(randomPosition.y, 'vertical', zombie)
+          );
+        } while (
+          this.enemiesGroup
+            .getChildren()
+            .some(
+              (child: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) => !isSpritePositionValid(zombie.sprite, child)
+            )
+        );
+
+        this.enemiesGroup.add(zombie.sprite);
+      });
+    }
   }
 
   onWorldBounds(body: Phaser.Physics.Arcade.Body) {

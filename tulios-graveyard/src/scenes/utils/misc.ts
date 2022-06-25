@@ -1,4 +1,5 @@
 import BaseProp from '../../props/baseProp';
+import { Orientation } from '../../types';
 import Screen from './screen';
 
 export function clamp(num: number, min: number, max: number) {
@@ -7,6 +8,38 @@ export function clamp(num: number, min: number, max: number) {
 
 export function isEmpty(data: { [k: string]: any }) {
   return Object.entries(data).length === 0;
+}
+
+export function isBetween(min: number, num: number, max: number) {
+  return min <= num && num <= max;
+}
+
+export function angleToDirection(angle: number): Orientation {
+  if (isBetween(0, angle, Math.PI / 4) || isBetween((7 * Math.PI) / 4, angle, Math.PI * 2)) {
+    return 'right';
+  }
+
+  if (isBetween(Math.PI / 4, angle, (3 * Math.PI) / 4)) {
+    return 'up';
+  }
+
+  if (isBetween((3 * Math.PI) / 4, angle, (5 * Math.PI) / 4)) {
+    return 'left';
+  }
+
+  if (isBetween((5 * Math.PI) / 4, angle, (7 * Math.PI) / 4)) {
+    return 'down';
+  }
+
+  return 'down';
+}
+
+export function correctAngle(angle: number) {
+  return angle < 0 ? -angle : Math.PI - angle + Math.PI;
+}
+
+export function angleToRadians(angle: number) {
+  return (angle * Math.PI) / 180;
 }
 
 export const gameScreen = {
@@ -28,9 +61,16 @@ export function generateRandomPosition(screen: Screen) {
 export function generateRandomArray(length: number, min: number, max: number) {
   return Array(length)
     .fill(null)
-    .map(() => Math.floor(Math.random() * (max - min) + min));
+    .map(() => Math.floor(randomInRange(min, max)));
 }
 
-export function isPropPositionValid(prop: BaseProp, shape: Phaser.GameObjects.Shape) {
-  return Phaser.Geom.Rectangle.Intersection(shape.getBounds(), prop.getBounds()).isEmpty();
+export function randomInRange(min: number, max: number) {
+  return Math.random() * (max - min) + min;
+}
+
+export function isSpritePositionValid(
+  sprite: Phaser.Physics.Arcade.Sprite,
+  other: Phaser.GameObjects.Shape | Phaser.Physics.Arcade.Sprite
+) {
+  return Phaser.Geom.Rectangle.Intersection(other.getBounds(), sprite.getBounds()).isEmpty();
 }
