@@ -14,6 +14,9 @@ export default class Zombie extends Entity {
       .setOrigin(0.5, 0.85)
       .setOffset(0, this.sprite.height * 0.8);
 
+    this.sprite.setDrag(0.8).setFriction(0.8).setMaxVelocity(30).setMass(5000).setDamping(true);
+    this.sprite.body.velocity.limit(30);
+
     this.animations = [
       {
         key: `${this.key}-walk-right`,
@@ -69,6 +72,7 @@ export default class Zombie extends Entity {
       -Math.cos(correctedAngle) * this.baseVelocity,
       Math.sin(correctedAngle) * this.baseVelocity
     );
+    this.sprite.body.velocity.limit(30);
 
     const mirroredAngle = (correctedAngle + Math.PI) % (Math.PI * 2);
 

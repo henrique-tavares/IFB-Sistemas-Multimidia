@@ -40,16 +40,10 @@ export default class Room_00 extends BaseRoom {
     super.create();
 
     super.addFixedProps(new House(this, this.screen.relativeX(28), this.screen.relativeY(32)));
-    // this.zombie = new Zombie(this, 700, 300);
-
-    // this.add.sprite(600, 300, 'characters:zombie', 7).setScale(2.5);
     super.generateRandomProps(5, [GraveyardProp.Tree1, GraveyardProp.Tree2, GraveyardProp.Tree3]);
-    const direction = this.scene.get('gui-scene').data.get('direction') as Direction;
-    this.cursor = direction.pointer;
   }
 
   update() {
     super.update();
-    // this.zombie.update();
   }
 }

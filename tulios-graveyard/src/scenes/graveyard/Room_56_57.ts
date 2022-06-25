@@ -1,6 +1,6 @@
 import 'phaser';
 import Mausoleum from '../../props/mausoleum';
-import { RoomSize } from '../../types';
+import { RoomDifficulty, RoomSize } from '../../types';
 import { generateNextRoomData } from '../utils/graveyard';
 import BaseRoom from './baseRoom';
 
@@ -25,7 +25,8 @@ export default class Room_56_57 extends BaseRoom {
           mode: 'single',
         },
       }),
-      RoomSize['1x2']
+      RoomSize['1x2'],
+      RoomDifficulty.Hard
     );
   }
 

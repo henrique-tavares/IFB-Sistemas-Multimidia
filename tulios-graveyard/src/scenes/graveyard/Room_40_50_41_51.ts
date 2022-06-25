@@ -1,5 +1,5 @@
 import 'phaser';
-import { RoomSize } from '../../types';
+import { RoomDifficulty, RoomSize } from '../../types';
 import { generateNextRoomData } from '../utils/graveyard';
 import BaseRoom from './baseRoom';
 
@@ -25,7 +25,8 @@ export default class Room_40_50_41_51 extends BaseRoom {
           offsets: [0, 0],
         },
       }),
-      RoomSize['2x2']
+      RoomSize['2x2'],
+      RoomDifficulty.Medium
     );
   }
 

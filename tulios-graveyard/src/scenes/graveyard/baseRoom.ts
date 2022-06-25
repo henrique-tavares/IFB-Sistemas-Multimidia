@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import Tulio from '../../entities/tulio';
 import Zombie from '../../entities/zombie';
 import AudioHandler from '../../handlers/audioHandler';
@@ -23,11 +24,9 @@ import {
   generateRandomPosition,
   isEmpty,
   isSpritePositionValid,
-  randomInRange,
 } from '../utils/misc';
 import NextRoomArrow from '../utils/nextRoomArrow';
 import Screen from '../utils/screen';
-import _ from 'lodash';
 
 export default abstract class BaseRoom extends Phaser.Scene {
   protected key: string;
@@ -44,7 +43,6 @@ export default abstract class BaseRoom extends Phaser.Scene {
   private isThereNextRoom: boolean;
   protected enemiesGroup: Phaser.Physics.Arcade.Group;
   protected staticProps: Phaser.Physics.Arcade.StaticGroup;
-  protected dynamicSprites: Phaser.Physics.Arcade.Sprite[];
   protected proplessAreas: Phaser.Physics.Arcade.StaticGroup;
   readonly roomSize: RoomSize;
   readonly difficulty: RoomDifficulty;
@@ -143,7 +141,10 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.enemiesGroup = this.physics.add.group();
     this.physics.add.collider(this.enemiesGroup, this.enemiesGroup);
-    this.physics.add.collider(this.player.sprite, this.enemiesGroup);
+    this.physics.add.collider(this.player.sprite, this.enemiesGroup, (player, enemy) => {
+      player.body.velocity.limit(30);
+      enemy.body.velocity.limit(30);
+    });
     this.physics.add.collider(this.staticProps, this.enemiesGroup);
 
     this.proplessAreas = this.physics.add.staticGroup();
@@ -161,11 +162,12 @@ export default abstract class BaseRoom extends Phaser.Scene {
         new NextRoomArrow(this, this.screen, key as Orientation, Array.isArray(value) ? value.length : 1)
     );
 
-    this.physics.world.on(`${this.key}:concluded`, () =>
+    this.physics.world.on(`${this.key}:concluded`, () => {
+      this.data.set('concluded', true);
       nextRoomArrows.forEach(arrow => {
         arrow.toggleVisible();
-      })
-    );
+      });
+    });
 
     this.events.on('wake', this.wake, this);
 
@@ -177,9 +179,11 @@ export default abstract class BaseRoom extends Phaser.Scene {
   update() {
     this.player.update();
 
-    this.dynamicSprites.forEach(sprite => {
-      sprite.setDepth(sprite.y);
-    });
+    this.children.list
+      .filter(child => child.body instanceof Phaser.Physics.Arcade.Body)
+      .forEach((sprite: Phaser.Physics.Arcade.Sprite) => {
+        sprite.setDepth(sprite.y);
+      });
   }
 
   addFixedProps(...props: BaseProp[]) {
@@ -339,10 +343,6 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.staticProps.getChildren().forEach((prop: Phaser.Physics.Arcade.Sprite) => {
       prop.setDepth(prop.y);
     });
-
-    this.dynamicSprites = this.children.list.filter(
-      child => child.body instanceof Phaser.Physics.Arcade.Body
-    ) as Phaser.Physics.Arcade.Sprite[];
   }
 
   addEnemies() {
@@ -355,9 +355,32 @@ export default abstract class BaseRoom extends Phaser.Scene {
       left: 'left',
     };
 
-    const spawnableArea: BorderSideArea[] = Object.keys(this.nextRoom).map(
-      key => this.borderArea[directionTranslator[key]]
-    );
+    const spawnableArea = Object.entries(this.nextRoom).reduce((acc, [side, room]) => {
+      if (_.isArray(room)) {
+        const areas: BorderSideArea[] = room
+          .filter(room => !this.scene.get(room).data.get('concluded'))
+          .map((_room, i) => {
+            const area: BorderSideArea = this.borderArea[directionTranslator[side]];
+
+            return {
+              ...area,
+              pos: {
+                x: area.pos.x == 50 ? (i + 1) * 25 : area.pos.x,
+                y: area.pos.y == 50 ? (i + 1) * 25 : area.pos.y,
+              },
+            };
+          });
+
+        return [...acc, ...areas];
+      }
+
+      return [
+        ...acc,
+        ...(!this.scene.get(room).data.get('concluded')
+          ? [this.borderArea[directionTranslator[side]] as BorderSideArea]
+          : []),
+      ];
+    }, [] as BorderSideArea[]);
 
     const handleZombieSpawnPositionOffscreen = (
       pos: number,
@@ -391,15 +414,19 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
       this.time.delayedCall(_.random(1000, 5000, true), () => {
         const zombie = new Zombie(this, 0, 0);
+        const borderSafety = {
+          x: 15,
+          y: 10,
+        };
 
         do {
           const randomPosition = {
             x: [0, 1].includes(side.x)
               ? this.screen.relativeX(side.x * 100)
-              : this.screen.relativeX(_.random(this.bgBorder['left'] ?? 0, 100 - (this.bgBorder['right'] ?? 0), true)),
+              : this.screen.relativeX(_.random(borderSafety.x, 100 - borderSafety.x, true)),
             y: [0, 1].includes(side.y)
               ? this.screen.relativeY(side.y * 100)
-              : this.screen.relativeY(_.random(this.bgBorder['top'] ?? 0, 100 - (this.bgBorder['bottom'] ?? 0), true)),
+              : this.screen.relativeY(_.random(borderSafety.y, 100 - borderSafety.y, true)),
           };
 
           zombie.sprite.setPosition(

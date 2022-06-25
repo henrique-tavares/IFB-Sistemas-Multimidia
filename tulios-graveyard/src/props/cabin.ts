@@ -18,7 +18,7 @@ export default class Cabin extends BaseProp {
         this.relativeX(20),
         this.relativeY(7),
         0x000,
-        0.5
+        0
       ),
       new Phaser.GameObjects.Rectangle(
         scene,
@@ -27,7 +27,7 @@ export default class Cabin extends BaseProp {
         this.relativeX(30),
         this.relativeY(100),
         0x000,
-        0.5
+        0
       ).setOrigin(0.5, 0.05),
       (player, door) => {
         // TODO: Go to cabin interior
