@@ -410,7 +410,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
     };
 
     for (const _x of _.range(enemiesNum)) {
-      const side = _.sample(spawnableArea)!.origin;
+      const side = _.sample(spawnableArea)!;
 
       this.time.delayedCall(_.random(1000, 5000, true), () => {
         const zombie = new Zombie(this, 0, 0);
@@ -421,12 +421,20 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
         do {
           const randomPosition = {
-            x: [0, 1].includes(side.x)
-              ? this.screen.relativeX(side.x * 100)
-              : this.screen.relativeX(_.random(borderSafety.x, 100 - borderSafety.x, true)),
-            y: [0, 1].includes(side.y)
-              ? this.screen.relativeY(side.y * 100)
-              : this.screen.relativeY(_.random(borderSafety.y, 100 - borderSafety.y, true)),
+            x: [0, 1].includes(side.origin.x)
+              ? this.screen.relativeX(side.origin.x * 100)
+              : side.pos.x == 50
+              ? this.screen.relativeX(_.random(borderSafety.x, 100 - borderSafety.x, true))
+              : this.screen.relativeX(
+                  _.random(borderSafety.x + side.pos.x - 25, side.pos.x + 25 - borderSafety.x, true)
+                ),
+            y: [0, 1].includes(side.origin.y)
+              ? this.screen.relativeY(side.origin.y * 100)
+              : side.pos.y == 50
+              ? this.screen.relativeY(_.random(borderSafety.y, 100 - borderSafety.y, true))
+              : this.screen.relativeY(
+                  _.random(borderSafety.y + side.pos.y - 25, side.pos.y + 25 - borderSafety.y, true)
+                ),
           };
 
           zombie.sprite.setPosition(
