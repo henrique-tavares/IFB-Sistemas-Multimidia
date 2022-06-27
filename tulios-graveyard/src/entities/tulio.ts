@@ -1,4 +1,5 @@
-import { Scene } from 'phaser';
+import { delay } from 'lodash';
+import { Input, Scene } from 'phaser';
 import PlayerHandler from '../handlers/playerHandler';
 import Direction from '../scenes/gui/direction';
 import { angleToDirection, correctAngle, isBetween } from '../scenes/utils/misc';
@@ -8,10 +9,12 @@ import Entity from './entity';
 export default class Tulio extends Entity {
   private direction: Direction;
   private frozen = false;
+  private isAttacking = false;
   private baseVelocity = 120;
 
   constructor(scene: Scene, x: number = 400, y: number = 300) {
     super('characters:tulio', scene.physics.add.sprite(x, y, 'characters:tulio'), 10, 1);
+
     this.sprite
       .setSize(this.sprite.width, this.sprite.height * 0.2)
       .setScale(2.5)
@@ -41,20 +44,8 @@ export default class Tulio extends Entity {
         repeat: -1,
       },
       {
-        key: `${this.key}-idle-right`,
-        frames: scene.anims.generateFrameNumbers(this.key, { frames: [4] }),
-        frameRate: 8,
-        repeat: -1,
-      },
-      {
         key: `${this.key}-walk-left`,
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [9, 10, 11] }),
-        frameRate: 8,
-        repeat: -1,
-      },
-      {
-        key: `${this.key}-idle-left`,
-        frames: scene.anims.generateFrameNumbers(this.key, { frames: [10] }),
         frameRate: 8,
         repeat: -1,
       },
@@ -65,14 +56,26 @@ export default class Tulio extends Entity {
         repeat: -1,
       },
       {
-        key: `${this.key}-idle-up`,
-        frames: scene.anims.generateFrameNumbers(this.key, { frames: [1] }),
+        key: `${this.key}-walk-down`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [6, 7, 8] }),
         frameRate: 8,
         repeat: -1,
       },
       {
-        key: `${this.key}-walk-down`,
-        frames: scene.anims.generateFrameNumbers(this.key, { frames: [6, 7, 8] }),
+        key: `${this.key}-idle-right`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [4] }),
+        frameRate: 8,
+        repeat: -1,
+      },
+      {
+        key: `${this.key}-idle-left`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [10] }),
+        frameRate: 8,
+        repeat: -1,
+      },
+      {
+        key: `${this.key}-idle-up`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [1] }),
         frameRate: 8,
         repeat: -1,
       },
@@ -81,6 +84,26 @@ export default class Tulio extends Entity {
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [7] }),
         frameRate: 8,
         repeat: -1,
+      },
+      {
+        key: `${this.key}-shovel-attack-right`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [27, 28, 29] }),
+        duration: 200,
+      },
+      {
+        key: `${this.key}-shovel-attack-left`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [33, 34, 35] }),
+        duration: 200,
+      },
+      {
+        key: `${this.key}-shovel-attack-up`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [24, 25, 26] }),
+        duration: 200,
+      },
+      {
+        key: `${this.key}-shovel-attack-down`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [30, 31, 32] }),
+        duration: 200,
       },
     ];
 
@@ -131,8 +154,8 @@ export default class Tulio extends Entity {
     const anim = `${this.key}-${this.direction.isPressed && this.sprite.body.speed > 0 ? 'walk' : 'idle'}-${
       this.facingDirection
     }`;
-    if (this.currentAnimation != anim) {
-      this.sprite.play(anim);
+    if (!this.isAttacking){
+      this.sprite.play(anim, true);
     }
 
     this.sprite.body.velocity.limit(this.baseVelocity);
@@ -141,6 +164,15 @@ export default class Tulio extends Entity {
       this.sprite.setVelocity(velX * 2, velY * 2);
       this.sprite.body.velocity.limit(this.baseVelocity * 2);
     }
+
+    /* TODO: Funcionando para todas as direções menos esquerda */
+    // if(this.direction.pointer.leftButtonDown()){
+    //   this.isAttacking = true;
+    //   console.log(`${this.key}-${this.weapon?.name}-attack-${this.facingDirection}`);
+    //   this.sprite.play(`${this.key}-${this.weapon?.name}-attack-${this.facingDirection}`);
+    //   this.sprite.playAfterDelay(anim, 300);
+    //   delay(() => this.isAttacking = false, 300);
+    // }
   }
 
   calculateVelocity(): { x: number; y: number } {

@@ -37,6 +37,10 @@ export default class Weapon extends Item {
     }
   }
 
+  public get name(): string {
+    return this.key.substring(7);
+  }
+
   public get currentAmmunition(): number {
     return this.ammunition;
   }
