@@ -1,6 +1,6 @@
-import { delay } from 'lodash';
-import { Input, Scene } from 'phaser';
+import { GameObjects, Geom, Physics, Scene } from 'phaser';
 import PlayerHandler from '../handlers/playerHandler';
+import { WeaponType } from '../weapons/weapon';
 import Direction from '../scenes/gui/direction';
 import { angleToDirection, correctAngle, isBetween } from '../scenes/utils/misc';
 import { Orientation, TulioData } from '../types';
@@ -9,17 +9,22 @@ import Entity from './entity';
 export default class Tulio extends Entity {
   private direction: Direction;
   private frozen = false;
-  private isAttacking = false;
   private baseVelocity = 120;
 
+  public isAttacking = false;
+
+  readonly scene: Scene;
+
   constructor(scene: Scene, x: number = 400, y: number = 300) {
-    super('characters:tulio', scene.physics.add.sprite(x, y, 'characters:tulio'), 10, 1);
+    super(scene, 'characters:tulio', scene.physics.add.sprite(x, y, 'characters:tulio'), 10, 1);
+    
+    this.scene = scene as Scene;
 
     this.sprite
-      .setSize(this.sprite.width, this.sprite.height * 0.2)
+      .setSize(this.sprite.width * 0.5, this.sprite.height * 0.2)
       .setScale(2.5)
       .setOrigin(0.5, 0.85)
-      .setOffset(0, this.sprite.height * 0.8);
+      .setOffset(this.sprite.width * 0.25, this.sprite.height * 0.8);
 
     // Weapon for gui testing -> TODO Inventory
 
@@ -34,6 +39,7 @@ export default class Tulio extends Entity {
     });
 
     this.weapon = playerData.weapon;
+
     this.currentHealth = playerData.health;
 
     this.animations = [
@@ -88,22 +94,22 @@ export default class Tulio extends Entity {
       {
         key: `${this.key}-shovel-attack-right`,
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [27, 28, 29] }),
-        duration: 200,
+        duration: 150,
       },
       {
         key: `${this.key}-shovel-attack-left`,
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [33, 34, 35] }),
-        duration: 200,
+        duration: 150,
       },
       {
         key: `${this.key}-shovel-attack-up`,
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [24, 25, 26] }),
-        duration: 200,
+        duration: 150,
       },
       {
         key: `${this.key}-shovel-attack-down`,
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [30, 31, 32] }),
-        duration: 200,
+        duration: 150,
       },
     ];
 
@@ -115,14 +121,14 @@ export default class Tulio extends Entity {
   }
 
   public get facingDirection(): Orientation {
-    const playerToCursorLine = new Phaser.Geom.Line(
+    const playerToCursorLine = new Geom.Line(
       this.sprite.x,
       this.sprite.y,
       this.direction.pointer.x,
       this.direction.pointer.y
     );
 
-    const angle = Phaser.Geom.Line.Angle(playerToCursorLine);
+    const angle = Geom.Line.Angle(playerToCursorLine);
     const correctedAngle = correctAngle(angle);
 
     return angleToDirection(correctedAngle);
@@ -148,16 +154,19 @@ export default class Tulio extends Entity {
       return;
     }
 
+    this.weapon?.update();
+
     const { x: velX, y: velY } = this.calculateVelocity();
     this.sprite.setVelocity(velX, velY);
 
     const anim = `${this.key}-${this.direction.isPressed && this.sprite.body.speed > 0 ? 'walk' : 'idle'}-${
       this.facingDirection
     }`;
+
     if (!this.isAttacking){
       this.sprite.play(anim, true);
     }
-
+    
     this.sprite.body.velocity.limit(this.baseVelocity);
 
     if (this.direction.shift && this.sprite.body.speed > 0) {
@@ -165,14 +174,9 @@ export default class Tulio extends Entity {
       this.sprite.body.velocity.limit(this.baseVelocity * 2);
     }
 
-    /* TODO: Funcionando para todas as direções menos esquerda */
-    // if(this.direction.pointer.leftButtonDown()){
-    //   this.isAttacking = true;
-    //   console.log(`${this.key}-${this.weapon?.name}-attack-${this.facingDirection}`);
-    //   this.sprite.play(`${this.key}-${this.weapon?.name}-attack-${this.facingDirection}`);
-    //   this.sprite.playAfterDelay(anim, 300);
-    //   delay(() => this.isAttacking = false, 300);
-    // }
+    if(this.direction.pointer.leftButtonDown()){
+      this.handleAttackAnim(anim);
+    }
   }
 
   calculateVelocity(): { x: number; y: number } {
@@ -196,5 +200,25 @@ export default class Tulio extends Entity {
     }
 
     return { x, y };
+  }
+
+  handleAttackAnim(animKey: string){
+    // this.scene.events.emit('tulio-attack', this);
+    this.weapon?.attack(this);
+
+    if(!this.isAttacking){
+      this.isAttacking = true;
+      this.sprite.play(`${this.key}-${this.weapon?.name}-attack-${this.facingDirection}`);
+
+      this.sprite.on("animationcomplete", () => {
+        this.isAttacking = false;
+        this.sprite
+        .setSize(this.sprite.width * 0.5, this.sprite.height * 0.2)
+        .setScale(2.5)
+        .setOrigin(0.5, 0.85)
+        .setOffset(this.sprite.width * 0.25, this.sprite.height * 0.8);
+        this.sprite.playAfterDelay(animKey, 150);
+      });
+    }
   }
 }

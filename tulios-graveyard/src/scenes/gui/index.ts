@@ -1,6 +1,6 @@
 import AudioHandler from '../../handlers/audioHandler';
 import Screen from '../utils/screen';
-import Weapon, { WeaponType } from '../../items/weapon';
+import Weapon, { WeaponType } from '../../weapons/weapon';
 import Direction from './direction';
 import PlayerHandler from '../../handlers/playerHandler';
 import { TulioData } from '../../types';
@@ -10,7 +10,7 @@ export default class GUIScene extends Phaser.Scene {
   private playerData: TulioData;
   private audioHandler: AudioHandler;
 
-  private weapon: Weapon;
+  private weapon?: Weapon;
   private ammunitionText: Phaser.GameObjects.Text;
   private ammunitionIcon: Phaser.GameObjects.Image;
 
@@ -19,6 +19,8 @@ export default class GUIScene extends Phaser.Scene {
 
   private pauseButton: Phaser.GameObjects.Image;
   private pauseScreenGroup: Phaser.GameObjects.Group;
+
+  private currSceneKey: string;
 
   constructor() {
     super('gui-scene');
@@ -52,13 +54,13 @@ export default class GUIScene extends Phaser.Scene {
     x -= 15;
     y += 30;
 
-    if (this.weapon.type === WeaponType.shovel) {
+    if (this.weapon?.type === WeaponType.shovel) {
       this.ammunitionText = this.add.text(x, y, 'x', { color: '#EDEDED', fontFamily: 'ZillaSlab', fontSize: '20px' });
       this.ammunitionIcon = this.add.image(x + 22, y + 10, 'gui:infinity');
       return;
     }
 
-    this.ammunitionText = this.add.text(x, y, `x${this.weapon.currentAmmunition}`, {
+    this.ammunitionText = this.add.text(x, y, `x${this.weapon?.currentAmmunition}`, {
       color: '#EDEDED',
       fontFamily: 'ZillaSlab',
       fontSize: '20px',
@@ -67,7 +69,7 @@ export default class GUIScene extends Phaser.Scene {
   }
 
   handleAmmunitionText() {
-    this.ammunitionText.setText(`x${this.weapon.currentAmmunition}`);
+    this.ammunitionText.setText(`x${this.weapon?.currentAmmunition}`);
   }
 
   handleHealthHearts(x: number, y: number) {
@@ -208,16 +210,24 @@ export default class GUIScene extends Phaser.Scene {
   startPause() {
     this.pauseButton.setVisible(false);
     this.pauseScreenGroup.toggleVisible();
-    this.scene.pause('ui-scene');
+
+    const activeScenes = this.scene.manager.getScenes(true);
+    activeScenes.forEach(s => {
+      if(s.scene.key != "gui-scene"){
+        this.currSceneKey = s.scene.key;
+        s.scene.pause();
+      }
+    });
   }
 
   stopPause(key: string) {
     this.pauseButton.setVisible(true);
     this.pauseScreenGroup.toggleVisible();
-    this.scene.resume('ui-scene');
 
     if (key === 'menu') {
       this.handleMenuButton();
+    } else {
+      this.scene.manager.getScene(this.currSceneKey).scene.resume();
     }
   }
 

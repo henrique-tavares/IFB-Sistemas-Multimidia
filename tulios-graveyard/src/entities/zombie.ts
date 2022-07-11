@@ -6,13 +6,13 @@ export default class Zombie extends Entity {
   private player: Tulio;
   private baseVelocity = 30;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
-    super('characters:zombie', scene.physics.add.sprite(x, y, 'characters:zombie'), 10, 1);
+  constructor(scene: Phaser.Scene, x: number, y: number, id: number) {
+    super(scene, 'characters:zombie', scene.physics.add.sprite(x, y, 'characters:zombie'), 10, 1, `characters:zombie:${id}`);
     this.sprite
-      .setSize(this.sprite.width, this.sprite.height * 0.2)
+      .setSize(this.sprite.width * 0.75, this.sprite.height * 0.2)
       .setScale(2.5)
       .setOrigin(0.5, 0.85)
-      .setOffset(0, this.sprite.height * 0.8);
+      .setOffset(this.sprite.width * 0.15, this.sprite.height * 0.8);
 
     this.animations = [
       {
@@ -77,5 +77,9 @@ export default class Zombie extends Entity {
     if (this.currentAnimation != anim) {
       this.sprite.play(anim);
     }
+  }
+
+  die(){
+
   }
 }

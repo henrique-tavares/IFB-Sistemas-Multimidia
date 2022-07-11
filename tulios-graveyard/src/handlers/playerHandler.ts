@@ -1,5 +1,6 @@
-import Weapon, { WeaponType } from '../items/weapon';
+import Weapon, { WeaponType } from '../weapons/weapon';
 import { TulioData } from '../types';
+import Shovel from '../weapons/shovel';
 
 export default class PlayerHandler {
   private _playerData: TulioData | null = null;
@@ -7,7 +8,7 @@ export default class PlayerHandler {
 
   constructor() {
     this._initialData = {
-      weapon: new Weapon('weapon:shovel', WeaponType.shovel, 2),
+      weapon: undefined,
       health: 10,
     };
   }

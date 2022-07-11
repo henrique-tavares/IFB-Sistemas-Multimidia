@@ -1,4 +1,4 @@
-import Weapon from '../items/weapon';
+import Weapon from '../weapons/weapon';
 
 export interface BackgroundBorderConfig {
   hasLeft?: boolean;
@@ -79,7 +79,7 @@ export enum GraveyardProp {
 
 export interface TulioData {
   health: number;
-  weapon: Weapon;
+  weapon?: Weapon;
 }
 
 export enum RoomDifficulty {

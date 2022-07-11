@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import { GameObjects, Physics } from 'phaser';
+import Entity from '../../entities/entity';
 import Tulio from '../../entities/tulio';
 import Zombie from '../../entities/zombie';
 import AudioHandler from '../../handlers/audioHandler';
@@ -15,6 +17,7 @@ import {
   RoomDifficulty,
   RoomSize,
 } from '../../types';
+import Shovel from '../../weapons/shovel';
 import Background from '../utils/background';
 import { allGraveyardProps, graveyardPropBuilder } from '../utils/graveyard';
 import {
@@ -42,6 +45,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected fadeDuration = 500;
   private isThereNextRoom: boolean;
   protected enemiesGroup: Phaser.Physics.Arcade.Group;
+  protected zombiesInScene = new Array<Zombie>();
   protected staticProps: Phaser.Physics.Arcade.StaticGroup;
   protected proplessAreas: Phaser.Physics.Arcade.StaticGroup;
   readonly roomSize: RoomSize;
@@ -125,6 +129,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.screen = new Screen(this.bg.image.width, this.bg.image.height);
 
     this.player = new Tulio(this);
+    this.player.weapon = new Shovel(this);
     this.player.sprite.body.setCollideWorldBounds(true, undefined, undefined, true);
     this.data.set('player', this.player);
 
@@ -178,12 +183,48 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
   update() {
     this.player.update();
-
+    
     this.children.list
       .filter(child => child.body instanceof Phaser.Physics.Arcade.Body)
       .forEach((sprite: Phaser.Physics.Arcade.Sprite) => {
         sprite.setDepth(sprite.y);
       });
+      
+    if(this.player.isAttacking){
+      this.handleAttack();
+    }
+  }
+
+  handleAttack(){
+    if(this.player.weapon){
+      const overlaped: Array<Physics.Arcade.Body> | Array<Physics.Arcade.StaticBody> = this.physics.overlapRect(
+        this.player.weapon.attackAreaShape.x, 
+        this.player.weapon.attackAreaShape.y, 
+        this.player.weapon.attackAreaShape.displayWidth, 
+        this.player.weapon.attackAreaShape.displayHeight
+      );
+
+      let overlapedEnemies = new Array<string>();
+
+      overlaped.forEach((b: Physics.Arcade.Body | Physics.Arcade.StaticBody) => {
+        if(b.gameObject instanceof Physics.Arcade.Sprite){
+          if(b.gameObject.name.includes('zombie')){
+            overlapedEnemies.push(b.gameObject.name);
+          }
+        }
+      });
+
+      if(overlapedEnemies.length > 0){
+        overlapedEnemies.forEach((e: string) => {
+          let enemy = this.zombiesInScene.find(el => el.sprite.name === e)
+          console.log(`Player attacks ${e}`);
+          if(enemy){
+            this.player.attack(enemy);
+          }
+        });
+      }
+      
+    }
   }
 
   addFixedProps(...props: BaseProp[]) {
@@ -346,7 +387,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
   }
 
   addEnemies() {
-    const enemiesNum = _.random(3, 5) * this.difficulty;
+    const enemiesNum = 1;
+    // const enemiesNum = _.random(3, 5) * this.difficulty;
 
     const directionTranslator = {
       up: 'top',
@@ -413,7 +455,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
       const side = _.sample(spawnableArea)!;
 
       this.time.delayedCall(_.random(1000, 5000, true), () => {
-        const zombie = new Zombie(this, 0, 0);
+        const zombie = new Zombie(this, 0, 0, this.enemiesGroup.countActive());
         const borderSafety = {
           x: 15,
           y: 10,
@@ -450,6 +492,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
         );
 
         this.enemiesGroup.add(zombie.sprite);
+        this.zombiesInScene.push(zombie);
       });
     }
   }
