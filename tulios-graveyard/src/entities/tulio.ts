@@ -1,23 +1,27 @@
-import { GameObjects, Geom, Physics, Scene } from 'phaser';
-import PlayerHandler from '../handlers/playerHandler';
-import { WeaponType } from '../weapons/weapon';
-import Direction from '../scenes/gui/direction';
-import { angleToDirection, correctAngle, isBetween } from '../scenes/utils/misc';
-import { Orientation, TulioData } from '../types';
-import Entity from './entity';
+import { Geom, Scene } from "phaser";
+import PlayerHandler from "../handlers/playerHandler";
+import Direction from "../scenes/gui/direction";
+import { angleToDirection, correctAngle } from "../scenes/utils/misc";
+import { Orientation, TulioData } from "../types";
+import Shovel from "../weapons/shovel";
+import Weapon from "../weapons/weapon";
+import Entity from "./entity";
 
 export default class Tulio extends Entity {
   private direction: Direction;
   private frozen = false;
   private baseVelocity = 120;
+  private _weapon: Weapon;
+  private invencible = false;
 
   public isAttacking = false;
 
   readonly scene: Scene;
+  readonly sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
   constructor(scene: Scene, x: number = 400, y: number = 300) {
-    super(scene, 'characters:tulio', scene.physics.add.sprite(x, y, 'characters:tulio'), 10, 1);
-    
+    super(scene, "characters:tulio", scene.physics.add.sprite(x, y, "characters:tulio"), 10, 1);
+
     this.scene = scene as Scene;
 
     this.sprite
@@ -28,17 +32,17 @@ export default class Tulio extends Entity {
 
     // Weapon for gui testing -> TODO Inventory
 
-    const playerHandler = scene.cache.custom['handlers'].get('playerHandler') as PlayerHandler;
+    const playerHandler = scene.cache.custom["handlers"].get("playerHandler") as PlayerHandler;
     const { playerData } = playerHandler;
 
-    this.sprite.on('refresh-player-data', (data: Partial<TulioData>) => {
+    this.sprite.on("refresh-player-data", (data: Partial<TulioData>) => {
       playerHandler.playerData = {
         ...playerData,
         ...data,
       };
     });
 
-    this.weapon = playerData.weapon;
+    this.weapon = playerData.weapon ?? new Shovel(scene, this);
 
     this.currentHealth = playerData.health;
 
@@ -117,7 +121,77 @@ export default class Tulio extends Entity {
       scene.anims.create(animation);
     });
 
-    this.direction = scene.scene.get('gui-scene').data.get('direction') as Direction;
+    this.sprite.on(
+      "hit",
+      () => {
+        if (this.invencible) {
+          return;
+        }
+        this.invencible = true;
+
+        this.sprite.once("post-hit", () => {
+          const event = this.scene.time.addEvent({
+            callback: () => {
+              if (!this.sprite.visible) {
+                this.sprite.setVisible(true);
+              } else {
+                this.sprite.setVisible(false);
+              }
+
+              console.log("pinto", event.getOverallProgress());
+              if (event.getOverallProgress() == 1) {
+                this.invencible = false;
+              }
+            },
+            repeat: 19,
+            delay: 50,
+          });
+        });
+
+        this.scene.time.delayedCall(2000, () => {
+          this.invencible = false;
+        });
+
+        console.log("aa", this.invencible);
+      },
+      this
+    );
+
+    this.direction = scene.scene.get("gui-scene").data.get("direction") as Direction;
+  }
+
+  receiveDamage(damage: number): void {
+    if (this.invencible) {
+      return;
+    }
+
+    super.receiveDamage(damage);
+  }
+
+  public get damage(): number {
+    return this.baseDamage + this.weapon.damage;
+  }
+
+  public get weapon() {
+    return this._weapon;
+  }
+
+  public set weapon(val) {
+    this._weapon = val;
+    this.sprite.emit("refresh-player-data", {
+      weapon: this.weapon,
+    });
+  }
+
+  public get currentHealth() {
+    return super.currentHealth;
+  }
+
+  public set currentHealth(val: number) {
+    super.currentHealth = val;
+    this.sprite.emit("refresh-player-data", {
+      health: this.currentHealth,
+    });
   }
 
   public get facingDirection(): Orientation {
@@ -159,14 +233,14 @@ export default class Tulio extends Entity {
     const { x: velX, y: velY } = this.calculateVelocity();
     this.sprite.setVelocity(velX, velY);
 
-    const anim = `${this.key}-${this.direction.isPressed && this.sprite.body.speed > 0 ? 'walk' : 'idle'}-${
-      this.facingDirection
-    }`;
+    const anim = `${this.key}-${
+      this.direction.isPressed && this.sprite.body.speed > 0 ? "walk" : "idle"
+    }-${this.facingDirection}`;
 
-    if (!this.isAttacking){
+    if (!this.isAttacking) {
       this.sprite.play(anim, true);
     }
-    
+
     this.sprite.body.velocity.limit(this.baseVelocity);
 
     if (this.direction.shift && this.sprite.body.speed > 0) {
@@ -174,7 +248,7 @@ export default class Tulio extends Entity {
       this.sprite.body.velocity.limit(this.baseVelocity * 2);
     }
 
-    if(this.direction.pointer.leftButtonDown()){
+    if (this.direction.pointer.leftButtonDown()) {
       this.handleAttackAnim(anim);
     }
   }
@@ -202,23 +276,32 @@ export default class Tulio extends Entity {
     return { x, y };
   }
 
-  handleAttackAnim(animKey: string){
-    // this.scene.events.emit('tulio-attack', this);
-    this.weapon?.attack(this);
+  attack(enemy: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
+    super.attack(enemy, this.weapon.damage);
+  }
 
-    if(!this.isAttacking){
-      this.isAttacking = true;
-      this.sprite.play(`${this.key}-${this.weapon?.name}-attack-${this.facingDirection}`);
+  handleAttackAnim(animKey: string) {
+    if (this.isAttacking || this.weapon?.inDelay) {
+      return;
+    }
 
-      this.sprite.on("animationcomplete", () => {
-        this.isAttacking = false;
-        this.sprite
+    this.scene.time.delayedCall(100, () => {
+      this.weapon?.attack();
+    });
+
+    this.isAttacking = true;
+    this.sprite.play(`${this.key}-${this.weapon?.name}-attack-${this.facingDirection}`);
+
+    this.sprite.once("animationcomplete", () => {
+      this.isAttacking = false;
+      this.sprite
         .setSize(this.sprite.width * 0.5, this.sprite.height * 0.2)
         .setScale(2.5)
         .setOrigin(0.5, 0.85)
         .setOffset(this.sprite.width * 0.25, this.sprite.height * 0.8);
-        this.sprite.playAfterDelay(animKey, 150);
-      });
-    }
+      this.sprite.playAfterDelay(animKey, 100);
+
+      this.weapon?.scene.events.emit("attack-concluded");
+    });
   }
 }

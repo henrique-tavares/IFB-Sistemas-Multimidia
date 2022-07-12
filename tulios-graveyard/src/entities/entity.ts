@@ -1,23 +1,20 @@
-import { GameObjects, Scene } from 'phaser';
-import Weapon from '../weapons/weapon';
+import { GameObjects, Scene } from "phaser";
+import { Orientation } from "../types";
+import Weapon from "../weapons/weapon";
 
-export default class Entity {
+export default abstract class Entity {
   readonly scene: Scene;
   readonly key: string;
   readonly sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   protected animations: Phaser.Types.Animations.Animation[];
 
-  private _weapon?: Weapon;
   protected baseDamage: number;
 
   protected totalHealth: number;
   private _currentHealth: number;
   public isAlive: boolean = true;
 
-
-  public get damage() {
-    return this.baseDamage + (this.weapon?.damage ?? 0);
-  }
+  public abstract get damage(): number;
 
   constructor(
     scene: Scene,
@@ -34,39 +31,43 @@ export default class Entity {
     this.totalHealth = totalHealth;
     this.currentHealth = totalHealth;
     this.baseDamage = baseDamage;
+
+    this.sprite.on(
+      "receive-damage",
+      (damage: number) => {
+        this.receiveDamage(damage);
+      },
+      this
+    );
   }
 
   public get currentAnimation(): string {
-    return this.sprite.anims.currentAnim?.key ?? '';
+    return this.sprite.anims.currentAnim?.key ?? "";
   }
 
-  attack(other: Entity) {
-    other.receiveDamage(this.damage);
+  attack(other: Phaser.Types.Physics.Arcade.GameObjectWithBody, damage: number) {
+    other.emit("receive-damage", damage);
   }
 
-  receiveDamage(damage: number){
+  receiveDamage(damage: number) {
     this.currentHealth -= damage;
     console.log(this.sprite.name, this.currentHealth);
     this.isAlive = this.currentHealth > 0;
 
-    if(!this.isAlive){
+    if (!this.isAlive) {
       this.die();
+      return;
     }
-  }
 
-  die(){
-    //TODO Death
-  }
-
-  public get weapon() {
-    return this._weapon;
-  }
-
-  public set weapon(v: Weapon | undefined) {
-    this._weapon = v;
-    this.sprite.emit('refresh-player-data', {
-      weapon: this.weapon,
+    this.sprite.setTint(0xaa0000);
+    this.scene.time.delayedCall(250, () => {
+      this.sprite.clearTint();
+      this.sprite.emit("post-hit");
     });
+  }
+
+  die() {
+    this.sprite.disableBody(true);
   }
 
   public get currentHealth() {
@@ -75,8 +76,5 @@ export default class Entity {
 
   public set currentHealth(v: number) {
     this._currentHealth = v;
-    this.sprite.emit('refresh-player-data', {
-      health: this.currentHealth,
-    });
   }
 }

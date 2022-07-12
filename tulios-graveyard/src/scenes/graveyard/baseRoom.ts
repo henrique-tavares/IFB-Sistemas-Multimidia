@@ -1,10 +1,8 @@
-import _ from 'lodash';
-import { GameObjects, Physics } from 'phaser';
-import Entity from '../../entities/entity';
-import Tulio from '../../entities/tulio';
-import Zombie from '../../entities/zombie';
-import AudioHandler from '../../handlers/audioHandler';
-import BaseProp from '../../props/baseProp';
+import _ from "lodash";
+import Tulio from "../../entities/tulio";
+import Zombie from "../../entities/zombie";
+import AudioHandler from "../../handlers/audioHandler";
+import BaseProp from "../../props/baseProp";
 import {
   BackgroundBorder,
   BackgroundBorderConfig,
@@ -16,10 +14,10 @@ import {
   PlayerCoordinate,
   RoomDifficulty,
   RoomSize,
-} from '../../types';
-import Shovel from '../../weapons/shovel';
-import Background from '../utils/background';
-import { allGraveyardProps, graveyardPropBuilder } from '../utils/graveyard';
+} from "../../types";
+import Shovel from "../../weapons/shovel";
+import Background from "../utils/background";
+import { allGraveyardProps, graveyardPropBuilder } from "../utils/graveyard";
 import {
   clamp,
   gameScreen,
@@ -27,9 +25,9 @@ import {
   generateRandomPosition,
   isEmpty,
   isSpritePositionValid,
-} from '../utils/misc';
-import NextRoomArrow from '../utils/nextRoomArrow';
-import Screen from '../utils/screen';
+} from "../utils/misc";
+import NextRoomArrow from "../utils/nextRoomArrow";
+import Screen from "../utils/screen";
 
 export default abstract class BaseRoom extends Phaser.Scene {
   protected key: string;
@@ -38,7 +36,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected bg: Background;
   protected bgBorder: BackgroundBorder;
   protected borderArea: {
-    [key in 'top' | 'right' | 'bottom' | 'left']: BorderSideArea;
+    [key in "top" | "right" | "bottom" | "left"]: BorderSideArea;
   };
   protected nextRoom: NextRoom;
   protected nextRoomData: NextRoomData;
@@ -76,7 +74,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.borderArea = {
       top: {
         pos: { x: 50, y: 0 },
-        size: { height: this.bgBorder['top'] ?? 10, width: 100 },
+        size: { height: this.bgBorder["top"] ?? 10, width: 100 },
         origin: {
           x: 0.5,
           y: 0,
@@ -92,7 +90,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
       },
       bottom: {
         pos: { x: 50, y: 100 },
-        size: { height: this.bgBorder['bottom'] ?? 10, width: 100 },
+        size: { height: this.bgBorder["bottom"] ?? 10, width: 100 },
         origin: {
           x: 0.5,
           y: 1,
@@ -113,14 +111,14 @@ export default abstract class BaseRoom extends Phaser.Scene {
     console.log(this.constructor.name);
     this.fadeIn(this.fadeDuration);
     if (isEmpty(coordinate)) {
-      this.physics.world.once('worldbounds', this.onWorldBounds, this);
+      this.physics.world.once("worldbounds", this.onWorldBounds, this);
       return;
     }
-    this.events.on('reposition-player', () => {
+    this.events.on("reposition-player", () => {
       const { x, y } = this.repositionPlayer(coordinate);
       this.player.setPosition(x, y);
 
-      this.physics.world.once('worldbounds', this.onWorldBounds, this);
+      this.physics.world.once("worldbounds", this.onWorldBounds, this);
     });
   }
 
@@ -129,18 +127,18 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.screen = new Screen(this.bg.image.width, this.bg.image.height);
 
     this.player = new Tulio(this);
-    this.player.weapon = new Shovel(this);
+    this.player.weapon = new Shovel(this, this.player);
     this.player.sprite.body.setCollideWorldBounds(true, undefined, undefined, true);
-    this.data.set('player', this.player);
+    this.data.set("player", this.player);
 
-    this.events.emit('reposition-player');
+    this.events.emit("reposition-player");
 
     this.cameras.main.startFollow(this.player.sprite);
     this.bg.applyBoundsOnSprite(this.player.sprite);
 
     this.staticProps = this.physics.add.staticGroup();
 
-    this.events.on('add-extra-area', this.addExtraArea, this);
+    this.events.on("add-extra-area", this.addExtraArea, this);
 
     this.physics.add.collider(this.player.sprite, this.staticProps);
 
@@ -149,6 +147,9 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.physics.add.collider(this.player.sprite, this.enemiesGroup, (player, enemy) => {
       player.body.velocity.limit(30);
       enemy.body.velocity.limit(30);
+
+      const zombie = this.zombiesInScene.find(zombie => zombie.sprite.name == enemy.name)!;
+      zombie.attack(player);
     });
     this.physics.add.collider(this.staticProps, this.enemiesGroup);
 
@@ -159,72 +160,77 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.addEnemies();
 
-    const audioHandler = this.cache.custom['handlers'].get('audioHandler') as AudioHandler;
+    this.events.on(
+      "add-attack-collider",
+      (attackArea: Phaser.GameObjects.GameObject) => {
+        const alreadyAttackedEnemies = new Set<Phaser.Types.Physics.Arcade.GameObjectWithBody>();
+
+        const attackOverlap = this.physics.add.overlap(
+          attackArea,
+          this.enemiesGroup,
+          (_, enemy) => {
+            if (alreadyAttackedEnemies.has(enemy)) {
+              return;
+            }
+
+            console.log("attack hit");
+            this.player.attack(enemy);
+            this.player.weapon!.knockback(enemy, this.player.facingDirection);
+            alreadyAttackedEnemies.add(enemy);
+          }
+        );
+
+        this.events.once("remove-attack-collider", () => {
+          attackOverlap.destroy();
+        });
+      },
+      this
+    );
+
+    const audioHandler = this.cache.custom["handlers"].get("audioHandler") as AudioHandler;
     audioHandler.handleBackgroundMusic(this);
 
     const nextRoomArrows = Object.entries(this.nextRoom).map(
       ([key, value]) =>
-        new NextRoomArrow(this, this.screen, key as Orientation, Array.isArray(value) ? value.length : 1)
+        new NextRoomArrow(
+          this,
+          this.screen,
+          key as Orientation,
+          Array.isArray(value) ? value.length : 1
+        )
     );
 
-    this.physics.world.on(`${this.key}:concluded`, () => {
-      this.data.set('concluded', true);
-      nextRoomArrows.forEach(arrow => {
-        arrow.toggleVisible();
+    this.events.on("wake", this.wake, this);
+
+    this.time.delayedCall(5000, () => {
+      const verifyConcluded = this.time.addEvent({
+        callback: () => {
+          if (this.enemiesGroup.getChildren().every(enemy => !enemy.active)) {
+            this.events.emit("room-concluded");
+            verifyConcluded.destroy();
+          }
+        },
+        loop: true,
+        delay: 1000,
       });
-    });
 
-    this.events.on('wake', this.wake, this);
-
-    this.time.delayedCall(1000, () => {
-      this.physics.world.emit(`${this.key}:concluded`);
+      this.events.on("room-concluded", () => {
+        this.data.set("concluded", true);
+        nextRoomArrows.forEach(arrow => {
+          arrow.toggleVisible();
+        });
+      });
     });
   }
 
   update() {
     this.player.update();
-    
+
     this.children.list
       .filter(child => child.body instanceof Phaser.Physics.Arcade.Body)
       .forEach((sprite: Phaser.Physics.Arcade.Sprite) => {
         sprite.setDepth(sprite.y);
       });
-      
-    if(this.player.isAttacking){
-      this.handleAttack();
-    }
-  }
-
-  handleAttack(){
-    if(this.player.weapon){
-      const overlaped: Array<Physics.Arcade.Body> | Array<Physics.Arcade.StaticBody> = this.physics.overlapRect(
-        this.player.weapon.attackAreaShape.x, 
-        this.player.weapon.attackAreaShape.y, 
-        this.player.weapon.attackAreaShape.displayWidth, 
-        this.player.weapon.attackAreaShape.displayHeight
-      );
-
-      let overlapedEnemies = new Array<string>();
-
-      overlaped.forEach((b: Physics.Arcade.Body | Physics.Arcade.StaticBody) => {
-        if(b.gameObject instanceof Physics.Arcade.Sprite){
-          if(b.gameObject.name.includes('zombie')){
-            overlapedEnemies.push(b.gameObject.name);
-          }
-        }
-      });
-
-      if(overlapedEnemies.length > 0){
-        overlapedEnemies.forEach((e: string) => {
-          let enemy = this.zombiesInScene.find(el => el.sprite.name === e)
-          console.log(`Player attacks ${e}`);
-          if(enemy){
-            this.player.attack(enemy);
-          }
-        });
-      }
-      
-    }
   }
 
   addFixedProps(...props: BaseProp[]) {
@@ -243,7 +249,9 @@ export default abstract class BaseRoom extends Phaser.Scene {
         const randomPosition = generateRandomPosition(this.screen);
         newProp.updatePosition(randomPosition.x, randomPosition.y);
       } while (
-        this.proplessAreas.getChildren().some((area: Phaser.GameObjects.Shape) => !isSpritePositionValid(newProp, area))
+        this.proplessAreas
+          .getChildren()
+          .some((area: Phaser.GameObjects.Shape) => !isSpritePositionValid(newProp, area))
       );
 
       this.staticProps.add(newProp, true);
@@ -348,16 +356,16 @@ export default abstract class BaseRoom extends Phaser.Scene {
       };
 
       switch (roomSize) {
-        case RoomSize['1x1']: {
+        case RoomSize["1x1"]: {
           return [horizontal.center, vertical.center];
         }
-        case RoomSize['1x2']: {
+        case RoomSize["1x2"]: {
           return [horizontal.center, vertical.first, vertical.second];
         }
-        case RoomSize['2x1']: {
+        case RoomSize["2x1"]: {
           return [horizontal.first, horizontal.second];
         }
-        case RoomSize['2x2']: {
+        case RoomSize["2x2"]: {
           return [horizontal.first, horizontal.second, vertical.first, vertical.second];
         }
       }
@@ -391,16 +399,16 @@ export default abstract class BaseRoom extends Phaser.Scene {
     // const enemiesNum = _.random(3, 5) * this.difficulty;
 
     const directionTranslator = {
-      up: 'top',
-      right: 'right',
-      down: 'bottom',
-      left: 'left',
+      up: "top",
+      right: "right",
+      down: "bottom",
+      left: "left",
     };
 
     const spawnableArea = Object.entries(this.nextRoom).reduce((acc, [side, room]) => {
       if (_.isArray(room)) {
         const areas: BorderSideArea[] = room
-          .filter(room => !this.scene.get(room).data.get('concluded'))
+          .filter(room => !this.scene.get(room).data.get("concluded"))
           .map((_room, i) => {
             const area: BorderSideArea = this.borderArea[directionTranslator[side]];
 
@@ -418,7 +426,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
       return [
         ...acc,
-        ...(!this.scene.get(room).data.get('concluded')
+        ...(!this.scene.get(room).data.get("concluded")
           ? [this.borderArea[directionTranslator[side]] as BorderSideArea]
           : []),
       ];
@@ -426,11 +434,11 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     const handleZombieSpawnPositionOffscreen = (
       pos: number,
-      orientation: 'vertical' | 'horizontal',
+      orientation: "vertical" | "horizontal",
       zombie: Zombie
     ) => {
       switch (orientation) {
-        case 'horizontal': {
+        case "horizontal": {
           if (pos == this.screen.relativeX(0)) {
             return -zombie.sprite.width * zombie.sprite.scaleX;
           }
@@ -439,7 +447,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
           }
           return pos;
         }
-        case 'vertical': {
+        case "vertical": {
           if (pos == this.screen.relativeY(0)) {
             return -zombie.sprite.height * zombie.sprite.scaleY;
           }
@@ -480,14 +488,15 @@ export default abstract class BaseRoom extends Phaser.Scene {
           };
 
           zombie.sprite.setPosition(
-            handleZombieSpawnPositionOffscreen(randomPosition.x, 'horizontal', zombie),
-            handleZombieSpawnPositionOffscreen(randomPosition.y, 'vertical', zombie)
+            handleZombieSpawnPositionOffscreen(randomPosition.x, "horizontal", zombie),
+            handleZombieSpawnPositionOffscreen(randomPosition.y, "vertical", zombie)
           );
         } while (
           this.enemiesGroup
             .getChildren()
             .some(
-              (child: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) => !isSpritePositionValid(zombie.sprite, child)
+              (child: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) =>
+                !isSpritePositionValid(zombie.sprite, child)
             )
         );
 
@@ -498,8 +507,15 @@ export default abstract class BaseRoom extends Phaser.Scene {
   }
 
   onWorldBounds(body: Phaser.Physics.Arcade.Body) {
-    ['up', 'right', 'left', 'down'].forEach((orientation: Orientation) => {
-      if (!(body.blocked[orientation] && this.nextRoom[orientation] && this.nextRoomData[orientation])) {
+    if (!this.data.get("concluded")) {
+      this.physics.world.once("worldbounds", this.onWorldBounds, this);
+      return;
+    }
+
+    ["up", "right", "left", "down"].forEach((orientation: Orientation) => {
+      if (
+        !(body.blocked[orientation] && this.nextRoom[orientation] && this.nextRoomData[orientation])
+      ) {
         this.isThereNextRoom = false;
         return;
       }
@@ -507,7 +523,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
       this.handleTransition(orientation);
     });
     if (!this.isThereNextRoom) {
-      this.physics.world.once('worldbounds', this.onWorldBounds, this);
+      this.physics.world.once("worldbounds", this.onWorldBounds, this);
     }
   }
 
@@ -516,13 +532,13 @@ export default abstract class BaseRoom extends Phaser.Scene {
     const nextRoom = this.nextRoom[orientation]!;
 
     const half =
-      (['up', 'down'].includes(orientation) && this.player.sprite.x < this.screen.relativeX(50)) ||
-      (['left', 'right'].includes(orientation) && this.player.sprite.y < this.screen.relativeY(50))
-        ? 'first'
-        : 'second';
+      (["up", "down"].includes(orientation) && this.player.sprite.x < this.screen.relativeX(50)) ||
+      (["left", "right"].includes(orientation) && this.player.sprite.y < this.screen.relativeY(50))
+        ? "first"
+        : "second";
 
     if (Array.isArray(playerCoordinate)) {
-      playerCoordinate = half == 'first' ? playerCoordinate[0] : playerCoordinate[1];
+      playerCoordinate = half == "first" ? playerCoordinate[0] : playerCoordinate[1];
     }
 
     const parsedData: PlayerCoordinate = {
@@ -543,7 +559,11 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.time.delayedCall(this.fadeDuration, () => {
       this.player.sprite.disableBody();
       this.scene.transition({
-        target: Array.isArray(nextRoom) ? (half == 'first' ? nextRoom[0] : nextRoom[1]) : (nextRoom as string),
+        target: Array.isArray(nextRoom)
+          ? half == "first"
+            ? nextRoom[0]
+            : nextRoom[1]
+          : (nextRoom as string),
         data: parsedData,
         sleep: true,
         duration: 0,
@@ -557,7 +577,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
     const { x: newX, y: newY } = this.repositionPlayer(data);
     this.player.sprite.enableBody(true, newX, newY, true, true);
     this.player.unfreeze();
-    this.physics.world.once('worldbounds', this.onWorldBounds, this);
+    this.physics.world.once("worldbounds", this.onWorldBounds, this);
   }
 
   repositionPlayer({ x, y }: PlayerCoordinate) {
@@ -567,8 +587,12 @@ export default abstract class BaseRoom extends Phaser.Scene {
     const minY = this.player.sprite.height + 5;
     const maxY = this.screen.height - this.player.sprite.height - 5;
 
-    const newX = x.relative ? this.screen.relativeX(x.value!) : x.value! + this.screen.relativeX(x.offset ?? 0);
-    const newY = y.relative ? this.screen.relativeY(y.value!) : y.value! + this.screen.relativeY(y.offset ?? 0);
+    const newX = x.relative
+      ? this.screen.relativeX(x.value!)
+      : x.value! + this.screen.relativeX(x.offset ?? 0);
+    const newY = y.relative
+      ? this.screen.relativeY(y.value!)
+      : y.value! + this.screen.relativeY(y.offset ?? 0);
 
     return {
       x: clamp(newX, minX, maxX),

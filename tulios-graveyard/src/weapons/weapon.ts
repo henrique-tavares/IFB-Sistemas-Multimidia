@@ -1,7 +1,8 @@
-import { GameObjects, Scene, Types } from 'phaser';
-import Tulio from '../entities/tulio';
-import Zombie from '../entities/zombie';
-import Item from '../items/item';
+import { GameObjects, Scene, Types } from "phaser";
+import Tulio from "../entities/tulio";
+import Zombie from "../entities/zombie";
+import Item from "../items/item";
+import { Orientation } from "../types";
 
 export enum WeaponType {
   shovel = 0,
@@ -9,23 +10,35 @@ export enum WeaponType {
   shotgun = 2,
 }
 
-export default class Weapon extends Item {
+export default abstract class Weapon extends Item {
   readonly key: string;
   readonly sprite: GameObjects.Image;
   readonly type: WeaponType;
   readonly damage: number;
-  
-  protected scene: Scene;
-  protected ammunition: number;
-  protected attackArea: GameObjects.Rectangle;
+  readonly owner: Tulio | Zombie;
 
-  constructor(scene: Scene, key: string, type: WeaponType, damage: number, ammunition: number) {
+  readonly scene: Scene;
+  protected ammunition: number;
+  private delay: number;
+  private _inDelay: boolean = false;
+
+  constructor(
+    scene: Scene,
+    key: string,
+    type: WeaponType,
+    damage: number,
+    ammunition: number,
+    owner: Tulio | Zombie,
+    delay: number
+  ) {
     super();
     this.scene = scene;
     this.key = key;
     this.type = type;
     this.damage = damage;
     this.ammunition = ammunition;
+    this.owner = owner;
+    this.delay = delay;
 
     // switch (type) {
     //   case WeaponType.shovel: {
@@ -42,24 +55,34 @@ export default class Weapon extends Item {
     //   }
     // }
   }
-  
+
   public get name(): string {
     return this.key.substring(7);
   }
-  
+
   public get currentAmmunition(): number {
     return this.ammunition;
   }
 
-  public get attackAreaShape(): GameObjects.Rectangle {
-    return this.attackArea;
+  public get inDelay(): boolean {
+    return this._inDelay;
   }
 
-  update(){
-    this.scene.events.once('tulio-attack', this.attack, this);
+  // public get attackAreaShape(): GameObjects.Rectangle {
+  //   return this.attackArea;
+  // }
+
+  update() {
+    this.scene.events.once("tulio-attack", this.attack, this);
   }
 
-  attack(owner: Tulio | Zombie){
+  attack() {
     console.log("Attack");
-  };
+    this._inDelay = true;
+    this.scene.time.delayedCall(this.delay, () => {
+      this._inDelay = false;
+    });
+  }
+
+  abstract knockback(other: Phaser.Types.Physics.Arcade.GameObjectWithBody, direction: Orientation);
 }
