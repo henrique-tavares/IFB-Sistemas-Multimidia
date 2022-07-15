@@ -62,7 +62,7 @@ export default class Death extends Phaser.Scene {
       .setAlpha(0);
 
     const buttonReiniciar = this.add
-      .image(this.screen.relativeX(30), this.screen.relativeY(70), "death-screen:button_reiniciar")
+      .image(this.screen.relativeX(35), this.screen.relativeY(75), "death-screen:button_reiniciar")
       .setScale(0.5)
       .setAlpha(0)
       .setInteractive({
@@ -91,7 +91,7 @@ export default class Death extends Phaser.Scene {
       });
 
     const buttonVoltar = this.add
-      .image(this.screen.relativeX(70), this.screen.relativeY(70), "death-screen:button_voltar")
+      .image(this.screen.relativeX(65), this.screen.relativeY(75), "death-screen:button_voltar")
       .setScale(0.5)
       .setAlpha(0)
       .setInteractive({

@@ -314,8 +314,8 @@ export default class Tulio extends Entity {
 
     this.scene.scene.start("death", {
       pos: {
-        x: this.sprite.x,
-        y: this.sprite.y,
+        x: this.sprite.x - this.scene.cameras.main.scrollX,
+        y: this.sprite.y - this.scene.cameras.main.scrollY,
       },
       facingDirection: this.facingDirection,
     });

@@ -463,7 +463,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
     for (const _x of _.range(enemiesNum)) {
       const side = _.sample(spawnableArea)!;
 
-      this.time.delayedCall(_.random(1000, 5000, true), () => {
+      this.time.delayedCall(_.random(0, 3000, true), () => {
         const zombie = new Zombie(this, 0, 0, this.enemiesGroup.countActive());
         const borderSafety = {
           x: 15,
