@@ -15,6 +15,7 @@ import {
   RoomDifficulty,
   RoomSize,
 } from "../../types";
+import Pistol from "../../weapons/pistol";
 import Shovel from "../../weapons/shovel";
 import Background from "../utils/background";
 import { allGraveyardProps, graveyardPropBuilder } from "../utils/graveyard";
@@ -157,33 +158,70 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.proplessAreas = this.physics.add.staticGroup();
 
+    // this.player.weapon = new Shovel(this, this.player);
+    this.player.weapon = new Pistol(this, this.player);
+
     this.generateInicialProplessAreas();
     this.refreshProps();
 
     this.addEnemies();
 
     this.events.on(
-      "add-attack-collider",
+      "init-shovel-attack",
       (attackArea: Phaser.GameObjects.GameObject) => {
         const alreadyAttackedEnemies = new Set<Phaser.Types.Physics.Arcade.GameObjectWithBody>();
 
         const attackOverlap = this.physics.add.overlap(
           attackArea,
           this.enemiesGroup,
-          (_, enemy) => {
+          (_obj, enemy) => {
             if (alreadyAttackedEnemies.has(enemy)) {
               return;
             }
 
             this.player.attack(enemy);
-            this.player.weapon!.knockback(enemy, this.player.facingDirection);
             alreadyAttackedEnemies.add(enemy);
+
+            this.events.emit("shovel-knockback", enemy, this.player.facingDirection);
           }
         );
 
-        this.events.once("remove-attack-collider", () => {
+        this.events.once("finish-shovel-attack", () => {
           attackOverlap.destroy();
         });
+      },
+      this
+    );
+
+    this.events.on(
+      "init-bullet-attack",
+      (attackArea: Phaser.GameObjects.GameObject) => {
+        console.log("iniciou evento");
+        const attackOverlap = this.physics.add.overlap(
+          attackArea,
+          this.enemiesGroup,
+          (bullet, enemy) => {
+            console.log(bullet);
+            this.player.attack(enemy);
+            bullet.emit("enemy-hit", enemy);
+            attackOverlap.destroy();
+          }
+        );
+      },
+      this
+    );
+
+    this.events.on(
+      "add-bullet-prop-collider",
+      (hitArea: Phaser.GameObjects.GameObject) => {
+        const propCollider = this.physics.add.collider(
+          hitArea,
+          this.staticProps,
+          (hitArea, _prop) => {
+            hitArea.emit("prop-hit");
+            propCollider.destroy();
+          }
+        );
       },
       this
     );

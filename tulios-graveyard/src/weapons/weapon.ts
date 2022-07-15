@@ -28,7 +28,7 @@ export default abstract class Weapon extends Item {
     type: WeaponType,
     damage: number,
     ammunition: number,
-    owner: Tulio | Zombie,
+    owner: Tulio,
     delay: number
   ) {
     super();
@@ -82,6 +82,4 @@ export default abstract class Weapon extends Item {
       this._inDelay = false;
     });
   }
-
-  abstract knockback(other: Phaser.Types.Physics.Arcade.GameObjectWithBody, direction: Orientation);
 }

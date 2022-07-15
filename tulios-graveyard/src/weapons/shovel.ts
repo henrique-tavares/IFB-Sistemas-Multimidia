@@ -11,6 +11,13 @@ export default class Shovel extends Weapon {
 
   constructor(scene: Scene, owner: Tulio) {
     super(scene, "weapon:shovel", WeaponType.shovel, 2, Infinity, owner, 1000);
+
+    scene.events.on(
+      "shovel-knockback",
+      (enemy: Phaser.Types.Physics.Arcade.GameObjectWithBody, facingDirection: Orientation) => {
+        this.knockback(enemy, facingDirection);
+      }
+    );
   }
 
   attack() {
@@ -66,14 +73,14 @@ export default class Shovel extends Weapon {
       this.attackAreaSize.height
     );
 
-    this.scene.events.emit("add-attack-collider", this.attackArea);
+    this.scene.events.emit("init-shovel-attack", this.attackArea);
 
     this.scene.events.on(
-      "attack-concluded",
+      "shovel-attack-concluded",
       () => {
         this.attackArea?.destroy();
         this.attackArea = null;
-        this.scene.events.emit("remove-attack-collider");
+        this.scene.events.emit("finish-shovel-attack");
       },
       this
     );

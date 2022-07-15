@@ -4,14 +4,14 @@ import Direction from "../scenes/gui/direction";
 import { angleToDirection, correctAngle } from "../scenes/utils/misc";
 import { Orientation, TulioData } from "../types";
 import Shovel from "../weapons/shovel";
-import Weapon from "../weapons/weapon";
+import Weapon, { WeaponType } from "../weapons/weapon";
 import Entity from "./entity";
 
 export default class Tulio extends Entity {
   private direction: Direction;
   private frozen = false;
   private baseVelocity = 120;
-  private _weapon: Weapon;
+  private _weapon?: Weapon;
   private invencible = false;
 
   public isAttacking = false;
@@ -43,7 +43,7 @@ export default class Tulio extends Entity {
       scene.scene.get("gui-scene").events.emit("refresh-player-data", playerHandler.playerData);
     });
 
-    this.weapon = playerData.weapon ?? new Shovel(scene, this);
+    this.weapon = playerData.weapon;
 
     this.currentHealth = playerData.health;
 
@@ -173,7 +173,7 @@ export default class Tulio extends Entity {
   }
 
   public get damage(): number {
-    return this.baseDamage + this.weapon.damage;
+    return this.baseDamage + (this.weapon?.damage ?? 0);
   }
 
   public get weapon() {
@@ -200,8 +200,8 @@ export default class Tulio extends Entity {
 
   public get facingDirection(): Orientation {
     const playerToCursorLine = new Geom.Line(
-      this.sprite.x,
-      this.sprite.y,
+      this.sprite.x - this.scene.cameras.main.scrollX,
+      this.sprite.y - this.scene.cameras.main.scrollY,
       this.direction.pointer.x,
       this.direction.pointer.y
     );
@@ -253,7 +253,7 @@ export default class Tulio extends Entity {
     }
 
     if (this.direction.pointer.leftButtonDown()) {
-      this.handleAttackAnim(anim);
+      this.handleAttack(anim);
     }
   }
 
@@ -281,32 +281,40 @@ export default class Tulio extends Entity {
   }
 
   attack(enemy: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
-    super.attack(enemy, this.weapon.damage);
+    super.attack(enemy, this.damage);
   }
 
-  handleAttackAnim(animKey: string) {
-    if (this.isAttacking || this.weapon?.inDelay) {
+  handleAttack(animKey: string) {
+    if (!this.weapon || this.isAttacking || this.weapon?.inDelay) {
       return;
     }
 
-    this.scene.time.delayedCall(100, () => {
-      this.weapon?.attack();
-    });
+    switch (this.weapon.type) {
+      case WeaponType.shovel:
+        this.scene.time.delayedCall(100, () => {
+          this.weapon!.attack();
+        });
 
-    this.isAttacking = true;
-    this.sprite.play(`${this.key}-${this.weapon?.name}-attack-${this.facingDirection}`);
+        this.isAttacking = true;
+        this.sprite.play(`${this.key}-${this.weapon?.name}-attack-${this.facingDirection}`);
 
-    this.sprite.once("animationcomplete", () => {
-      this.isAttacking = false;
-      this.sprite
-        .setSize(this.sprite.width * 0.5, this.sprite.height * 0.2)
-        .setScale(2.5)
-        .setOrigin(0.5, 0.85)
-        .setOffset(this.sprite.width * 0.25, this.sprite.height * 0.8);
-      this.sprite.playAfterDelay(animKey, 100);
+        this.sprite.once("animationcomplete", () => {
+          this.isAttacking = false;
+          this.sprite
+            .setSize(this.sprite.width * 0.5, this.sprite.height * 0.2)
+            .setScale(2.5)
+            .setOrigin(0.5, 0.85)
+            .setOffset(this.sprite.width * 0.25, this.sprite.height * 0.8);
+          this.sprite.playAfterDelay(animKey, 100);
 
-      this.weapon?.scene.events.emit("attack-concluded");
-    });
+          this.weapon?.scene.events.emit("shovel-attack-concluded");
+        });
+
+        break;
+      case WeaponType.pistol:
+        this.weapon.attack();
+        break;
+    }
   }
 
   die() {

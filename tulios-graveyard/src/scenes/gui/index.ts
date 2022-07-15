@@ -15,8 +15,8 @@ export default class GUIScene extends Phaser.Scene {
   private weapon?: Weapon;
   private weaponIcon?: Phaser.GameObjects.Image;
 
-  private ammunitionText: Phaser.GameObjects.Text;
-  private ammunitionIcon: Phaser.GameObjects.Image;
+  private ammunitionText?: Phaser.GameObjects.Text;
+  private ammunitionIcon?: Phaser.GameObjects.Image;
 
   private health: number;
   private hearts: Phaser.GameObjects.Image[];
@@ -59,12 +59,13 @@ export default class GUIScene extends Phaser.Scene {
     this.weapon = playerData.weapon;
 
     if (this.weapon) {
-      if (!this.weaponIcon) {
-        this.weaponIcon = this.add.image(this.weaponBg.x, this.weaponBg.y, `${this.weapon.key}`);
-      } else if (this.weapon.key == this.weaponIcon.texture.key) {
-        this.weaponIcon.setTexture(this.weapon.key);
+      this.clearWeapon();
+      this.weaponIcon = this.add.image(this.weaponBg.x, this.weaponBg.y, `${this.weapon.key}`);
+      switch (this.weapon.type) {
+        case WeaponType.pistol: {
+          this.weaponIcon.setScale(2);
+        }
       }
-
       this.createAmmunitionText(this.weaponBg.x, this.weaponBg.y);
     }
 
@@ -95,7 +96,13 @@ export default class GUIScene extends Phaser.Scene {
   }
 
   handleAmmunitionText() {
-    this.ammunitionText.setText(`x${this.weapon?.currentAmmunition}`);
+    this.ammunitionText?.setText(`x${this.weapon?.currentAmmunition}`);
+  }
+
+  clearWeapon() {
+    this.weaponIcon?.destroy();
+    this.ammunitionIcon?.destroy();
+    this.ammunitionText?.destroy();
   }
 
   handleHealthHearts(x: number, y: number) {

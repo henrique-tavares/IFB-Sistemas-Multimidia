@@ -62,7 +62,7 @@ export default class Preloader extends Phaser.Scene {
     this.load.image("title-screen:button_creditos", "assets/title_screen/button_creditos.png");
 
     this.load.image("death-screen:button_reiniciar", "assets/death_screen/button-reiniciar.png");
-    this.load.image("death-screen:button_voltar", "assets/death_screen/button-voltar.png");
+    this.load.image("death-screen:button_menu", "assets/death_screen/button-menu.png");
 
     this.load.image("gui:arrow-up", "assets/gui/arrow_up.png");
     this.load.image("gui:arrow-right", "assets/gui/arrow_right.png");
@@ -85,8 +85,12 @@ export default class Preloader extends Phaser.Scene {
     });
 
     this.load.image("weapon:shovel", "assets/items/shovel.png");
-    this.load.image("weapon:pistol", "assets/items/pistol.png");
-    this.load.image("weapon:shotgun", "assets/items/shotgun.png");
+    this.load.image("weapon:item:pistol", "assets/items/pistol.png");
+    this.load.image("weapon:item:shotgun", "assets/items/shotgun.png");
+
+    this.load.image("weapon:pistol", "assets/weapons/pistol.png");
+    this.load.image("weapon:shotgun", "assets/weapons/shotgun.png");
+    this.load.image("weapon:bullet", "assets/weapons/bullet.png");
 
     this.load.image("graveyard:mausoleum:bg", "assets/graveyard/Mausoleum.png");
     this.load.image("graveyard:tool_shed:bg", "assets/graveyard/Tool Shed.png");

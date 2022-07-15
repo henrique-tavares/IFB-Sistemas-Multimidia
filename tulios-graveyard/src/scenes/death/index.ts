@@ -90,8 +90,8 @@ export default class Death extends Phaser.Scene {
         });
       });
 
-    const buttonVoltar = this.add
-      .image(this.screen.relativeX(65), this.screen.relativeY(75), "death-screen:button_voltar")
+    const buttonMenu = this.add
+      .image(this.screen.relativeX(65), this.screen.relativeY(75), "death-screen:button_menu")
       .setScale(0.5)
       .setAlpha(0)
       .setInteractive({
@@ -99,14 +99,14 @@ export default class Death extends Phaser.Scene {
       })
       .on("pointerover", () => {
         this.tweens.add({
-          targets: buttonVoltar,
+          targets: buttonMenu,
           scale: 0.5 * 1.1,
           duration: 200,
         });
       })
       .on("pointerout", () => {
         this.tweens.add({
-          targets: buttonVoltar,
+          targets: buttonMenu,
           scale: 0.5,
           duration: 200,
         });
@@ -119,7 +119,7 @@ export default class Death extends Phaser.Scene {
       });
 
     this.tweens.add({
-      targets: [deathText, buttonReiniciar, buttonVoltar],
+      targets: [deathText, buttonReiniciar, buttonMenu],
       alpha: 1,
       duration: 1000,
     });
