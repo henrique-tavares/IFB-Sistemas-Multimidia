@@ -1,16 +1,23 @@
-import { addCustomBounds, generateCustomBounds, generateNextRoomData, handleNextRoomArrows } from '../utils/dungeon';
-import BaseRoom from './baseRoom';
+import {
+  addCustomBounds,
+  generateCustomBounds,
+  generateNextRoomData,
+  handleNextRoomArrows,
+} from "../utils/dungeon";
+import BaseRoom from "./baseRoom";
 
 export default class Room_01 extends BaseRoom {
+  static key = "dungeon:room_01";
+
   constructor() {
     super(
-      'dungeon:room_01',
+      Room_01.key,
       {},
       {
-        up: 'dungeon:room_00',
-        left: 'dungeon:room_03L',
-        right: 'dungeon:room_03R',
-        down: 'dungeon:room_02',
+        up: "dungeon:room_00",
+        left: "dungeon:room_03L",
+        right: "dungeon:room_03R",
+        down: "dungeon:room_02",
       },
       generateNextRoomData({
         up: -100,

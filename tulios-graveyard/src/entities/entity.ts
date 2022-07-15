@@ -51,7 +51,7 @@ export default abstract class Entity {
 
   receiveDamage(damage: number) {
     this.currentHealth -= damage;
-    console.log(this.sprite.name, this.currentHealth);
+    // console.log(this.sprite.name, this.currentHealth);
     this.isAlive = this.currentHealth > 0;
 
     if (!this.isAlive) {

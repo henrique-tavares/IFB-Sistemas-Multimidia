@@ -1,11 +1,13 @@
-import Zombie from '../../entities/zombie';
-import House from '../../props/house';
-import { GraveyardProp, RoomDifficulty, RoomSize } from '../../types';
-import Direction from '../gui/direction';
-import { generateNextRoomData } from '../utils/graveyard';
-import BaseRoom from './baseRoom';
+import Zombie from "../../entities/zombie";
+import House from "../../props/house";
+import { GraveyardProp, RoomDifficulty, RoomSize } from "../../types";
+import Direction from "../gui/direction";
+import { generateNextRoomData } from "../utils/graveyard";
+import BaseRoom from "./baseRoom";
 
 export default class Room_00 extends BaseRoom {
+  static key = "graveyard:room_00";
+
   staticProps: Phaser.Physics.Arcade.StaticGroup;
   dynamicSprites: Phaser.Physics.Arcade.Sprite[];
   line: Phaser.GameObjects.Line;
@@ -14,24 +16,24 @@ export default class Room_00 extends BaseRoom {
 
   constructor() {
     super(
-      'graveyard:room_00',
+      Room_00.key,
       {
         hasTop: true,
         hasLeft: true,
       },
       {
-        right: 'graveyard:room_01',
-        down: 'graveyard:room_10',
+        right: "graveyard:room_01",
+        down: "graveyard:room_10",
       },
       generateNextRoomData({
         right: {
-          mode: 'single',
+          mode: "single",
         },
         down: {
-          mode: 'single',
+          mode: "single",
         },
       }),
-      RoomSize['1x1'],
+      RoomSize["1x1"],
       RoomDifficulty.Easy
     );
   }

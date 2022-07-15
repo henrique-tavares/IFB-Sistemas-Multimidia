@@ -77,7 +77,6 @@ export default abstract class Weapon extends Item {
   }
 
   attack() {
-    console.log("Attack");
     this._inDelay = true;
     this.scene.time.delayedCall(this.delay, () => {
       this._inDelay = false;

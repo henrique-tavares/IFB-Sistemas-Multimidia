@@ -1,32 +1,34 @@
-import 'phaser';
-import { RoomDifficulty, RoomSize } from '../../types';
-import { generateNextRoomData } from '../utils/graveyard';
-import BaseRoom from './baseRoom';
+import "phaser";
+import { RoomDifficulty, RoomSize } from "../../types";
+import { generateNextRoomData } from "../utils/graveyard";
+import BaseRoom from "./baseRoom";
 
 export default class Room_05 extends BaseRoom {
+  static key = "graveyard:room_05";
+
   constructor() {
     super(
-      'graveyard:room_05',
+      Room_05.key,
       {
         hasTop: true,
       },
       {
-        right: 'graveyard:room_06_07_16_17',
-        left: 'graveyard:room_04_14',
-        down: 'graveyard:room_15',
+        right: "graveyard:room_06_07_16_17",
+        left: "graveyard:room_04_14",
+        down: "graveyard:room_15",
       },
       generateNextRoomData({
         right: {
-          mode: 'single',
+          mode: "single",
         },
         down: {
-          mode: 'single',
+          mode: "single",
         },
         left: {
-          mode: 'single',
+          mode: "single",
         },
       }),
-      RoomSize['1x1'],
+      RoomSize["1x1"],
       RoomDifficulty.Easy
     );
   }

@@ -1,18 +1,25 @@
-import 'phaser';
-import { addCustomBounds, generateCustomBounds, generateNextRoomData, handleNextRoomArrows } from '../utils/dungeon';
-import BaseRoom from './baseRoom';
+import "phaser";
+import {
+  addCustomBounds,
+  generateCustomBounds,
+  generateNextRoomData,
+  handleNextRoomArrows,
+} from "../utils/dungeon";
+import BaseRoom from "./baseRoom";
 
 export default class Room_10L extends BaseRoom {
+  static key = "dungeon:room_10L";
+
   constructor() {
     super(
-      'dungeon:room_10L',
+      Room_10L.key,
       {
         hasLeft: true,
       },
       {
-        up: 'dungeon:room_09L',
-        down: 'dungeon:room_11L',
-        right: 'dungeon:room_12L',
+        up: "dungeon:room_09L",
+        down: "dungeon:room_11L",
+        right: "dungeon:room_12L",
       },
       generateNextRoomData({
         up: 0,

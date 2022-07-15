@@ -40,6 +40,7 @@ export default class Tulio extends Entity {
         ...playerData,
         ...data,
       };
+      scene.scene.get("gui-scene").events.emit("refresh-player-data", playerHandler.playerData);
     });
 
     this.weapon = playerData.weapon ?? new Shovel(scene, this);
@@ -48,20 +49,14 @@ export default class Tulio extends Entity {
 
     this.animations = [
       {
-        key: `${this.key}-walk-right`,
-        frames: scene.anims.generateFrameNumbers(this.key, { frames: [3, 4, 5] }),
-        frameRate: 8,
-        repeat: -1,
-      },
-      {
-        key: `${this.key}-walk-left`,
-        frames: scene.anims.generateFrameNumbers(this.key, { frames: [9, 10, 11] }),
-        frameRate: 8,
-        repeat: -1,
-      },
-      {
         key: `${this.key}-walk-up`,
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [0, 1, 2] }),
+        frameRate: 8,
+        repeat: -1,
+      },
+      {
+        key: `${this.key}-walk-right`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [3, 4, 5] }),
         frameRate: 8,
         repeat: -1,
       },
@@ -72,20 +67,21 @@ export default class Tulio extends Entity {
         repeat: -1,
       },
       {
-        key: `${this.key}-idle-right`,
-        frames: scene.anims.generateFrameNumbers(this.key, { frames: [4] }),
+        key: `${this.key}-walk-left`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [9, 10, 11] }),
         frameRate: 8,
         repeat: -1,
       },
-      {
-        key: `${this.key}-idle-left`,
-        frames: scene.anims.generateFrameNumbers(this.key, { frames: [10] }),
-        frameRate: 8,
-        repeat: -1,
-      },
+
       {
         key: `${this.key}-idle-up`,
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [1] }),
+        frameRate: 8,
+        repeat: -1,
+      },
+      {
+        key: `${this.key}-idle-right`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [4] }),
         frameRate: 8,
         repeat: -1,
       },
@@ -96,8 +92,24 @@ export default class Tulio extends Entity {
         repeat: -1,
       },
       {
+        key: `${this.key}-idle-left`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [10] }),
+        frameRate: 8,
+        repeat: -1,
+      },
+      {
+        key: `${this.key}-shovel-attack-up`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [24, 25, 26] }),
+        duration: 150,
+      },
+      {
         key: `${this.key}-shovel-attack-right`,
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [27, 28, 29] }),
+        duration: 150,
+      },
+      {
+        key: `${this.key}-shovel-attack-down`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [30, 31, 32] }),
         duration: 150,
       },
       {
@@ -106,14 +118,24 @@ export default class Tulio extends Entity {
         duration: 150,
       },
       {
-        key: `${this.key}-shovel-attack-up`,
-        frames: scene.anims.generateFrameNumbers(this.key, { frames: [24, 25, 26] }),
-        duration: 150,
+        key: `${this.key}-die-up`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [36, 37, 38] }),
+        duration: 1500,
       },
       {
-        key: `${this.key}-shovel-attack-down`,
-        frames: scene.anims.generateFrameNumbers(this.key, { frames: [30, 31, 32] }),
-        duration: 150,
+        key: `${this.key}-die-right`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [39, 40, 41] }),
+        duration: 1500,
+      },
+      {
+        key: `${this.key}-die-down`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [42, 43, 44] }),
+        duration: 1500,
+      },
+      {
+        key: `${this.key}-die-left`,
+        frames: scene.anims.generateFrameNumbers(this.key, { frames: [45, 46, 47] }),
+        duration: 1500,
       },
     ];
 
@@ -124,10 +146,7 @@ export default class Tulio extends Entity {
     this.sprite.on(
       "hit",
       () => {
-        if (this.invencible) {
-          return;
-        }
-        this.invencible = true;
+        this.sprite.toggleData("invencible");
 
         this.sprite.once("post-hit", () => {
           const event = this.scene.time.addEvent({
@@ -138,34 +157,19 @@ export default class Tulio extends Entity {
                 this.sprite.setVisible(false);
               }
 
-              console.log("pinto", event.getOverallProgress());
               if (event.getOverallProgress() == 1) {
-                this.invencible = false;
+                this.sprite.toggleData("invencible");
               }
             },
             repeat: 19,
             delay: 50,
           });
         });
-
-        this.scene.time.delayedCall(2000, () => {
-          this.invencible = false;
-        });
-
-        console.log("aa", this.invencible);
       },
       this
     );
 
     this.direction = scene.scene.get("gui-scene").data.get("direction") as Direction;
-  }
-
-  receiveDamage(damage: number): void {
-    if (this.invencible) {
-      return;
-    }
-
-    super.receiveDamage(damage);
   }
 
   public get damage(): number {
@@ -302,6 +306,18 @@ export default class Tulio extends Entity {
       this.sprite.playAfterDelay(animKey, 100);
 
       this.weapon?.scene.events.emit("attack-concluded");
+    });
+  }
+
+  die() {
+    super.die();
+
+    this.scene.scene.start("death", {
+      pos: {
+        x: this.sprite.x,
+        y: this.sprite.y,
+      },
+      facingDirection: this.facingDirection,
     });
   }
 }

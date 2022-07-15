@@ -1,6 +1,4 @@
-import Weapon, { WeaponType } from '../weapons/weapon';
-import { TulioData } from '../types';
-import Shovel from '../weapons/shovel';
+import { TulioData } from "../types";
 
 export default class PlayerHandler {
   private _playerData: TulioData | null = null;
@@ -11,6 +9,10 @@ export default class PlayerHandler {
       weapon: undefined,
       health: 10,
     };
+  }
+
+  public clean() {
+    this._playerData = null;
   }
 
   public get playerData() {

@@ -108,7 +108,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
   }
 
   init(coordinate: PlayerCoordinate) {
-    console.log(this.constructor.name);
+    // console.log(this.constructor.name);
     this.fadeIn(this.fadeDuration);
     if (isEmpty(coordinate)) {
       this.physics.world.once("worldbounds", this.onWorldBounds, this);
@@ -149,7 +149,9 @@ export default abstract class BaseRoom extends Phaser.Scene {
       enemy.body.velocity.limit(30);
 
       const zombie = this.zombiesInScene.find(zombie => zombie.sprite.name == enemy.name)!;
-      zombie.attack(player);
+      if (!player.getData("invencible")) {
+        zombie.attack(player);
+      }
     });
     this.physics.add.collider(this.staticProps, this.enemiesGroup);
 
@@ -173,7 +175,6 @@ export default abstract class BaseRoom extends Phaser.Scene {
               return;
             }
 
-            console.log("attack hit");
             this.player.attack(enemy);
             this.player.weapon!.knockback(enemy, this.player.facingDirection);
             alreadyAttackedEnemies.add(enemy);
@@ -572,7 +573,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
   }
 
   wake(sys: Phaser.Scenes.Systems, data: PlayerCoordinate) {
-    console.log(this.constructor.name);
+    // console.log(this.constructor.name);
     this.fadeIn(this.fadeDuration);
     const { x: newX, y: newY } = this.repositionPlayer(data);
     this.player.sprite.enableBody(true, newX, newY, true, true);
