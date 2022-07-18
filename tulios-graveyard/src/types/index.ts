@@ -1,4 +1,4 @@
-import Weapon from '../weapons/weapon';
+import Weapon, { WeaponType } from "../weapons/weapon";
 
 export interface BackgroundBorderConfig {
   hasLeft?: boolean;
@@ -14,7 +14,7 @@ export interface BackgroundBorder {
   left?: number;
 }
 
-export type Orientation = 'up' | 'right' | 'down' | 'left';
+export type Orientation = "up" | "right" | "down" | "left";
 
 export type NextRoom = { [Key in Orientation]?: string | [string, string] };
 
@@ -36,7 +36,7 @@ export interface PlayerCoordinate {
 }
 
 export interface NextRoomDest {
-  mode: 'single' | 'double';
+  mode: "single" | "double";
   offset?: number;
   offsets?: [number, number];
 }
@@ -62,10 +62,10 @@ export interface NextRoomArrowPosition {
 }
 
 export enum RoomSize {
-  '1x1',
-  '2x1',
-  '1x2',
-  '2x2',
+  "1x1",
+  "2x1",
+  "1x2",
+  "2x2",
 }
 
 export enum GraveyardProp {
@@ -79,7 +79,14 @@ export enum GraveyardProp {
 
 export interface TulioData {
   health: number;
-  weapon?: Weapon;
+  selectedWeapon?: WeaponType;
+  weapons: {
+    [key in WeaponType]: {
+      type: WeaponType;
+      ammo: number;
+      picked: boolean;
+    };
+  };
 }
 
 export enum RoomDifficulty {

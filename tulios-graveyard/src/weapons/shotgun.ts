@@ -1,11 +1,10 @@
 import _ from "lodash";
 import Tulio from "../entities/tulio";
 import Direction from "../scenes/gui/direction";
-import { Orientation } from "../types";
 import Bullet from "./bullet";
 import Weapon, { WeaponType } from "./weapon";
 
-export default class Pistol extends Weapon {
+export default class Shotgun extends Weapon {
   direction: Direction;
   angle: number;
   bullets: Map<number, Bullet> = new Map();
@@ -13,9 +12,9 @@ export default class Pistol extends Weapon {
   bulletsPropHitGroup: Phaser.Physics.Arcade.Group;
 
   constructor(scene: Phaser.Scene, owner: Tulio, ammo: number) {
-    super(scene, "weapon:pistol", WeaponType.pistol, 5, ammo, owner, 500);
+    super(scene, "weapon:shotgun", WeaponType.shotgun, 10, ammo, owner, 1000);
 
-    this.sprite = scene.add.image(400, 300, "weapon:pistol").setScale(2);
+    this.sprite = scene.add.image(400, 300, "weapon:shotgun").setScale(2);
 
     this.direction = scene.scene.get("gui-scene").data.get("direction") as Direction;
 
@@ -57,14 +56,14 @@ export default class Pistol extends Weapon {
         break;
     }
 
-    const pistolToCursorLine = new Phaser.Geom.Line(
+    const shotgunToCursorLine = new Phaser.Geom.Line(
       this.sprite.x - this.scene.cameras.main.scrollX,
       this.sprite.y - this.scene.cameras.main.scrollY,
       this.direction.pointer.x,
       this.direction.pointer.y
     );
 
-    this.angle = Phaser.Geom.Line.Angle(pistolToCursorLine);
+    this.angle = Phaser.Geom.Line.Angle(shotgunToCursorLine);
 
     const shouldFlip = _.inRange(Math.abs(this.angle), Math.PI / 2, Math.PI);
     this.sprite.setFlipY(shouldFlip);

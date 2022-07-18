@@ -9,8 +9,8 @@ export default class Shovel extends Weapon {
   private attackAreaOffset: { x: number; y: number };
   private attackAreaSize: { width: number; height: number };
 
-  constructor(scene: Scene, owner: Tulio) {
-    super(scene, "weapon:shovel", WeaponType.shovel, 2, Infinity, owner, 1000);
+  constructor(scene: Scene, owner: Tulio, ammo: number) {
+    super(scene, "weapon:shovel", WeaponType.shovel, 2, ammo, owner, 1000);
 
     scene.events.on(
       "shovel-knockback",

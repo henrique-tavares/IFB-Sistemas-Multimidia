@@ -59,7 +59,6 @@ export default class Bullet {
     });
 
     this.enemyHitArea.on("enemy-hit", (enemy: Phaser.Types.Physics.Arcade.GameObjectWithBody) => {
-      console.log("fhdskjhdjh");
       this.knockback(enemy);
       this.destroy();
     });
@@ -87,7 +86,6 @@ export default class Bullet {
   }
 
   destroy() {
-    console.log(`bala #${this.id} fora`);
     this.scene.events.emit("remove-bullet", this.id);
     this.sprite.destroy(true);
     this.enemyHitArea.destroy(true);

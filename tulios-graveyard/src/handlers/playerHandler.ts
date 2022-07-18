@@ -1,4 +1,5 @@
 import { TulioData } from "../types";
+import { WeaponType } from "../weapons/weapon";
 
 export default class PlayerHandler {
   private _playerData: TulioData | null = null;
@@ -6,8 +7,25 @@ export default class PlayerHandler {
 
   constructor() {
     this._initialData = {
-      weapon: undefined,
+      weapons: {
+        [WeaponType.shovel]: {
+          type: WeaponType.shovel,
+          ammo: Infinity,
+          picked: false,
+        },
+        [WeaponType.pistol]: {
+          type: WeaponType.pistol,
+          ammo: 10,
+          picked: false,
+        },
+        [WeaponType.shotgun]: {
+          type: WeaponType.shotgun,
+          ammo: 5,
+          picked: false,
+        },
+      },
       health: 10,
+      selectedWeapon: undefined,
     };
   }
 

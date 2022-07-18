@@ -1,8 +1,6 @@
-import { GameObjects, Scene, Types } from "phaser";
+import { GameObjects, Scene } from "phaser";
 import Tulio from "../entities/tulio";
-import Zombie from "../entities/zombie";
 import Item from "../items/item";
-import { Orientation } from "../types";
 
 export enum WeaponType {
   shovel = 0,
@@ -12,10 +10,10 @@ export enum WeaponType {
 
 export default abstract class Weapon extends Item {
   readonly key: string;
-  readonly sprite: GameObjects.Image;
+  sprite: GameObjects.Image;
   readonly type: WeaponType;
   readonly damage: number;
-  readonly owner: Tulio | Zombie;
+  readonly owner: Tulio;
 
   readonly scene: Scene;
   protected ammunition: number;
@@ -74,6 +72,10 @@ export default abstract class Weapon extends Item {
 
   update() {
     this.scene.events.once("tulio-attack", this.attack, this);
+  }
+
+  handleAmmo(amount: number) {
+    this.ammunition += amount;
   }
 
   attack() {

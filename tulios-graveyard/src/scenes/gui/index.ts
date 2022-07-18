@@ -12,7 +12,10 @@ export default class GUIScene extends Phaser.Scene {
   private audioHandler: AudioHandler;
 
   private weaponBg: Phaser.GameObjects.Image;
-  private weapon?: Weapon;
+  private weapon?: {
+    type: WeaponType;
+    ammo: number;
+  };
   private weaponIcon?: Phaser.GameObjects.Image;
 
   private ammunitionText?: Phaser.GameObjects.Text;
@@ -56,15 +59,28 @@ export default class GUIScene extends Phaser.Scene {
   }
 
   handlePlayerData(playerData: TulioData) {
-    this.weapon = playerData.weapon;
+    this.weapon = playerData.weapons[playerData.selectedWeapon ?? -1];
+
+    const weaponKeyTranslator = {
+      [WeaponType.shovel]: "weapon:shovel",
+      [WeaponType.pistol]: "weapon:pistol",
+      [WeaponType.shotgun]: "weapon:shotgun",
+    };
 
     if (this.weapon) {
       this.clearWeapon();
-      this.weaponIcon = this.add.image(this.weaponBg.x, this.weaponBg.y, `${this.weapon.key}`);
+      this.weaponIcon = this.add.image(
+        this.weaponBg.x,
+        this.weaponBg.y,
+        weaponKeyTranslator[this.weapon.type]
+      );
       switch (this.weapon.type) {
-        case WeaponType.pistol: {
+        case WeaponType.shotgun:
+          this.weaponIcon.setScale(1.5);
+          break;
+        case WeaponType.pistol:
           this.weaponIcon.setScale(2);
-        }
+          break;
       }
       this.createAmmunitionText(this.weaponBg.x, this.weaponBg.y);
     }
@@ -87,7 +103,7 @@ export default class GUIScene extends Phaser.Scene {
       return;
     }
 
-    this.ammunitionText = this.add.text(x, y, `x${this.weapon?.currentAmmunition}`, {
+    this.ammunitionText = this.add.text(x, y, `x${this.weapon?.ammo}`, {
       color: "#EDEDED",
       fontFamily: "ZillaSlab",
       fontSize: "20px",
@@ -96,7 +112,7 @@ export default class GUIScene extends Phaser.Scene {
   }
 
   handleAmmunitionText() {
-    this.ammunitionText?.setText(`x${this.weapon?.currentAmmunition}`);
+    this.ammunitionText?.setText(`x${this.weapon?.ammo}`);
   }
 
   clearWeapon() {

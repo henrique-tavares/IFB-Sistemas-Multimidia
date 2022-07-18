@@ -1,8 +1,11 @@
+import _ from "lodash";
 import { Geom, Scene } from "phaser";
 import PlayerHandler from "../handlers/playerHandler";
 import Direction from "../scenes/gui/direction";
 import { angleToDirection, correctAngle } from "../scenes/utils/misc";
 import { Orientation, TulioData } from "../types";
+import Pistol from "../weapons/pistol";
+import Shotgun from "../weapons/shotgun";
 import Shovel from "../weapons/shovel";
 import Weapon, { WeaponType } from "../weapons/weapon";
 import Entity from "./entity";
@@ -12,9 +15,10 @@ export default class Tulio extends Entity {
   private frozen = false;
   private baseVelocity = 120;
   private _weapon?: Weapon;
-  private invencible = false;
 
   public isAttacking = false;
+
+  private changeWeaponKey: Phaser.Input.Keyboard.Key;
 
   readonly scene: Scene;
   readonly sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
@@ -43,9 +47,16 @@ export default class Tulio extends Entity {
       scene.scene.get("gui-scene").events.emit("refresh-player-data", playerHandler.playerData);
     });
 
-    this.weapon = playerData.weapon;
+    if (playerData.selectedWeapon) {
+      this.pickupWeapon(playerData.selectedWeapon);
+    }
 
     this.currentHealth = playerData.health;
+
+    this.changeWeaponKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TAB, true);
+    this.changeWeaponKey.on("down", () => {
+      this.changeWeapon();
+    });
 
     this.animations = [
       {
@@ -172,33 +183,82 @@ export default class Tulio extends Entity {
     this.direction = scene.scene.get("gui-scene").data.get("direction") as Direction;
   }
 
-  public get damage(): number {
+  pickupWeapon(weaponType: WeaponType) {
+    const playerData = this.playerHandlerData;
+
+    playerData.selectedWeapon = weaponType;
+
+    const playerDataWeapon = playerData.weapons[playerData.selectedWeapon];
+    playerDataWeapon.picked = true;
+
+    if (this.weapon && this.weapon.type != WeaponType.shovel) {
+      this.weapon.sprite.destroy(true);
+    }
+
+    switch (playerData.selectedWeapon) {
+      case WeaponType.shovel:
+        this.weapon = new Shovel(this.scene, this, playerDataWeapon.ammo);
+        break;
+      case WeaponType.pistol:
+        this.weapon = new Pistol(this.scene, this, playerDataWeapon.ammo);
+        break;
+      case WeaponType.shotgun:
+        this.weapon = new Shotgun(this.scene, this, playerDataWeapon.ammo);
+        break;
+    }
+  }
+
+  changeWeapon() {
+    const playerData = this.playerHandlerData;
+
+    if (!this.weapon) {
+      return;
+    }
+
+    for (let i = 1; i <= 3; i++) {
+      const newWeapon = playerData.weapons[(this.weapon.type + i) % 3];
+
+      if (!newWeapon.picked) {
+        continue;
+      }
+
+      this.pickupWeapon(newWeapon.type);
+      break;
+    }
+  }
+
+  private get playerHandlerData() {
+    const playerHandler = this.scene.cache.custom["handlers"].get("playerHandler") as PlayerHandler;
+    return playerHandler.playerData;
+  }
+
+  get damage(): number {
     return this.baseDamage + (this.weapon?.damage ?? 0);
   }
 
-  public get weapon() {
+  get weapon() {
     return this._weapon;
   }
 
-  public set weapon(val) {
+  set weapon(val) {
     this._weapon = val;
     this.sprite.emit("refresh-player-data", {
-      weapon: this.weapon,
+      selectedWeapon: this.weapon?.type,
     });
   }
 
-  public get currentHealth() {
+  get currentHealth() {
     return super.currentHealth;
   }
 
-  public set currentHealth(val: number) {
+  set currentHealth(val: number) {
     super.currentHealth = val;
     this.sprite.emit("refresh-player-data", {
       health: this.currentHealth,
     });
   }
 
-  public get facingDirection(): Orientation {
+  get facingDirection(): Orientation {
     const playerToCursorLine = new Geom.Line(
       this.sprite.x - this.scene.cameras.main.scrollX,
       this.sprite.y - this.scene.cameras.main.scrollY,
@@ -284,10 +344,37 @@ export default class Tulio extends Entity {
     super.attack(enemy, this.damage);
   }
 
-  handleAttack(animKey: string) {
-    if (!this.weapon || this.isAttacking || this.weapon?.inDelay) {
+  private handleAmmo(amount: number) {
+    if (!this.weapon) {
       return;
     }
+
+    const playerData = this.playerHandlerData;
+    const playerDataWeapon = playerData.weapons[playerData.selectedWeapon!];
+    playerDataWeapon.ammo += amount;
+    this.sprite.emit("refresh-player-data", {
+      ...playerData,
+      weapons: {
+        ...playerData.weapons,
+        ...playerDataWeapon,
+      },
+    });
+
+    this.weapon.handleAmmo(amount);
+  }
+
+  handleAttack(animKey: string) {
+    if (
+      !this.weapon ||
+      this.isAttacking ||
+      this.weapon.inDelay ||
+      this.weapon.currentAmmunition == 0
+    ) {
+      return;
+    }
+
+    this.handleAmmo(-1);
+    console.log("ammo", this.weapon.currentAmmunition);
 
     switch (this.weapon.type) {
       case WeaponType.shovel:
@@ -312,6 +399,7 @@ export default class Tulio extends Entity {
 
         break;
       case WeaponType.pistol:
+      case WeaponType.shotgun:
         this.weapon.attack();
         break;
     }

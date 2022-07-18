@@ -2,6 +2,7 @@ import _ from "lodash";
 import Tulio from "../../entities/tulio";
 import Zombie from "../../entities/zombie";
 import AudioHandler from "../../handlers/audioHandler";
+import PlayerHandler from "../../handlers/playerHandler";
 import BaseProp from "../../props/baseProp";
 import {
   BackgroundBorder,
@@ -16,7 +17,9 @@ import {
   RoomSize,
 } from "../../types";
 import Pistol from "../../weapons/pistol";
+import Shotgun from "../../weapons/shotgun";
 import Shovel from "../../weapons/shovel";
+import { WeaponType } from "../../weapons/weapon";
 import Background from "../utils/background";
 import { allGraveyardProps, graveyardPropBuilder } from "../utils/graveyard";
 import {
@@ -128,7 +131,9 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.screen = new Screen(this.bg.image.width, this.bg.image.height);
 
     this.player = new Tulio(this);
-    this.player.weapon = new Shovel(this, this.player);
+    this.player.pickupWeapon(WeaponType.shovel);
+    this.player.pickupWeapon(WeaponType.pistol);
+    this.player.pickupWeapon(WeaponType.shotgun);
     this.player.sprite.body.setCollideWorldBounds(true, undefined, undefined, true);
     this.data.set("player", this.player);
 
@@ -157,9 +162,6 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.physics.add.collider(this.staticProps, this.enemiesGroup);
 
     this.proplessAreas = this.physics.add.staticGroup();
-
-    // this.player.weapon = new Shovel(this, this.player);
-    this.player.weapon = new Pistol(this, this.player);
 
     this.generateInicialProplessAreas();
     this.refreshProps();
@@ -196,12 +198,10 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.events.on(
       "init-bullet-attack",
       (attackArea: Phaser.GameObjects.GameObject) => {
-        console.log("iniciou evento");
         const attackOverlap = this.physics.add.overlap(
           attackArea,
           this.enemiesGroup,
           (bullet, enemy) => {
-            console.log(bullet);
             this.player.attack(enemy);
             bullet.emit("enemy-hit", enemy);
             attackOverlap.destroy();
