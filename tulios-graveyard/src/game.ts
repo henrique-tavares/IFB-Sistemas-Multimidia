@@ -5,6 +5,7 @@ import Dungeon from "./scenes/dungeon";
 import Preloader from "./scenes/preloader";
 import GUIScene from "./scenes/gui";
 import Death from "./scenes/death";
+import Interiors from "./scenes/interiors";
 
 const scenesList = [Preloader, Start, GUIScene, Death, ...Graveyard, ...Dungeon];
 export const scenesMap = scenesList.reduce(
@@ -34,7 +35,7 @@ const config = {
     height: 600,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [Preloader, Start, GUIScene, Death, ...Graveyard, ...Dungeon],
+  scene: [Preloader, Start, GUIScene, Death, ...Interiors, ...Graveyard, ...Dungeon],
 };
 
 const game = new Phaser.Game(config);

@@ -225,14 +225,7 @@ export default class GUIScene extends Phaser.Scene {
         }
 
         musicButton.setTexture("gui:music_icon_on");
-        const activeScenes = this.scene.manager.getScenes(true);
-        const playableScene = activeScenes.find(scene => {
-          return (
-            scene.sys.config.toString().startsWith("graveyard:") ||
-            scene.sys.config.toString().startsWith("dungeon:")
-          );
-        })!;
-        this.audioHandler.turnOnMusic(playableScene);
+        this.audioHandler.turnOnMusic(this.scene.manager.getScene(this.currSceneKey));
       });
 
     this.pauseScreenGroup.addMultiple([
@@ -254,7 +247,7 @@ export default class GUIScene extends Phaser.Scene {
     const activeScenes = this.scene.manager.getScenes(true);
     activeScenes.forEach(s => {
       if (s.scene.key != "gui-scene") {
-        this.currSceneKey = s.scene.key;
+        this.currSceneKey = s.sys.config as string;
         s.scene.pause();
       }
     });
@@ -265,17 +258,10 @@ export default class GUIScene extends Phaser.Scene {
     this.pauseScreenGroup.toggleVisible();
 
     if (key === "menu") {
-      this.handleMenuButton();
+      this.scene.stop(this.currSceneKey);
+      this.scene.start("start");
     } else {
       this.scene.manager.getScene(this.currSceneKey).scene.resume();
     }
-  }
-
-  handleMenuButton() {
-    const activeScenes = this.scene.manager.getScenes(true);
-    activeScenes.forEach(s => {
-      this.scene.stop(s.sys.config as string);
-    });
-    this.scene.start("start");
   }
 }

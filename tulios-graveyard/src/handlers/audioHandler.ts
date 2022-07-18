@@ -38,7 +38,7 @@ export default class AudioHandler {
   }
 
   handleBackgroundMusic(scene: Scene) {
-    const sceneKey = scene.sys.config as string;
+    const sceneKey = scene.sys.config as string; 
     scene.sound.pauseOnBlur = false;
 
     if (['start', 'credits', 'options'].includes(sceneKey)) {

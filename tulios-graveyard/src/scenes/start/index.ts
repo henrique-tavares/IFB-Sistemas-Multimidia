@@ -90,7 +90,7 @@ export default class Start extends Phaser.Scene {
         this.time.delayedCall(500, () => {
           this.scene.run("gui-scene");
           this.scene.start("graveyard:room_00");
-        });
+        }); 
       });
 
     const buttonCreditos = this.add
