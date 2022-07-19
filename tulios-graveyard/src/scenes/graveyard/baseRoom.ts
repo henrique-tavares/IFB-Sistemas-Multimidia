@@ -2,7 +2,6 @@ import _ from "lodash";
 import Tulio from "../../entities/tulio";
 import Zombie from "../../entities/zombie";
 import AudioHandler from "../../handlers/audioHandler";
-import PlayerHandler from "../../handlers/playerHandler";
 import BaseProp from "../../props/baseProp";
 import {
   BackgroundBorder,
@@ -16,9 +15,6 @@ import {
   RoomDifficulty,
   RoomSize,
 } from "../../types";
-import Pistol from "../../weapons/pistol";
-import Shotgun from "../../weapons/shotgun";
-import Shovel from "../../weapons/shovel";
 import { WeaponType } from "../../weapons/weapon";
 import Background from "../utils/background";
 import { allGraveyardProps, graveyardPropBuilder } from "../utils/graveyard";
@@ -50,6 +46,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected zombiesInScene = new Array<Zombie>();
   protected staticProps: Phaser.Physics.Arcade.StaticGroup;
   protected proplessAreas: Phaser.Physics.Arcade.StaticGroup;
+  protected lootGroup: Phaser.Physics.Arcade.Group;
   readonly roomSize: RoomSize;
   readonly difficulty: RoomDifficulty;
 
@@ -130,6 +127,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.bg = new Background(this, `${this.key}:bg`, this.bgBorder);
     this.screen = new Screen(this.bg.image.width, this.bg.image.height);
 
+    this.data.set("difficulty", this.difficulty);
+
     this.player = new Tulio(this);
     this.player.pickupWeapon(WeaponType.shovel);
     this.player.pickupWeapon(WeaponType.pistol);
@@ -165,6 +164,9 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.generateInicialProplessAreas();
     this.refreshProps();
+
+    this.lootGroup = this.physics.add.group();
+    this.data.set("lootGroup", this.lootGroup);
 
     this.addEnemies();
 
@@ -434,8 +436,30 @@ export default abstract class BaseRoom extends Phaser.Scene {
   }
 
   addEnemies() {
-    const enemiesNum = 1;
-    // const enemiesNum = _.random(3, 5) * this.difficulty;
+    let enemiesNum = 0;
+    switch (this.difficulty) {
+      case RoomDifficulty.Peaceful:
+        enemiesNum = 0;
+        break;
+      case RoomDifficulty.Easy:
+        enemiesNum = _.random(1, 3);
+        break;
+      case RoomDifficulty.Medium:
+        enemiesNum = _.random(3, 5);
+        break;
+      case RoomDifficulty.Hard:
+        enemiesNum = _.random(5, 7);
+        break;
+    }
+
+    switch (this.screen.width / 800 + this.screen.height / 600) {
+      case 3:
+        enemiesNum = Math.floor(enemiesNum * 1.25);
+        break;
+      case 4:
+        enemiesNum = Math.floor(enemiesNum * 2);
+        break;
+    }
 
     const directionTranslator = {
       up: "top",
@@ -499,7 +523,11 @@ export default abstract class BaseRoom extends Phaser.Scene {
     };
 
     for (const _x of _.range(enemiesNum)) {
-      const side = _.sample(spawnableArea)!;
+      const side = _.sample(spawnableArea);
+
+      if (!side) {
+        return;
+      }
 
       this.time.delayedCall(_.random(0, 3000, true), () => {
         const zombie = new Zombie(this, 0, 0, this.enemiesGroup.countActive());

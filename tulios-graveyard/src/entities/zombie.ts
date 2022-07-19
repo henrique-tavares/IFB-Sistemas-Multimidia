@@ -1,11 +1,16 @@
+import _ from "lodash";
+import { LootType } from "../loot/BaseLoot";
+import LootPistol from "../loot/LootPistol";
+import LootShotgun from "../loot/LootShotgun";
+import BaseRoomDungeon from "../scenes/dungeon/baseRoom";
 import { angleToDirection, angleToRadians, isBetween } from "../scenes/utils/misc";
-import { Orientation } from "../types";
+import { Orientation, RoomDifficulty } from "../types";
 import Entity from "./entity";
 import Tulio from "./tulio";
 
 export default class Zombie extends Entity {
   private player: Tulio;
-  private baseVelocity = 50;
+  private baseVelocity = 30;
   private walkEvent: Phaser.Time.TimerEvent;
 
   constructor(scene: Phaser.Scene, x: number, y: number, id: number) {
@@ -22,6 +27,19 @@ export default class Zombie extends Entity {
       .setScale(2.5)
       .setOrigin(0.5, 0.85)
       .setOffset(this.sprite.width * 0.15, this.sprite.height * 0.8);
+
+    switch (scene.data.get("difficulty")! as RoomDifficulty) {
+      case RoomDifficulty.Easy:
+        this.baseVelocity = 50;
+        break;
+      case RoomDifficulty.Medium:
+        this.baseVelocity = 75;
+        break;
+      case RoomDifficulty.Hard:
+      case RoomDifficulty.Jorge:
+        this.baseVelocity = 100;
+        break;
+    }
 
     this.animations = [
       {
@@ -98,7 +116,7 @@ export default class Zombie extends Entity {
       -Math.cos(correctedAngle) * this.baseVelocity,
       Math.sin(correctedAngle) * this.baseVelocity
     );
-    this.sprite.body.velocity.limit(30);
+    this.sprite.body.velocity.limit(this.baseVelocity);
 
     const mirroredAngle = (correctedAngle + Math.PI) % (Math.PI * 2);
 
@@ -119,6 +137,38 @@ export default class Zombie extends Entity {
     )! as Orientation;
   }
 
+  lootHandler() {
+    const num = _.random(0, 100, true);
+
+    if (!_.inRange(num, 0, 50)) {
+      return;
+    }
+
+    const lootType = _.sample([
+      LootType.PistolAmmo,
+      // ...(this.scene instanceof BaseRoomDungeon ? [LootType.ShotgunAmmo] : []),
+    ])!;
+
+    switch (lootType) {
+      case LootType.PistolAmmo:
+        return new LootPistol(
+          this.scene,
+          this.player,
+          this.sprite.x,
+          this.sprite.y,
+          Math.trunc(num % 4) + 2
+        );
+      case LootType.ShotgunAmmo:
+        return new LootShotgun(
+          this.scene,
+          this.player,
+          this.sprite.x,
+          this.sprite.y,
+          Math.trunc(num % 4) + 1
+        );
+    }
+  }
+
   die() {
     this.sprite.setMaxVelocity(0);
     this.walkEvent.destroy();
@@ -127,6 +177,10 @@ export default class Zombie extends Entity {
       "animationcomplete",
       () => {
         super.die();
+        const loot = this.lootHandler();
+        if (loot) {
+          this.scene.data.get("lootGroup")!.add(loot.sprite);
+        }
       },
       this
     );

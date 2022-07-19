@@ -37,6 +37,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected customBorders?: CustomBorder[];
   protected enemiesGroup: Phaser.Physics.Arcade.Group;
   protected zombiesInScene = new Array<Zombie>();
+  protected lootGroup: Phaser.Physics.Arcade.Group;
   protected nextRoomArrowsPosition: NextRoomArrowPosition;
   readonly difficulty: RoomDifficulty;
   readonly verticalPadding = 11;
@@ -123,6 +124,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.bg = new Background(this, `${this.key}:bg`, this.bgBorder);
     this.screen = new Screen(this.bg.image.width, this.bg.image.height);
 
+    this.data.set("difficulty", this.difficulty);
+
     this.player = new Tulio(this, 400, 175);
     this.player.pickupWeapon(WeaponType.shovel);
     this.player.pickupWeapon(WeaponType.pistol);
@@ -135,11 +138,6 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.cameras.main.startFollow(this.player.sprite);
     this.bg.applyBoundsOnSprite(this.player.sprite);
 
-    if (this.customBorders) {
-      this.customBorderGroup = this.createCustomBorders(this.customBorders);
-      this.physics.add.collider(this.player.sprite, this.customBorderGroup);
-    }
-
     this.enemiesGroup = this.physics.add.group();
     this.physics.add.collider(this.enemiesGroup, this.enemiesGroup);
     this.physics.add.collider(this.player.sprite, this.enemiesGroup, (player, enemy) => {
@@ -151,6 +149,15 @@ export default abstract class BaseRoom extends Phaser.Scene {
         zombie.attack(player);
       }
     });
+
+    this.lootGroup = this.physics.add.group();
+    this.data.set("lootGroup", this.lootGroup);
+
+    if (this.customBorders) {
+      this.customBorderGroup = this.createCustomBorders(this.customBorders);
+      this.physics.add.collider(this.player.sprite, this.customBorderGroup);
+      this.physics.add.collider(this.enemiesGroup, this.customBorderGroup);
+    }
 
     this.addEnemies();
 
@@ -188,6 +195,9 @@ export default abstract class BaseRoom extends Phaser.Scene {
           attackArea,
           this.enemiesGroup,
           (bullet, enemy) => {
+            if (!attackOverlap.active) {
+              return;
+            }
             this.player.attack(enemy);
             bullet.emit("enemy-hit", enemy);
             attackOverlap.destroy();
@@ -253,15 +263,15 @@ export default abstract class BaseRoom extends Phaser.Scene {
           customBorderGroup.addMultiple([
             this.add.rectangle(
               this.screen.relativeX(2),
-              this.screen.relativeY(5),
+              this.screen.relativeY(0),
               this.screen.relativeX(4),
-              this.screen.relativeY(11)
+              this.screen.relativeY(22)
             ),
             this.add.rectangle(
               this.screen.relativeX(73),
-              this.screen.relativeY(5),
+              this.screen.relativeY(0),
               this.screen.relativeX(54),
-              this.screen.relativeY(11)
+              this.screen.relativeY(22)
             ),
           ]);
           break;
@@ -269,30 +279,30 @@ export default abstract class BaseRoom extends Phaser.Scene {
           customBorderGroup.addMultiple([
             this.add.rectangle(
               this.screen.relativeX(27),
-              this.screen.relativeY(5),
+              this.screen.relativeY(0),
               this.screen.relativeX(54),
-              this.screen.relativeY(11)
+              this.screen.relativeY(22)
             ),
             this.add.rectangle(
               this.screen.relativeX(98),
-              this.screen.relativeY(5),
+              this.screen.relativeY(0),
               this.screen.relativeX(4),
-              this.screen.relativeY(11)
+              this.screen.relativeY(22)
             ),
           ]);
           break;
         case CustomBorder.RightTop:
           customBorderGroup.addMultiple([
             this.add.rectangle(
-              this.screen.relativeX(96),
+              this.screen.relativeX(100),
               this.screen.relativeY(79.5),
-              this.screen.relativeX(8),
+              this.screen.relativeX(16),
               this.screen.relativeY(70)
             ),
             this.add.rectangle(
-              this.screen.relativeX(96),
+              this.screen.relativeX(100),
               this.screen.relativeY(2.75),
-              this.screen.relativeX(8),
+              this.screen.relativeX(16),
               this.screen.relativeY(5.5)
             ),
           ]);
@@ -300,15 +310,15 @@ export default abstract class BaseRoom extends Phaser.Scene {
         case CustomBorder.RightBottom:
           customBorderGroup.addMultiple([
             this.add.rectangle(
-              this.screen.relativeX(96),
+              this.screen.relativeX(100),
               this.screen.relativeY(20),
-              this.screen.relativeX(8),
+              this.screen.relativeX(16),
               this.screen.relativeY(70)
             ),
             this.add.rectangle(
-              this.screen.relativeX(96),
+              this.screen.relativeX(100),
               this.screen.relativeY(97.25),
-              this.screen.relativeX(8),
+              this.screen.relativeX(16),
               this.screen.relativeY(5.5)
             ),
           ]);
@@ -317,30 +327,30 @@ export default abstract class BaseRoom extends Phaser.Scene {
           customBorderGroup.addMultiple([
             this.add.rectangle(
               this.screen.relativeX(2),
-              this.screen.relativeY(95),
+              this.screen.relativeY(100),
               this.screen.relativeX(4),
-              this.screen.relativeY(11)
+              this.screen.relativeY(22)
             ),
             this.add.rectangle(
               this.screen.relativeX(73),
-              this.screen.relativeY(95),
+              this.screen.relativeY(100),
               this.screen.relativeX(54),
-              this.screen.relativeY(11)
+              this.screen.relativeY(22)
             ),
           ]);
           break;
         case CustomBorder.LeftTop:
           customBorderGroup.addMultiple([
             this.add.rectangle(
-              this.screen.relativeX(4),
+              this.screen.relativeX(0),
               this.screen.relativeY(79.5),
-              this.screen.relativeX(8),
+              this.screen.relativeX(16),
               this.screen.relativeY(70)
             ),
             this.add.rectangle(
-              this.screen.relativeX(4),
+              this.screen.relativeX(0),
               this.screen.relativeY(2.75),
-              this.screen.relativeX(8),
+              this.screen.relativeX(16),
               this.screen.relativeY(5.5)
             ),
           ]);
@@ -348,15 +358,15 @@ export default abstract class BaseRoom extends Phaser.Scene {
         case CustomBorder.LeftBottom:
           customBorderGroup.addMultiple([
             this.add.rectangle(
-              this.screen.relativeX(4),
+              this.screen.relativeX(0),
               this.screen.relativeY(20),
-              this.screen.relativeX(8),
+              this.screen.relativeX(16),
               this.screen.relativeY(70)
             ),
             this.add.rectangle(
-              this.screen.relativeX(4),
+              this.screen.relativeX(0),
               this.screen.relativeY(97.25),
-              this.screen.relativeX(8),
+              this.screen.relativeX(16),
               this.screen.relativeY(5.5)
             ),
           ]);
@@ -388,8 +398,30 @@ export default abstract class BaseRoom extends Phaser.Scene {
   }
 
   addEnemies() {
-    const enemiesNum = 0;
-    // const enemiesNum = _.random(3, 5) * this.difficulty;
+    let enemiesNum = 0;
+    switch (this.difficulty) {
+      case RoomDifficulty.Peaceful:
+        enemiesNum = 0;
+        break;
+      case RoomDifficulty.Easy:
+        enemiesNum = _.random(1, 3);
+        break;
+      case RoomDifficulty.Medium:
+        enemiesNum = _.random(3, 5);
+        break;
+      case RoomDifficulty.Hard:
+        enemiesNum = _.random(5, 7);
+        break;
+    }
+
+    switch (this.screen.width / 800 + this.screen.height / 600) {
+      case 3:
+        enemiesNum = Math.floor(enemiesNum * 1.25);
+        break;
+      case 4:
+        enemiesNum = Math.floor(enemiesNum * 2);
+        break;
+    }
 
     const directionTranslator = {
       up: "top",
@@ -453,7 +485,11 @@ export default abstract class BaseRoom extends Phaser.Scene {
     };
 
     for (const _x of _.range(enemiesNum)) {
-      const side = _.sample(spawnableArea)!;
+      const side = _.sample(spawnableArea);
+
+      if (!side) {
+        return;
+      }
 
       this.time.delayedCall(_.random(0, 3000, true), () => {
         const zombie = new Zombie(this, 0, 0, this.enemiesGroup.countActive());
@@ -490,6 +526,15 @@ export default abstract class BaseRoom extends Phaser.Scene {
             .some(
               (child: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) =>
                 !isSpritePositionValid(zombie.sprite, child)
+            ) ||
+          this.customBorderGroup
+            ?.getChildren()
+            .some(
+              (customBorder: Phaser.GameObjects.Rectangle) =>
+                !Phaser.Geom.Rectangle.Intersection(
+                  customBorder.getBounds(),
+                  zombie.sprite.getBounds()
+                ).isEmpty()
             )
         );
 

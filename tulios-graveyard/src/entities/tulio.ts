@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { Geom, Scene } from "phaser";
 import PlayerHandler from "../handlers/playerHandler";
+import BaseLoot, { LootType } from "../loot/BaseLoot";
 import Direction from "../scenes/gui/direction";
 import { angleToDirection, correctAngle } from "../scenes/utils/misc";
 import { Orientation, TulioData } from "../types";
@@ -40,8 +41,10 @@ export default class Tulio extends Entity {
     const { playerData } = playerHandler;
 
     this.sprite.on("refresh-player-data", (data: Partial<TulioData>) => {
+      const playerHandler = this.playerHandler;
+
       playerHandler.playerData = {
-        ...playerData,
+        ...playerHandler.playerData,
         ...data,
       };
       scene.scene.get("gui-scene").events.emit("refresh-player-data", playerHandler.playerData);
@@ -183,8 +186,27 @@ export default class Tulio extends Entity {
     this.direction = scene.scene.get("gui-scene").data.get("direction") as Direction;
   }
 
+  pickupLoot(loot: BaseLoot): boolean {
+    switch (loot.type) {
+      case LootType.PistolAmmo:
+        if (this.weapon?.type !== WeaponType.pistol) {
+          return false;
+        }
+
+        this.handleAmmo(loot.value);
+        return true;
+      case LootType.ShotgunAmmo:
+        if (this.weapon?.type !== WeaponType.shotgun) {
+          return false;
+        }
+
+        this.handleAmmo(loot.value);
+        return true;
+    }
+  }
+
   pickupWeapon(weaponType: WeaponType) {
-    const playerData = this.playerHandlerData;
+    const { playerData } = this.playerHandler;
 
     playerData.selectedWeapon = weaponType;
 
@@ -209,7 +231,7 @@ export default class Tulio extends Entity {
   }
 
   changeWeapon() {
-    const playerData = this.playerHandlerData;
+    const { playerData } = this.playerHandler;
 
     if (!this.weapon) {
       return;
@@ -227,9 +249,9 @@ export default class Tulio extends Entity {
     }
   }
 
-  private get playerHandlerData() {
+  private get playerHandler() {
     const playerHandler = this.scene.cache.custom["handlers"].get("playerHandler") as PlayerHandler;
-    return playerHandler.playerData;
+    return playerHandler;
   }
 
   get damage(): number {
@@ -349,7 +371,7 @@ export default class Tulio extends Entity {
       return;
     }
 
-    const playerData = this.playerHandlerData;
+    const { playerData } = this.playerHandler;
     const playerDataWeapon = playerData.weapons[playerData.selectedWeapon!];
     playerDataWeapon.ammo += amount;
     this.sprite.emit("refresh-player-data", {

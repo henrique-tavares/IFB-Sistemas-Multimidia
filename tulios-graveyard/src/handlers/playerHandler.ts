@@ -15,12 +15,12 @@ export default class PlayerHandler {
         },
         [WeaponType.pistol]: {
           type: WeaponType.pistol,
-          ammo: 10,
+          ammo: 99,
           picked: false,
         },
         [WeaponType.shotgun]: {
           type: WeaponType.shotgun,
-          ammo: 5,
+          ammo: 50,
           picked: false,
         },
       },
