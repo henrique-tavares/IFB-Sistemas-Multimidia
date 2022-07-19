@@ -8,12 +8,6 @@ import BaseRoom from "./baseRoom";
 export default class Room_00 extends BaseRoom {
   static key = "graveyard:room_00";
 
-  staticProps: Phaser.Physics.Arcade.StaticGroup;
-  dynamicSprites: Phaser.Physics.Arcade.Sprite[];
-  line: Phaser.GameObjects.Line;
-  cursor: Phaser.Input.Pointer;
-  zombie: Zombie;
-
   constructor() {
     super(
       Room_00.key,

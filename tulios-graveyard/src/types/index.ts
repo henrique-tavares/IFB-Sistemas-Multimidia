@@ -90,13 +90,34 @@ export interface TulioData {
 }
 
 export enum RoomDifficulty {
-  Easy = 1,
+  Peaceful,
+  Easy,
   Medium,
   Hard,
+  Jorge,
 }
 
 export interface BorderSideArea {
   pos: { x: number; y: number };
   size: { width: number; height: number };
   origin: { x: number; y: number };
+}
+
+// export interface CustomBorder {
+//   x: number;
+//   y: number;
+//   width: number;
+//   height: number;
+// }
+
+export enum CustomBorder {
+  TopLeft,
+  TopRight,
+  RightTop,
+  RightBottom,
+  BottomLeft,
+  LeftTop,
+  LeftBottom,
+  RightBottomCorner,
+  LeftBottomCorner,
 }

@@ -5,7 +5,7 @@ import Tulio from "./tulio";
 
 export default class Zombie extends Entity {
   private player: Tulio;
-  private baseVelocity = 30;
+  private baseVelocity = 50;
   private walkEvent: Phaser.Time.TimerEvent;
 
   constructor(scene: Phaser.Scene, x: number, y: number, id: number) {

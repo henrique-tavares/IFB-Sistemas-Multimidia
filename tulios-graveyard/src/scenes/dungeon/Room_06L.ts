@@ -1,4 +1,5 @@
 import "phaser";
+import { RoomSize, RoomDifficulty } from "../../types";
 import {
   addCustomBounds,
   generateCustomBounds,
@@ -6,6 +7,7 @@ import {
   handleNextRoomArrows,
 } from "../utils/dungeon";
 import BaseRoom from "./baseRoom";
+import { CustomBorder } from "../../types";
 
 export default class Room_06L extends BaseRoom {
   static key = "dungeon:room_06L";
@@ -24,33 +26,17 @@ export default class Room_06L extends BaseRoom {
       generateNextRoomData({
         down: 0,
         right: 50,
-      })
+      }),
+      RoomDifficulty.Hard,
+      {
+        down: -1,
+      },
+      [CustomBorder.BottomLeft]
     );
   }
 
   create() {
     super.create();
-
-    addCustomBounds(
-      this.player.sprite,
-      this,
-      this.screen,
-      generateCustomBounds(
-        this.screen,
-        {
-          top: this.topPadding,
-          bottom: this.bottomPadding,
-          horizontal: this.horizontalPadding,
-        },
-        {
-          down: 50,
-        }
-      )
-    );
-
-    handleNextRoomArrows(this.key, this, this.screen, this.nextRoom, {
-      down: -1,
-    });
   }
 
   update() {

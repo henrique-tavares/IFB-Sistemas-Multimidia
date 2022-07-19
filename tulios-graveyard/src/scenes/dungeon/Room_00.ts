@@ -1,4 +1,5 @@
 import "phaser";
+import { RoomDifficulty, RoomSize } from "../../types";
 import { handleNextRoomArrows, generateNextRoomData } from "../utils/dungeon";
 import BaseRoom from "./baseRoom";
 
@@ -16,14 +17,13 @@ export default class Room_00 extends BaseRoom {
       {
         down: "dungeon:room_01",
       },
-      generateNextRoomData({ down: 50 })
+      generateNextRoomData({ down: 50 }),
+      RoomDifficulty.Hard
     );
   }
 
   create() {
     super.create();
-
-    handleNextRoomArrows(this.key, this, this.screen, this.nextRoom, {});
   }
 
   update() {

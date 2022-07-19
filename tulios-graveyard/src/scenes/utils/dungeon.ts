@@ -1,6 +1,8 @@
-import 'phaser';
-import { GameObjects, Scene } from 'phaser';
+import _ from "lodash";
+import "phaser";
+import { GameObjects, Scene } from "phaser";
 import {
+  CustomBorder,
   CustomBoundConfig,
   CustomBounds,
   NextRoom,
@@ -10,9 +12,9 @@ import {
   NextRoomPlayerCoordinate,
   Orientation,
   PlayerCoordinate,
-} from '../../types';
-import NextRoomArrow from './nextRoomArrow';
-import Screen from './screen';
+} from "../../types";
+import NextRoomArrow from "./nextRoomArrow";
+import Screen from "./screen";
 
 export function handleNextRoomArrows(
   key: string,
@@ -21,8 +23,8 @@ export function handleNextRoomArrows(
   nextRoom: NextRoom,
   position: NextRoomArrowPosition
 ) {
-  console.log(key);
-  console.log(Object.entries(nextRoom));
+  // console.log(key);
+  // console.log(Object.entries(nextRoom));
 
   const nextRoomArrows = Object.entries(nextRoom).map(([key, value]) => {
     return new NextRoomArrow(
@@ -91,10 +93,10 @@ export function generateNextRoomData(config: { [Key in Orientation]?: number }):
   }
 
   return {
-    up: config.up ? generateDirection('up', config.up) : undefined,
-    right: config.right ? generateDirection('right', config.right) : undefined,
-    down: config.down ? generateDirection('down', config.down) : undefined,
-    left: config.left ? generateDirection('left', config.left) : undefined,
+    up: _.isNumber(config.up) ? generateDirection("up", config.up) : undefined,
+    right: _.isNumber(config.right) ? generateDirection("right", config.right) : undefined,
+    down: _.isNumber(config.down) ? generateDirection("down", config.down) : undefined,
+    left: _.isNumber(config.left) ? generateDirection("left", config.left) : undefined,
   };
 }
 
@@ -105,7 +107,7 @@ export function addCustomBounds(
   customBound: CustomBounds
 ) {
   const customBounds = scene.physics.add.staticGroup();
-  ['up', 'down', 'left', 'right'].forEach((orientation: Orientation) => {
+  ["up", "down", "left", "right"].forEach((orientation: Orientation) => {
     if (!customBound[orientation]) return;
 
     const config = customBound[orientation]!;
@@ -116,29 +118,29 @@ export function addCustomBounds(
     let y = screen.relativeY(config.y);
 
     switch (orientation) {
-      case 'up': {
+      case "up": {
         height = (screen.height * config.padding) / 100;
         x += width / 2;
         break;
       }
-      case 'down': {
+      case "down": {
         height = (screen.height * config.padding) / 100;
         x += width / 2;
         break;
       }
-      case 'left': {
+      case "left": {
         width = (screen.width * 2 * config.padding) / 100;
         y += height / 2 - 60;
         break;
       }
-      case 'right': {
+      case "right": {
         width = (screen.width * 2 * config.padding) / 100;
         y += height / 2 - 60;
         break;
       }
     }
 
-    customBounds.add(scene.add.rectangle(x, y, width, height, 0x000, 0), true);
+    customBounds.add(scene.add.rectangle(x, y, width, height, 0x000, 0.5), true);
   });
 
   scene.physics.add.collider(player, customBounds);
@@ -146,19 +148,19 @@ export function addCustomBounds(
 
 export function generateCustomBounds(
   screen: Screen,
-  paddings: { top: number; bottom: number; horizontal: number },
+  paddings: { vertical: number; horizontal: number },
   config: { [Key in Orientation]?: number }
 ): CustomBounds {
   const bound = {
     up: (offset: number): CustomBoundConfig => ({
       x: offset,
-      y: 2,
-      padding: paddings.top,
+      y: 5,
+      padding: paddings.vertical,
     }),
     down: (offset: number): CustomBoundConfig => ({
       x: offset,
-      y: 100,
-      padding: paddings.top + paddings.bottom,
+      y: 95,
+      padding: paddings.vertical,
     }),
     left: (offset: number): CustomBoundConfig => ({
       x: 0,
@@ -173,9 +175,9 @@ export function generateCustomBounds(
   };
 
   return {
-    up: config.up ? bound.up(config.up) : undefined,
-    right: config.right ? bound.right(config.right) : undefined,
-    down: config.down ? bound.down(config.down) : undefined,
-    left: config.left ? bound.left(config.left) : undefined,
+    up: _.isNumber(config.up) ? bound.up(config.up) : undefined,
+    right: _.isNumber(config.right) ? bound.right(config.right) : undefined,
+    down: _.isNumber(config.down) ? bound.down(config.down) : undefined,
+    left: _.isNumber(config.left) ? bound.left(config.left) : undefined,
   };
 }

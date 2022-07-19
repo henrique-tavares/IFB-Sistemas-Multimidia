@@ -374,7 +374,6 @@ export default class Tulio extends Entity {
     }
 
     this.handleAmmo(-1);
-    console.log("ammo", this.weapon.currentAmmunition);
 
     switch (this.weapon.type) {
       case WeaponType.shovel:
