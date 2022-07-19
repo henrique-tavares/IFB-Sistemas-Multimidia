@@ -63,98 +63,98 @@ export default class Tulio extends Entity {
 
     this.animations = [
       {
-        key: `${this.key}-walk-up`,
+        key: "walk-up",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [0, 1, 2] }),
         frameRate: 8,
         repeat: -1,
       },
       {
-        key: `${this.key}-walk-right`,
+        key: "walk-right",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [3, 4, 5] }),
         frameRate: 8,
         repeat: -1,
       },
       {
-        key: `${this.key}-walk-down`,
+        key: "walk-down",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [6, 7, 8] }),
         frameRate: 8,
         repeat: -1,
       },
       {
-        key: `${this.key}-walk-left`,
+        key: "walk-left",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [9, 10, 11] }),
         frameRate: 8,
         repeat: -1,
       },
 
       {
-        key: `${this.key}-idle-up`,
+        key: "idle-up",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [1] }),
         frameRate: 8,
         repeat: -1,
       },
       {
-        key: `${this.key}-idle-right`,
+        key: "idle-right",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [4] }),
         frameRate: 8,
         repeat: -1,
       },
       {
-        key: `${this.key}-idle-down`,
+        key: "idle-down",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [7] }),
         frameRate: 8,
         repeat: -1,
       },
       {
-        key: `${this.key}-idle-left`,
+        key: "idle-left",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [10] }),
         frameRate: 8,
         repeat: -1,
       },
       {
-        key: `${this.key}-shovel-attack-up`,
+        key: "shovel-attack-up",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [24, 25, 26] }),
         duration: 150,
       },
       {
-        key: `${this.key}-shovel-attack-right`,
+        key: "shovel-attack-right",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [27, 28, 29] }),
         duration: 150,
       },
       {
-        key: `${this.key}-shovel-attack-down`,
+        key: "shovel-attack-down",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [30, 31, 32] }),
         duration: 150,
       },
       {
-        key: `${this.key}-shovel-attack-left`,
+        key: "shovel-attack-left",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [33, 34, 35] }),
         duration: 150,
       },
       {
-        key: `${this.key}-die-up`,
+        key: "die-up",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [36, 37, 38] }),
         duration: 1500,
       },
       {
-        key: `${this.key}-die-right`,
+        key: "die-right",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [39, 40, 41] }),
         duration: 1500,
       },
       {
-        key: `${this.key}-die-down`,
+        key: "die-down",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [42, 43, 44] }),
         duration: 1500,
       },
       {
-        key: `${this.key}-die-left`,
+        key: "die-left",
         frames: scene.anims.generateFrameNumbers(this.key, { frames: [45, 46, 47] }),
         duration: 1500,
       },
     ];
 
     this.animations.forEach(animation => {
-      scene.anims.create(animation);
+      this.sprite.anims.create(animation);
     });
 
     this.sprite.on(
@@ -319,9 +319,9 @@ export default class Tulio extends Entity {
     const { x: velX, y: velY } = this.calculateVelocity();
     this.sprite.setVelocity(velX, velY);
 
-    const anim = `${this.key}-${
-      this.direction.isPressed && this.sprite.body.speed > 0 ? "walk" : "idle"
-    }-${this.facingDirection}`;
+    const anim = `${this.direction.isPressed && this.sprite.body.speed > 0 ? "walk" : "idle"}-${
+      this.facingDirection
+    }`;
 
     if (!this.isAttacking) {
       this.sprite.play(anim, true);
@@ -404,7 +404,7 @@ export default class Tulio extends Entity {
         });
 
         this.isAttacking = true;
-        this.sprite.play(`${this.key}-${this.weapon?.name}-attack-${this.facingDirection}`);
+        this.sprite.play(`${this.weapon?.name}-attack-${this.facingDirection}`);
 
         this.sprite.once("animationcomplete", () => {
           this.isAttacking = false;

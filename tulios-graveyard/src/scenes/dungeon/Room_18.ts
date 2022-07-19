@@ -1,5 +1,6 @@
 import _ from "lodash";
 import "phaser";
+import Jorge from "../../entities/jorge";
 import Zombie from "../../entities/zombie";
 import { RoomSize, RoomDifficulty } from "../../types";
 import { generateNextRoomData, handleNextRoomArrows } from "../utils/dungeon";
@@ -9,6 +10,7 @@ export default class Room_18 extends BaseRoom {
   static key = "dungeon:room_18";
 
   spawnArea: Phaser.Physics.Arcade.StaticGroup;
+  jorge: Jorge;
 
   constructor() {
     super(
@@ -59,18 +61,25 @@ export default class Room_18 extends BaseRoom {
       true
     );
 
+    this.jorge = new Jorge(this, this.screen.relativeX(50), this.screen.relativeY(50));
+
+    // this.jorge.die();
+
     let waveNum = 1;
     this.dispatchWave(waveNum);
 
     const waveCallback = () => {
+      if (waveNum == 3) {
+        this.events.off("wave-concluded", waveCallback);
+        this.jorge.sprite.clearTint();
+        this.jorge.die();
+        return;
+      }
+
       waveNum += 1;
       this.dispatchWave(waveNum);
-
-      if (waveNum != 3) {
-        this.events.once("wave-concluded", waveCallback);
-      }
     };
-    this.events.once("wave-concluded", waveCallback, this);
+    this.events.on("wave-concluded", waveCallback, this);
   }
 
   update() {
@@ -78,8 +87,15 @@ export default class Room_18 extends BaseRoom {
   }
 
   dispatchWave(num: number) {
-    this.wave(5 + num * 5);
-    // this.wave(5);
+    this.time.delayedCall(2000, () => {
+      this.jorge.summon();
+
+      if (num == 3) {
+        this.jorge.sprite.setTint(0xff0000);
+      }
+
+      this.wave(5 + num * 5);
+    });
   }
 
   wave(enemiesNum: number) {
@@ -95,6 +111,7 @@ export default class Room_18 extends BaseRoom {
     const timeEvent = this.time.addEvent({
       callback: () => {
         if (this.enemiesGroup.countActive() == 0) {
+          this.jorge.idle();
           this.events.emit("wave-concluded");
           timeEvent.destroy();
         }

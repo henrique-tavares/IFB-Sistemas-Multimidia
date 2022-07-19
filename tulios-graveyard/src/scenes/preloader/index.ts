@@ -189,6 +189,11 @@ export default class Preloader extends Phaser.Scene {
       frameHeight: 28,
     });
 
+    this.load.spritesheet("characters:jorge", "assets/characters/Jorge.png", {
+      frameWidth: 22,
+      frameHeight: 28,
+    });
+
     this.load.audio("bg_start_music", "audio/bg_start_music.wav");
     this.load.audio("bg_graveyard_music", "audio/bg_graveyard_music.wav");
     this.load.audio("bg_dungeon_music", "audio/bg_dungeon_music.wav");
