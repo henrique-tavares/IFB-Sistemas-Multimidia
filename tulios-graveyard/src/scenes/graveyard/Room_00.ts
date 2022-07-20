@@ -3,9 +3,9 @@ import House from "../../props/house";
 import { GraveyardProp, RoomDifficulty, RoomSize } from "../../types";
 import Direction from "../gui/direction";
 import { generateNextRoomData } from "../utils/graveyard";
-import BaseRoom from "./baseRoom";
+import BaseRoomGraveyard from "./baseRoomGraveyard";
 
-export default class Room_00 extends BaseRoom {
+export default class Room_00 extends BaseRoomGraveyard {
   static key = "graveyard:room_00";
 
   constructor() {

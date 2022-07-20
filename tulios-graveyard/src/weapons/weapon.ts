@@ -2,6 +2,7 @@ import { GameObjects, Scene } from "phaser";
 import Tulio from "../entities/tulio";
 import AudioHandler from "../handlers/audioHandler";
 import Item from "../items/item";
+import Bullet from "./bullet";
 
 export enum WeaponType {
   shovel = 0,
@@ -68,6 +69,10 @@ export default abstract class Weapon extends Item {
 
   public get inDelay(): boolean {
     return this._inDelay;
+  }
+
+  get bulletsInScene(): Map<number, Bullet> {
+    return this.scene.data.get("bullets");
   }
 
   // public get attackAreaShape(): GameObjects.Rectangle {

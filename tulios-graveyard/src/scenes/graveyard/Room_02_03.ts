@@ -2,9 +2,9 @@ import "phaser";
 import Cabin from "../../props/cabin";
 import { RoomDifficulty, RoomSize } from "../../types";
 import { generateNextRoomData } from "../utils/graveyard";
-import BaseRoom from "./baseRoom";
+import BaseRoomGraveyard from "./baseRoomGraveyard";
 
-export default class Room_02_03 extends BaseRoom {
+export default class Room_02_03 extends BaseRoomGraveyard {
   static key = "graveyard:room_02_03";
 
   constructor() {

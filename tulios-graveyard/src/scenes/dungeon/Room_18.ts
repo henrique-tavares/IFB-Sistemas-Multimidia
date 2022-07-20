@@ -4,9 +4,9 @@ import Jorge from "../../entities/jorge";
 import Zombie from "../../entities/zombie";
 import { RoomSize, RoomDifficulty } from "../../types";
 import { generateNextRoomData, handleNextRoomArrows } from "../utils/dungeon";
-import BaseRoom from "./baseRoom";
+import BaseRoomDungeon from "./baseRoomDungeon";
 
-export default class Room_18 extends BaseRoom {
+export default class Room_18 extends BaseRoomDungeon {
   static key = "dungeon:room_18";
 
   spawnArea: Phaser.Physics.Arcade.StaticGroup;

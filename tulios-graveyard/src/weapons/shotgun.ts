@@ -7,9 +7,6 @@ import Weapon, { WeaponType } from "./weapon";
 export default class Shotgun extends Weapon {
   direction: Direction;
   angle: number;
-  bullets: Map<number, Bullet> = new Map();
-  bulletsEnemyHitGroup: Phaser.Physics.Arcade.Group;
-  bulletsPropHitGroup: Phaser.Physics.Arcade.Group;
 
   constructor(scene: Phaser.Scene, owner: Tulio, ammo: number) {
     super(scene, "weapon:shotgun", WeaponType.shotgun, 10, ammo, owner, 1000);
@@ -19,16 +16,16 @@ export default class Shotgun extends Weapon {
     this.direction = scene.scene.get("gui-scene").data.get("direction") as Direction;
 
     this.scene.events.on("remove-bullet", (id: number) => {
-      this.bullets.delete(id);
+      this.bulletsInScene.delete(id);
     });
   }
 
   attack(): void {
     super.attack();
 
-    const id = (_.max(Array.from(this.bullets.keys())) ?? -1) + 1;
+    const id = (_.max(Array.from(this.bulletsInScene.keys())) ?? -1) + 1;
 
-    this.bullets.set(
+    this.bulletsInScene.set(
       id,
       new Bullet(this.scene, this.sprite.x, this.sprite.y, this.damage, this.angle, id)
     );
@@ -69,9 +66,5 @@ export default class Shotgun extends Weapon {
     this.sprite.setFlipY(shouldFlip);
 
     this.sprite.setRotation(this.angle);
-
-    this.bullets.forEach(bullet => {
-      bullet.update();
-    });
   }
 }

@@ -2,8 +2,7 @@ import _ from "lodash";
 import { LootType } from "../loot/BaseLoot";
 import LootPistol from "../loot/LootPistol";
 import LootShotgun from "../loot/LootShotgun";
-import BaseRoomDungeon from "../scenes/dungeon/baseRoom";
-import { angleToDirection, angleToRadians, isBetween } from "../scenes/utils/misc";
+import { angleToDirection } from "../scenes/utils/misc";
 import { Orientation, RoomDifficulty } from "../types";
 import Entity from "./entity";
 import Tulio from "./tulio";
@@ -146,7 +145,7 @@ export default class Zombie extends Entity {
 
     const lootType = _.sample([
       LootType.PistolAmmo,
-      ...(this.scene instanceof BaseRoomDungeon ? [LootType.ShotgunAmmo] : []),
+      ...(this.scene.data.get("type") == "dungeon" ? [LootType.ShotgunAmmo] : []),
     ])!;
 
     switch (lootType) {
@@ -185,6 +184,11 @@ export default class Zombie extends Entity {
       },
       this
     );
+  }
+
+  receiveDamage(damage: number) {
+    this.audioHandler.playSfx(this.scene, "zombie-hit", 0.3);
+    super.receiveDamage(damage);
   }
 
   public get damage(): number {

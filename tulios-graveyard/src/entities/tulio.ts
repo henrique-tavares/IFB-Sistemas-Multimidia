@@ -1,10 +1,9 @@
-import _ from "lodash";
 import { Geom, Scene } from "phaser";
 import AudioHandler from "../handlers/audioHandler";
 import PlayerHandler from "../handlers/playerHandler";
 import BaseLoot, { LootType } from "../loot/BaseLoot";
-import BaseRoomDungeon from "../scenes/dungeon/baseRoom";
-import BaseRoomGraveyard from "../scenes/graveyard/baseRoom";
+// import BaseRoomDungeon from "../scenes/dungeon/baseRoom";
+// import BaseRoomGraveyard from "../scenes/graveyard/baseRoom";
 import Direction from "../scenes/gui/direction";
 import { angleToDirection, correctAngle } from "../scenes/utils/misc";
 import { Orientation, TulioData } from "../types";
@@ -257,7 +256,9 @@ export default class Tulio extends Entity {
         continue;
       }
 
+      console.log(this.scene.data.get("bullets"));
       this.pickupWeapon(newWeapon.type);
+      console.log(this.scene.data.get("bullets"));
       break;
     }
   }
@@ -312,14 +313,13 @@ export default class Tulio extends Entity {
       return;
     }
 
-    if (this.scene instanceof BaseRoomDungeon) {
-      this.audioHandler.playSfx(this.scene, "dungeon-walk", 0.08);
-      return;
-    }
-
-    if (this.scene instanceof BaseRoomGraveyard) {
-      this.audioHandler.playSfx(this.scene, "graveyard-walk", 0.08);
-      return;
+    switch (this.scene.data.get("type")) {
+      case "dungeon":
+        this.audioHandler.playSfx(this.scene, "dungeon-walk", 0.08);
+        return;
+      case "graveyard":
+        this.audioHandler.playSfx(this.scene, "graveyard-walk", 0.08);
+        return;
     }
   }
 
@@ -465,5 +465,10 @@ export default class Tulio extends Entity {
       },
       facingDirection: this.facingDirection,
     });
+  }
+
+  receiveDamage(damage: number) {
+    this.audioHandler.playSfx(this.scene, "person-hit", 0.3);
+    super.receiveDamage(damage);
   }
 }

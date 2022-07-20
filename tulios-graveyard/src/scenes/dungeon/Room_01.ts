@@ -5,9 +5,9 @@ import {
   generateNextRoomData,
   handleNextRoomArrows,
 } from "../utils/dungeon";
-import BaseRoom from "./baseRoom";
+import BaseRoomDungeon from "./baseRoomDungeon";
 
-export default class Room_01 extends BaseRoom {
+export default class Room_01 extends BaseRoomDungeon {
   static key = "dungeon:room_01";
 
   constructor() {

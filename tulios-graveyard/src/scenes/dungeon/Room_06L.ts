@@ -6,10 +6,10 @@ import {
   generateNextRoomData,
   handleNextRoomArrows,
 } from "../utils/dungeon";
-import BaseRoom from "./baseRoom";
+import BaseRoomDungeon from "./baseRoomDungeon";
 import { CustomBorder } from "../../types";
 
-export default class Room_06L extends BaseRoom {
+export default class Room_06L extends BaseRoomDungeon {
   static key = "dungeon:room_06L";
 
   constructor() {

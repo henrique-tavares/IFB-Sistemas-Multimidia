@@ -1,14 +1,9 @@
 import "phaser";
-import { RoomSize, RoomDifficulty, CustomBorder } from "../../types";
-import {
-  addCustomBounds,
-  generateCustomBounds,
-  generateNextRoomData,
-  handleNextRoomArrows,
-} from "../utils/dungeon";
-import BaseRoom from "./baseRoom";
+import { CustomBorder, RoomDifficulty } from "../../types";
+import { generateNextRoomData } from "../utils/dungeon";
+import BaseRoomDungeon from "./baseRoomDungeon";
 
-export default class Room_05L extends BaseRoom {
+export default class Room_05L extends BaseRoomDungeon {
   static key = "dungeon:room_05L";
 
   constructor() {

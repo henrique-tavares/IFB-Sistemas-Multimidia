@@ -1,9 +1,5 @@
-import { GameObjects, Scene } from "phaser";
+import { Scene } from "phaser";
 import AudioHandler from "../handlers/audioHandler";
-import { Orientation } from "../types";
-import Weapon from "../weapons/weapon";
-import Tulio from "./tulio";
-import Zombie from "./zombie";
 
 export default abstract class Entity {
   readonly scene: Scene;
@@ -56,12 +52,6 @@ export default abstract class Entity {
   }
 
   receiveDamage(damage: number) {
-    if (this instanceof Zombie) {
-      this.audioHandler.playSfx(this.scene, "zombie-hit", 0.3);
-    } else if (this instanceof Tulio) {
-      this.audioHandler.playSfx(this.scene, "person-hit", 0.2);
-    }
-
     this.currentHealth -= damage;
     // console.log(this.sprite.name, this.currentHealth);
     this.isAlive = this.currentHealth > 0;

@@ -2,9 +2,9 @@ import "phaser";
 import Mausoleum from "../../props/mausoleum";
 import { RoomDifficulty, RoomSize } from "../../types";
 import { generateNextRoomData } from "../utils/graveyard";
-import BaseRoom from "./baseRoom";
+import BaseRoomGraveyard from "./baseRoomGraveyard";
 
-export default class Room_56_57 extends BaseRoom {
+export default class Room_56_57 extends BaseRoomGraveyard {
   static key = "graveyard:room_56_57";
 
   constructor() {

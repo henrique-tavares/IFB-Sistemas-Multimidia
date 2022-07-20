@@ -1,9 +1,9 @@
 import "phaser";
 import { RoomDifficulty, RoomSize } from "../../types";
 import { generateNextRoomData, handleNextRoomArrows } from "../utils/dungeon";
-import BaseRoom from "./baseRoom";
+import BaseRoomDungeon from "./baseRoomDungeon";
 
-export default class Room_05R extends BaseRoom {
+export default class Room_05R extends BaseRoomDungeon {
   static key = "dungeon:room_05R";
 
   constructor() {
