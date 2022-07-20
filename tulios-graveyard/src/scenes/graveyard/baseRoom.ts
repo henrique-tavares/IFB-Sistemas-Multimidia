@@ -41,6 +41,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected nextRoom: NextRoom;
   protected nextRoomData: NextRoomData;
   protected fadeDuration = 500;
+  protected audioHandler: AudioHandler;
   private isThereNextRoom: boolean;
   protected enemiesGroup: Phaser.Physics.Arcade.Group;
   protected zombiesInScene = new Array<Zombie>();
@@ -228,8 +229,14 @@ export default abstract class BaseRoom extends Phaser.Scene {
       this
     );
 
-    const audioHandler = this.cache.custom["handlers"].get("audioHandler") as AudioHandler;
-    audioHandler.handleBackgroundMusic(this);
+    this.events.on("remove-zombie", (name: string) => {
+      this.enemiesGroup.remove(
+        this.enemiesGroup.getChildren().find(zombie => zombie.name == name)!
+      );
+    });
+
+    this.audioHandler = this.cache.custom["handlers"].get("audioHandler") as AudioHandler;
+    this.audioHandler.handleBackgroundMusic(this);
 
     const nextRoomArrows = Object.entries(this.nextRoom).map(
       ([key, value]) =>

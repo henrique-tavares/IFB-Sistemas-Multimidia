@@ -22,9 +22,9 @@ export default class AudioHandler {
   }
 
   turnOffMusic(scene: Scene) {
-    scene.sound.removeByKey('bg_graveyard_music');
-    scene.sound.removeByKey('bg_dungeon_music');
-    scene.sound.removeByKey('bg_start_music');
+    scene.sound.removeByKey("bg_graveyard_music");
+    scene.sound.removeByKey("bg_dungeon_music");
+    scene.sound.removeByKey("bg_start_music");
     this.musicEnabled = false;
   }
 
@@ -38,43 +38,49 @@ export default class AudioHandler {
   }
 
   handleBackgroundMusic(scene: Scene) {
-    const sceneKey = scene.sys.config as string; 
+    const sceneKey = scene.sys.config as string;
     scene.sound.pauseOnBlur = false;
 
-    if (['start', 'credits', 'options'].includes(sceneKey)) {
-      if (scene.sound.get('bg_start_music')) {
+    if (["start", "credits", "options"].includes(sceneKey)) {
+      if (scene.sound.get("bg_start_music")) {
         return;
       }
 
-      scene.sound.removeByKey('bg_graveyard_music');
-      scene.sound.removeByKey('bg_dungeon_music');
+      scene.sound.removeByKey("bg_graveyard_music");
+      scene.sound.removeByKey("bg_dungeon_music");
 
-      scene.sound.add('bg_start_music', { volume: 0.1, loop: true }).play();
+      scene.sound.add("bg_start_music", { volume: 0.1, loop: true }).play();
       return;
     }
 
-    if (sceneKey.startsWith('graveyard:')) {
-      if (scene.sound.get('bg_graveyard_music')) {
+    if (sceneKey.startsWith("graveyard:")) {
+      if (scene.sound.get("bg_graveyard_music")) {
         return;
       }
 
-      scene.sound.removeByKey('bg_start_music');
-      scene.sound.removeByKey('bg_dungeon_music');
+      scene.sound.removeByKey("bg_start_music");
+      scene.sound.removeByKey("bg_dungeon_music");
 
-      scene.sound.add('bg_graveyard_music', { volume: 0.1, loop: true }).play();
+      scene.sound.add("bg_graveyard_music", { volume: 0.1, loop: true }).play();
       return;
     }
 
-    if (sceneKey.startsWith('dungeon:')) {
-      if (scene.sound.get('bg_dungeon_music')) {
+    if (sceneKey.startsWith("dungeon:")) {
+      if (scene.sound.get("bg_dungeon_music")) {
         return;
       }
 
-      scene.sound.removeByKey('bg_start_music');
-      scene.sound.removeByKey('bg_graveyard_music');
+      scene.sound.removeByKey("bg_start_music");
+      scene.sound.removeByKey("bg_graveyard_music");
 
-      scene.sound.add('bg_dungeon_music', { volume: 0.1, loop: true }).play();
+      scene.sound.add("bg_dungeon_music", { volume: 0.1, loop: true }).play();
       return;
     }
+  }
+
+  playSfx(scene: Phaser.Scene, key: string, volume: number) {
+    scene.sound.play(key, {
+      volume,
+    });
   }
 }

@@ -112,6 +112,11 @@ export default class Room_18 extends BaseRoom {
       callback: () => {
         if (this.enemiesGroup.countActive() == 0) {
           this.jorge.idle();
+          this.jorge.sprite.setTint(0xff0000);
+          this.audioHandler.playSfx(this, "person-hit", 0.3);
+          this.time.delayedCall(500, () => {
+            this.jorge.sprite.clearTint();
+          });
           this.events.emit("wave-concluded");
           timeEvent.destroy();
         }

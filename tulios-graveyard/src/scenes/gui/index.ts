@@ -153,6 +153,7 @@ export default class GUIScene extends Phaser.Scene {
         useHandCursor: true,
       })
       .on("pointerdown", () => {
+        this.audioHandler.playSfx(this, "click-button", 0.2);
         this.startPause();
       });
 
@@ -186,6 +187,7 @@ export default class GUIScene extends Phaser.Scene {
         useHandCursor: true,
       })
       .on("pointerdown", () => {
+        this.audioHandler.playSfx(this, "click-button", 0.2);
         continueButton.setTexture("gui:button_default_down");
         continueText.setPadding(0, 3, 0, 0);
       })
@@ -211,6 +213,7 @@ export default class GUIScene extends Phaser.Scene {
         useHandCursor: true,
       })
       .on("pointerdown", () => {
+        this.audioHandler.playSfx(this, "click-button", 0.2);
         menuButton.setTexture("gui:button_default_down");
         menuText.setPadding(0, 3, 0, 0);
       })
@@ -234,6 +237,7 @@ export default class GUIScene extends Phaser.Scene {
         useHandCursor: true,
       })
       .on("pointerdown", () => {
+        this.audioHandler.playSfx(this, "click-button", 0.2);
         if (this.audioHandler.music) {
           musicButton.setTexture("gui:music_icon_off");
           this.audioHandler.turnOffMusic(this);

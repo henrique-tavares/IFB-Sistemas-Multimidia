@@ -56,9 +56,6 @@ export default class Jorge extends Entity {
     if (this.currentAnimation == "die") {
       return;
     }
-
-    console.log("hdfsjldfh");
-
     this.sprite.play("die");
 
     this.sprite.once("animationcomplete", () => {

@@ -86,6 +86,7 @@ export default class Start extends Phaser.Scene {
         });
       })
       .on("pointerdown", () => {
+        audioHandler.playSfx(this, "click-button", 0.2);
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.time.delayedCall(500, () => {
           this.scene.run("gui-scene");
@@ -115,6 +116,7 @@ export default class Start extends Phaser.Scene {
         });
       })
       .on("pointerdown", () => {
+        audioHandler.playSfx(this, "click-button", 0.2);
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.time.delayedCall(500, () => {
           this.scene.run("gui-scene");

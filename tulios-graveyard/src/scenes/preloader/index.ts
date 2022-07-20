@@ -199,6 +199,20 @@ export default class Preloader extends Phaser.Scene {
     this.load.audio("bg_dungeon_music", "audio/bg_dungeon_music.wav");
     this.load.audio("bg_marina_music", "audio/bg_marina_music.wav");
 
+    this.load.audio('click-button', 'audio/click-button.wav');
+    this.load.audio('pickup-loot', 'audio/pickup-loot.wav');
+
+    this.load.audio('dungeon-walk', 'audio/dungeon-walk.wav');
+    this.load.audio('graveyard-walk', 'audio/graveyard-walk.wav');
+
+    this.load.audio('person-hit', 'audio/person-hit.wav');
+    this.load.audio('zombie-hit', 'audio/zombie-hit.wav');
+    
+    this.load.audio('gun-empty', 'audio/gun-empty.wav');
+    this.load.audio('pistol-fire', 'audio/pistol-fire.wav');
+    this.load.audio('shotgun-fire', 'audio/shotgun-fire.wav');
+    this.load.audio('shovel-attack', 'audio/shovel-attack.wav');
+
     this.cache
       .addCustom("handlers")
       .add("audioHandler", new AudioHandler())

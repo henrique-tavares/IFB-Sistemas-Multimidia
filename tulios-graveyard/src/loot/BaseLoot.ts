@@ -1,5 +1,6 @@
 import _ from "lodash";
 import Tulio from "../entities/tulio";
+import AudioHandler from "../handlers/audioHandler";
 
 export enum LootType {
   PistolAmmo,
@@ -12,6 +13,7 @@ export default abstract class BaseLoot {
   type: LootType;
   player: Tulio;
   abstract value: number;
+  audioHandler: AudioHandler;
 
   constructor(
     scene: Phaser.Scene,
@@ -25,6 +27,8 @@ export default abstract class BaseLoot {
     this.sprite = scene.add.sprite(x, y, spriteKey);
     this.type = type;
     this.player = player;
+
+    this.audioHandler = scene.cache.custom["handlers"].get("audioHandler") as AudioHandler;
   }
 
   spawn() {
@@ -48,6 +52,7 @@ export default abstract class BaseLoot {
       const success = this.player.pickupLoot(this);
 
       if (success) {
+        this.audioHandler.playSfx(this.scene, "pickup-loot", 0.3);
         lootOverlap.destroy();
         this.sprite.destroy(true);
       }

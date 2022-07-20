@@ -1,7 +1,10 @@
 import _ from "lodash";
 import { Geom, Scene } from "phaser";
+import AudioHandler from "../handlers/audioHandler";
 import PlayerHandler from "../handlers/playerHandler";
 import BaseLoot, { LootType } from "../loot/BaseLoot";
+import BaseRoomDungeon from "../scenes/dungeon/baseRoom";
+import BaseRoomGraveyard from "../scenes/graveyard/baseRoom";
 import Direction from "../scenes/gui/direction";
 import { angleToDirection, correctAngle } from "../scenes/utils/misc";
 import { Orientation, TulioData } from "../types";
@@ -23,6 +26,7 @@ export default class Tulio extends Entity {
 
   readonly scene: Scene;
   readonly sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+  readonly audioHandler: AudioHandler;
 
   constructor(scene: Scene, x: number = 400, y: number = 300) {
     super(scene, "characters:tulio", scene.physics.add.sprite(x, y, "characters:tulio"), 10, 1);
@@ -60,6 +64,8 @@ export default class Tulio extends Entity {
     this.changeWeaponKey.on("down", () => {
       this.changeWeapon();
     });
+
+    this.audioHandler = scene.cache.custom["handlers"].get("audioHandler") as AudioHandler;
 
     this.animations = [
       {
@@ -184,6 +190,13 @@ export default class Tulio extends Entity {
     );
 
     this.direction = scene.scene.get("gui-scene").data.get("direction") as Direction;
+
+    this.scene.time.addEvent({
+      callback: this.walkSfx,
+      loop: true,
+      delay: 250,
+      callbackScope: this,
+    });
   }
 
   pickupLoot(loot: BaseLoot): boolean {
@@ -292,6 +305,22 @@ export default class Tulio extends Entity {
     const correctedAngle = correctAngle(angle);
 
     return angleToDirection(correctedAngle);
+  }
+
+  walkSfx() {
+    if (this.sprite.body.speed == 0) {
+      return;
+    }
+
+    if (this.scene instanceof BaseRoomDungeon) {
+      this.audioHandler.playSfx(this.scene, "dungeon-walk", 0.08);
+      return;
+    }
+
+    if (this.scene instanceof BaseRoomGraveyard) {
+      this.audioHandler.playSfx(this.scene, "graveyard-walk", 0.08);
+      return;
+    }
   }
 
   setPosition(x: number, y: number) {

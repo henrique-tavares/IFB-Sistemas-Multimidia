@@ -172,6 +172,7 @@ export default class Zombie extends Entity {
   die() {
     this.sprite.setMaxVelocity(0);
     this.walkEvent.destroy();
+    this.scene.events.emit("remove-zombie", this.sprite.name);
     this.sprite.play(`die-${this.facingDirection}`);
     this.sprite.once(
       "animationcomplete",
