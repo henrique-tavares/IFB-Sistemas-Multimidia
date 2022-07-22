@@ -1,9 +1,11 @@
-import { GameObjects } from "phaser";
+import { BlendModes, GameObjects } from "phaser";
 import BaseProp from "../../props/baseProp";
 import BlueChest from "../../props/blue-chest";
 import Door from "../../props/door";
 import HangingLight from "../../props/hanging-light";
+import WeaponProp from "../../props/weapon";
 import { RoomDifficulty } from "../../types";
+import { WeaponType } from "../../weapons/weapon";
 import BaseRoom from "./baseRoom";
 
 export default class ToolShed extends BaseRoom {
@@ -34,9 +36,11 @@ export default class ToolShed extends BaseRoom {
     this.player.sprite.setScale(3.5);
 
     super.addFixedProps(new BlueChest(this, this.screen.relativeX(60), this.screen.relativeY(20)));
+    super.addFixedProps(new WeaponProp(this, this.screen.relativeX(58), this.screen.relativeY(20), WeaponType.pistol));
 
     this.hanginglight = new HangingLight(this, this.screen.relativeX(49.9), this.screen.relativeY(5.2));
     this.hanginglight.setDepth(this.screen.relativeY(100));
+
 
     this.doors = [new Door(this, this.screen.relativeX(50.5), this.screen.relativeY(91.5), 2, "graveyard:room_02_03")];
     this.doors.forEach(door => super.addFixedProps(door));

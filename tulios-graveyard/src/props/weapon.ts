@@ -20,9 +20,8 @@ export default class WeaponProp extends BaseProp {
         super(scene, x, y, `weapon:pistol`);
 
         this
-          .setRotation(Math.PI)
-          .setScale(1.8)
-          .setOrigin(0.7, 0.7)
+          .setScale(2.8)
+          .setOrigin(0.2, 0.2)
           .resize({
             width: 1,
             height: 1,

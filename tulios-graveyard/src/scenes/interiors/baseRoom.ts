@@ -150,6 +150,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
         } else if (_collidedProp.name.includes("chest")){
           this.player.pickupWeapon(WeaponType.pistol);
           this.player.weapon?.sprite.setScale(2.5);
+          this.children.getByName("weapon:pistol")?.destroy();
         } else if (_collidedProp.name.includes("shotgun")){
           this.player.pickupWeapon(WeaponType.shotgun);
           _collidedProp.destroy();
