@@ -1,13 +1,23 @@
 import "phaser";
-import Start from "./scenes/start";
-import Graveyard from "./scenes/graveyard";
-import Dungeon from "./scenes/dungeon";
-import Preloader from "./scenes/preloader";
-import GUIScene from "./scenes/gui";
+import Credits from "./scenes/credits";
 import Death from "./scenes/death";
+import Dungeon from "./scenes/dungeon";
+import Graveyard from "./scenes/graveyard";
+import GUIScene from "./scenes/gui";
 import Interiors from "./scenes/interiors";
+import Preloader from "./scenes/preloader";
+import Start from "./scenes/start";
 
-const scenesList = [Preloader, Start, GUIScene, Death, ...Interiors, ...Graveyard, ...Dungeon];
+const scenesList = [
+  Preloader,
+  Start,
+  Credits,
+  GUIScene,
+  Death,
+  ...Interiors,
+  ...Graveyard,
+  ...Dungeon,
+];
 export const scenesMap = scenesList.reduce(
   (acc: { [x: string]: typeof scene }, scene) => ({
     ...acc,

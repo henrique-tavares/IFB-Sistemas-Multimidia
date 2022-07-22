@@ -9,6 +9,7 @@ export default class Start extends Phaser.Scene {
 
   bg: Phaser.GameObjects.Image;
   title: Phaser.GameObjects.Image;
+  audioHandler: AudioHandler;
 
   constructor() {
     super(Start.key);
@@ -18,6 +19,7 @@ export default class Start extends Phaser.Scene {
 
   create() {
     this.screen = new Screen(this.scale.width, this.scale.height);
+    this.cameras.main.fadeIn(500, 0, 0, 0);
 
     this.bg = this.add
       .image(this.screen.relativeX(50), this.screen.relativeY(50), "title-screen:background")
@@ -29,8 +31,8 @@ export default class Start extends Phaser.Scene {
       .setOrigin(0.5);
     this.title.setScale(this.screen.widthRatio(this.title.width) * 0.8);
 
-    const audioHandler = this.cache.custom["handlers"].get("audioHandler") as AudioHandler;
-    audioHandler.handleBackgroundMusic(this);
+    this.audioHandler = this.cache.custom["handlers"].get("audioHandler") as AudioHandler;
+    this.audioHandler.handleBackgroundMusic(this);
 
     const titleRotationTimeline = this.tweens
       .createTimeline({ loop: -1 })
@@ -86,7 +88,7 @@ export default class Start extends Phaser.Scene {
         });
       })
       .on("pointerdown", () => {
-        audioHandler.playSfx(this, "click-button", 0.2);
+        this.audioHandler.playSfx(this, "click-button", 0.2);
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.time.delayedCall(500, () => {
           this.scene.run("gui-scene");
@@ -116,11 +118,12 @@ export default class Start extends Phaser.Scene {
         });
       })
       .on("pointerdown", () => {
-        audioHandler.playSfx(this, "click-button", 0.2);
+        this.audioHandler.playSfx(this, "click-button", 0.2);
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.time.delayedCall(500, () => {
-          this.scene.run("gui-scene");
-          this.scene.start("dungeon:room_18");
+          // this.scene.run("gui-scene");
+          // this.scene.start("dungeon:room_18");
+          this.scene.start("credits");
         });
       });
   }

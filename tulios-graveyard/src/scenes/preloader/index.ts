@@ -179,6 +179,11 @@ export default class Preloader extends Phaser.Scene {
     this.load.image("loot:pistol-bullet", "assets/loot/loot-pistol.png");
     this.load.image("loot:shotgun-bullet", "assets/loot/loot-shotgun.png");
 
+    this.load.image("us:lazy-seal", "assets/the-gang/lazy-seal-pixelated.png");
+    this.load.image("us:lazy-seal-name", "assets/the-gang/lazy-seal-name.png");
+    this.load.image("us:neptune", "assets/the-gang/neptune-pixelated.png");
+    this.load.image("us:neptune-name", "assets/the-gang/neptune-name.png");
+
     this.load.spritesheet("characters:tulio", "assets/characters/Tulio_SpriteSheet.png", {
       frameWidth: 26,
       frameHeight: 28,
@@ -199,19 +204,19 @@ export default class Preloader extends Phaser.Scene {
     this.load.audio("bg_dungeon_music", "audio/bg_dungeon_music.wav");
     this.load.audio("bg_marina_music", "audio/bg_marina_music.wav");
 
-    this.load.audio('click-button', 'audio/click-button.wav');
-    this.load.audio('pickup-loot', 'audio/pickup-loot.wav');
+    this.load.audio("click-button", "audio/click-button.wav");
+    this.load.audio("pickup-loot", "audio/pickup-loot.wav");
 
-    this.load.audio('dungeon-walk', 'audio/dungeon-walk.wav');
-    this.load.audio('graveyard-walk', 'audio/graveyard-walk.wav');
+    this.load.audio("dungeon-walk", "audio/dungeon-walk.wav");
+    this.load.audio("graveyard-walk", "audio/graveyard-walk.wav");
 
-    this.load.audio('person-hit', 'audio/person-hit.wav');
-    this.load.audio('zombie-hit', 'audio/zombie-hit.wav');
-    
-    this.load.audio('gun-empty', 'audio/gun-empty.wav');
-    this.load.audio('pistol-fire', 'audio/pistol-fire.wav');
-    this.load.audio('shotgun-fire', 'audio/shotgun-fire.wav');
-    this.load.audio('shovel-attack', 'audio/shovel-attack.wav');
+    this.load.audio("person-hit", "audio/person-hit.wav");
+    this.load.audio("zombie-hit", "audio/zombie-hit.wav");
+
+    this.load.audio("gun-empty", "audio/gun-empty.wav");
+    this.load.audio("pistol-fire", "audio/pistol-fire.wav");
+    this.load.audio("shotgun-fire", "audio/shotgun-fire.wav");
+    this.load.audio("shovel-attack", "audio/shovel-attack.wav");
 
     this.cache
       .addCustom("handlers")

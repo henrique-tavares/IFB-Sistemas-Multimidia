@@ -1,5 +1,6 @@
 import Tulio from "../../entities/tulio";
 import { scenesMap } from "../../game";
+import AudioHandler from "../../handlers/audioHandler";
 import PlayerHandler from "../../handlers/playerHandler";
 import { Orientation } from "../../types";
 import Preloader from "../preloader";
@@ -11,6 +12,7 @@ export default class Death extends Phaser.Scene {
   screen: Screen;
   bg: Phaser.GameObjects.Graphics;
   deathText: Phaser.GameObjects.Text;
+  audioHandler: AudioHandler;
 
   constructor() {
     super(Death.key);
@@ -28,12 +30,14 @@ export default class Death extends Phaser.Scene {
         this.scene.manager.add(sceneKey, scenesMap[sceneKey]);
       });
 
+    this.audioHandler = this.cache.custom["handlers"].get("audioHandler") as AudioHandler;
+
     const playerHandler = this.cache.custom["handlers"].get("playerHandler") as PlayerHandler;
     playerHandler.clean();
 
     const player = new Tulio(this, pos.x, pos.y);
     player.freeze();
-    player.sprite.play(`${player.key}-die-${facingDirection}`);
+    player.sprite.play(`die-${facingDirection}`);
 
     player.sprite.once("animationcomplete", () => {
       this.tweens.add({
@@ -84,6 +88,7 @@ export default class Death extends Phaser.Scene {
       })
       .on("pointerdown", () => {
         this.cameras.main.fadeOut(500, 0, 0, 0);
+        this.audioHandler.playSfx(this, "click-button", 0.2);
         this.time.delayedCall(500, () => {
           this.scene.run("gui-scene");
           this.scene.start("graveyard:room_00");
@@ -113,6 +118,7 @@ export default class Death extends Phaser.Scene {
       })
       .on("pointerdown", () => {
         this.cameras.main.fadeOut(500, 0, 0, 0);
+        this.audioHandler.playSfx(this, "click-button", 0.2);
         this.time.delayedCall(500, () => {
           this.scene.start("start");
         });
