@@ -16,9 +16,6 @@ import {
   RoomDifficulty,
   RoomSize,
 } from "../../types";
-import Pistol from "../../weapons/pistol";
-import Shotgun from "../../weapons/shotgun";
-import Shovel from "../../weapons/shovel";
 import { WeaponType } from "../../weapons/weapon";
 import Background from "../utils/background";
 import { allGraveyardProps, graveyardPropBuilder } from "../utils/graveyard";
@@ -50,8 +47,10 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected zombiesInScene = new Array<Zombie>();
   protected staticProps: Phaser.Physics.Arcade.StaticGroup;
   protected proplessAreas: Phaser.Physics.Arcade.StaticGroup;
+  private playerInitialPos: {x: number, y: number};
   readonly roomSize: RoomSize;
   readonly difficulty: RoomDifficulty;
+
 
   constructor(
     key: string,
@@ -59,7 +58,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
     nextRoom: NextRoom,
     nextRoomData: NextRoomData,
     roomSize: RoomSize,
-    difficulty: RoomDifficulty
+    difficulty: RoomDifficulty,
+    playerInitialPos?: {x: number, y: number}
   ) {
     super(key);
 
@@ -109,6 +109,10 @@ export default abstract class BaseRoom extends Phaser.Scene {
         },
       },
     };
+
+    if(playerInitialPos){
+      this.playerInitialPos = playerInitialPos;
+    }
   }
 
   init(coordinate: PlayerCoordinate) {
@@ -130,10 +134,11 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.bg = new Background(this, `${this.key}:bg`, this.bgBorder);
     this.screen = new Screen(this.bg.image.width, this.bg.image.height);
 
-    this.player = new Tulio(this);
-    this.player.pickupWeapon(WeaponType.shovel);
-    this.player.pickupWeapon(WeaponType.pistol);
-    this.player.pickupWeapon(WeaponType.shotgun);
+    if(this.playerInitialPos){
+      this.player = new Tulio(this, this.playerInitialPos.x, this.playerInitialPos.y);
+    } else {
+      this.player = new Tulio(this);
+    }
     this.player.sprite.body.setCollideWorldBounds(true, undefined, undefined, true);
     this.data.set("player", this.player);
 

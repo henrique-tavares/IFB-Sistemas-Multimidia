@@ -1,6 +1,9 @@
 import _ from "lodash";
+import { GameObjects } from "phaser";
 import Tulio from "../../entities/tulio";
 import AudioHandler from "../../handlers/audioHandler";
+import BaseProp from "../../props/baseProp";
+import Door from "../../props/door";
 import {
   BackgroundBorder,
   BackgroundBorderConfig,
@@ -9,13 +12,11 @@ import {
   NextRoomData,
   Orientation,
   PlayerCoordinate,
+  RoomDifficulty,
 } from "../../types";
-import Shovel from "../../weapons/shovel";
+import { WeaponType } from "../../weapons/weapon";
 import Background from "../utils/background";
-import {
-  clamp,
-  isEmpty,
-} from "../utils/misc";
+import { clamp, isEmpty } from "../utils/misc";
 import Screen from "../utils/screen";
 
 export default abstract class BaseRoom extends Phaser.Scene {
@@ -30,30 +31,40 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected nextRoom: NextRoom;
   protected nextRoomData: NextRoomData;
   protected fadeDuration = 500;
-  private isThereNextRoom: boolean;
+  private isThereNextRoom: boolean;  
+  protected staticProps: Phaser.Physics.Arcade.StaticGroup;
+  protected staticColliderBoxes: Phaser.Physics.Arcade.StaticGroup;
+  readonly difficulty: RoomDifficulty;
+  protected verticalPadding: {top: number, bottom: number};
+  protected horizontalPadding: number;
+  protected doors: Door[];
 
   constructor(
     key: string,
     borderConfig: BackgroundBorderConfig,
     nextRoom: NextRoom,
     nextRoomData: NextRoomData,
+    difficulty: RoomDifficulty,
+    verticalPadding: {top: number, bottom: number} = {top: 15, bottom: 15},
+    horizontalPadding: number = 6.5,
   ) {
     super(key);
 
     this.key = key;
     this.bgBorder = {
-      top: borderConfig.hasTop ? 17 : undefined,
-      right: borderConfig.hasRight ? 6.5 : undefined,
-      bottom: borderConfig.hasBottom ? 17 : undefined,
-      left: borderConfig.hasLeft ? 6.5 : undefined,
+      top: borderConfig.hasTop ? verticalPadding.top : undefined,
+      right: borderConfig.hasRight ? horizontalPadding : undefined,
+      bottom: borderConfig.hasBottom ? verticalPadding.bottom : undefined,
+      left: borderConfig.hasLeft ? horizontalPadding : undefined,
     };
     this.nextRoom = nextRoom;
     this.nextRoomData = nextRoomData;
+    this.difficulty = difficulty;
 
     this.borderArea = {
       top: {
         pos: { x: 50, y: 0 },
-        size: { height: this.bgBorder["top"] ?? 10, width: 100 },
+        size: { height: this.bgBorder["top"] ?? 13, width: 100 },
         origin: {
           x: 0.5,
           y: 0,
@@ -61,7 +72,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
       },
       right: {
         pos: { x: 100, y: 50 },
-        size: { height: 100, width: 10 },
+        size: { height: 100, width: 7 },
         origin: {
           x: 1,
           y: 0.5,
@@ -69,7 +80,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
       },
       bottom: {
         pos: { x: 50, y: 100 },
-        size: { height: this.bgBorder["bottom"] ?? 10, width: 100 },
+        size: { height: this.bgBorder["bottom"] ?? 13, width: 100 },
         origin: {
           x: 0.5,
           y: 1,
@@ -77,7 +88,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
       },
       left: {
         pos: { x: 0, y: 50 },
-        size: { height: 100, width: 10 },
+        size: { height: 100, width: 7 },
         origin: {
           x: 0,
           y: 0.5,
@@ -93,6 +104,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
       this.physics.world.once("worldbounds", this.onWorldBounds, this);
       return;
     }
+
     this.events.on("reposition-player", () => {
       const { x, y } = this.repositionPlayer(coordinate);
       this.player.setPosition(x, y);
@@ -105,22 +117,46 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.bg = new Background(this, `${this.key}:bg`, this.bgBorder);
     this.screen = new Screen(this.bg.image.width, this.bg.image.height);
 
-    this.player = new Tulio(this);
-    this.player.weapon = new Shovel(this, this.player);
+    switch(this.key){
+      case "graveyard:house":
+        this.player = new Tulio(this, 635, 490);
+        break;
+      case "graveyard:toolshed":
+        this.player = new Tulio(this, 400, 480);    
+        break;
+      case "graveyard:mausoleum":
+        this.player = new Tulio(this, 100, 300);    
+        break;
+    }
+
     this.player.sprite.body.setCollideWorldBounds(true, undefined, undefined, true);
     this.data.set("player", this.player);
 
     this.events.emit("reposition-player");
 
     this.cameras.main.startFollow(this.player.sprite);
-    this.bg.applyBoundsOnSprite(this.player.sprite);
-
-    this.player.weapon = new Shovel(this, this.player);
-
-    this.events.on("init-shovel-attack", () => {
-      console.log("BaseRoom: shovel attack")
-    });
-
+    this.bg.applyBoundsOnSprite(this.player.sprite);  
+    
+    this.staticProps = this.physics.add.staticGroup();
+    this.physics.add.collider(
+      this.player.sprite, 
+      this.staticProps,
+      (_player, _collidedProp: BaseProp) => {
+        if(_collidedProp.name.includes("stairs") || _collidedProp.name.includes("door")){
+          this.scene.start(_collidedProp.getDestiny());
+        } else if (_collidedProp.name.includes("shovel")){
+          this.player.pickupWeapon(WeaponType.shovel);
+          _collidedProp.destroy();
+        } else if (_collidedProp.name.includes("chest")){
+          this.player.pickupWeapon(WeaponType.pistol);
+          this.player.weapon?.sprite.setScale(2.5);
+        } else if (_collidedProp.name.includes("shotgun")){
+          this.player.pickupWeapon(WeaponType.shotgun);
+          _collidedProp.destroy();
+        }
+      }
+    );
+    this.physics.add.collider(this.player.sprite, this.staticColliderBoxes);
 
     const audioHandler = this.cache.custom["handlers"].get("audioHandler") as AudioHandler;
     audioHandler.handleBackgroundMusic(this);
@@ -129,11 +165,27 @@ export default abstract class BaseRoom extends Phaser.Scene {
   update() {
     this.player.update();
 
-    // this.children.list
-    //   .filter(child => child.body instanceof Phaser.Physics.Arcade.Body)
-    //   .forEach((sprite: Phaser.Physics.Arcade.Sprite) => {
-    //     sprite.setDepth(sprite.y);
-    //   });
+    this.children.list
+      .filter(child => child.body instanceof Phaser.Physics.Arcade.Body)
+      .forEach((sprite: Phaser.Physics.Arcade.Sprite) => {
+        sprite.setDepth(sprite.y);
+      });
+  }
+
+  addFixedProps(...props: BaseProp[]) {
+    this.staticProps.addMultiple(props, true);
+    this.refreshProps();
+  }
+
+  addColliderBox(...rects: GameObjects.Rectangle[]) {
+    this.staticProps.addMultiple(rects, true);
+    this.refreshProps();
+  }
+
+  refreshProps() {
+    this.staticProps.getChildren().forEach((prop: Phaser.Physics.Arcade.Sprite) => {
+      prop.setDepth(prop.y);
+    });
   }
 
   onWorldBounds(body: Phaser.Physics.Arcade.Body) {
@@ -201,7 +253,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
     });
   }
 
-  wake(sys: Phaser.Scenes.Systems, data: PlayerCoordinate) { 
+  wake(sys: Phaser.Scenes.Systems, data: PlayerCoordinate) {
     // console.log(this.constructor.name);
     this.fadeIn(this.fadeDuration);
     const { x: newX, y: newY } = this.repositionPlayer(data);

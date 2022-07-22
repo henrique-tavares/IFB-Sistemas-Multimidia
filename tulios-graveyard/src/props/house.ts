@@ -30,8 +30,8 @@ export default class House extends BaseProp {
         0x000,
         0
       ).setOrigin(0.5, 0.05),
-      (player, door) => {
-        // TODO: Go to house interior
+      (_player, _door) => {
+        this.scene.scene.start("graveyard:house");
       }
     );
 

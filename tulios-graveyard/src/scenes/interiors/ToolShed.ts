@@ -1,51 +1,67 @@
-import Zombie from "../../entities/zombie";
-import House from "../../props/house";
-import { GraveyardProp, RoomDifficulty, RoomSize } from "../../types";
-import Direction from "../gui/direction";
-import { generateNextRoomData } from "../utils/graveyard";
+import { GameObjects } from "phaser";
+import BaseProp from "../../props/baseProp";
+import BlueChest from "../../props/blue-chest";
+import Door from "../../props/door";
+import HangingLight from "../../props/hanging-light";
+import { RoomDifficulty } from "../../types";
 import BaseRoom from "./baseRoom";
 
-export default class Room_00 extends BaseRoom {
-  static key = "graveyard:room_00";
+export default class ToolShed extends BaseRoom {
+  static key = "graveyard:toolshed";
 
-  staticProps: Phaser.Physics.Arcade.StaticGroup;
-  dynamicSprites: Phaser.Physics.Arcade.Sprite[];
-  line: Phaser.GameObjects.Line;
-  cursor: Phaser.Input.Pointer;
-  zombie: Zombie;
+  private hanginglight: BaseProp;
 
   constructor() {
     super(
-      Room_00.key,
+      ToolShed.key,
       {
         hasTop: true,
         hasLeft: true,
+        hasBottom: true,
+        hasRight: true
       },
-      {
-        right: "graveyard:room_01",
-        down: "graveyard:room_10",
-      },
-      generateNextRoomData({
-        right: {
-          mode: "single",
-        },
-        down: {
-          mode: "single",
-        },
-      }),
-      RoomSize["1x1"],
-      RoomDifficulty.Easy
+      {},
+      {},
+      RoomDifficulty.Peaceful,
+      {top: 20, bottom: 15},
+      26
     );
   }
 
   create() {
     super.create();
 
-    super.addFixedProps(new House(this, this.screen.relativeX(28), this.screen.relativeY(32)));
-    super.generateRandomProps(5, [GraveyardProp.Tree1, GraveyardProp.Tree2, GraveyardProp.Tree3]);
+    this.player.sprite.setScale(3.5);
+
+    super.addFixedProps(new BlueChest(this, this.screen.relativeX(60), this.screen.relativeY(20)));
+
+    this.hanginglight = new HangingLight(this, this.screen.relativeX(49.9), this.screen.relativeY(5.2));
+    this.hanginglight.setDepth(this.screen.relativeY(100));
+
+    this.doors = [new Door(this, this.screen.relativeX(50.5), this.screen.relativeY(91.5), 2, "graveyard:room_02_03")];
+    this.doors.forEach(door => super.addFixedProps(door));
+
+    const rects = [
+      new GameObjects.Rectangle(this, this.screen.relativeX(29.5), this.screen.relativeY(16), this.screen.relativeX(5), this.screen.relativeY(11)),
+      new GameObjects.Rectangle(this, this.screen.relativeX(42), this.screen.relativeY(20), this.screen.relativeX(8), this.screen.relativeY(6)),
+      new GameObjects.Rectangle(this, this.screen.relativeX(52), this.screen.relativeY(16), this.screen.relativeX(5), this.screen.relativeY(12)),
+      new GameObjects.Rectangle(this, this.screen.relativeX(73), this.screen.relativeY(18), this.screen.relativeX(6), this.screen.relativeY(10)),
+      new GameObjects.Rectangle(this, this.screen.relativeX(76), this.screen.relativeY(53), this.screen.relativeX(6), this.screen.relativeY(70)),
+      new GameObjects.Rectangle(this, this.screen.relativeX(73), this.screen.relativeY(73), this.screen.relativeX(4), this.screen.relativeY(13)),
+      new GameObjects.Rectangle(this, this.screen.relativeX(30), this.screen.relativeY(76), this.screen.relativeX(8), this.screen.relativeY(15)),
+      new GameObjects.Rectangle(this, this.screen.relativeX(29.5), this.screen.relativeY(32), this.screen.relativeX(5.75), this.screen.relativeY(10)),
+    ];
+
+    rects.map(rect => {
+      super.addColliderBox(rect);
+    });
   }
 
   update() {
     super.update();
+
+    if(this.player.sprite.scale != 3.5){
+      this.player.sprite.setScale(3.5);
+    }
   }
 }

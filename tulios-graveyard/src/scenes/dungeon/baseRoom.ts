@@ -124,9 +124,9 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.screen = new Screen(this.bg.image.width, this.bg.image.height);
 
     this.player = new Tulio(this, 400, 175);
-    this.player.pickupWeapon(WeaponType.shovel);
-    this.player.pickupWeapon(WeaponType.pistol);
-    this.player.pickupWeapon(WeaponType.shotgun);
+    // this.player.pickupWeapon(WeaponType.shovel);
+    // this.player.pickupWeapon(WeaponType.pistol);
+    // this.player.pickupWeapon(WeaponType.shotgun);
     this.player.sprite.body.setCollideWorldBounds(true, undefined, undefined, true);
     this.data.set("player", this.player);
 

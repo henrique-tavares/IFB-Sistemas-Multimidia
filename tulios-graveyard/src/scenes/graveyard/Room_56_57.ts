@@ -28,7 +28,8 @@ export default class Room_56_57 extends BaseRoom {
         },
       }),
       RoomSize["1x2"],
-      RoomDifficulty.Hard
+      RoomDifficulty.Hard,
+      {x: 1440, y: 260}
     );
   }
 

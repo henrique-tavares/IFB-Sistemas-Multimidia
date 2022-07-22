@@ -1,9 +1,15 @@
 export default abstract class BaseProp extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
-    super(scene, x, y, `prop:${texture}`);
+  protected destiny: string;
 
+  constructor(scene: Phaser.Scene, x: number, y: number, texture: string, destiny?: string) {
+    super(scene, x, y, texture.includes("weapon") ? texture : `prop:${texture}`);
+    super.name = texture;
     scene.add.existing(this);
     scene.physics.add.existing(this, true);
+
+    if(destiny){
+      this.destiny = destiny;
+    }
   }
 
   relativeX(x: number) {
@@ -51,5 +57,9 @@ export default abstract class BaseProp extends Phaser.Physics.Arcade.Sprite {
     this.body.x = this.x - this.body.width / 2;
     this.body.y = this.y - this.body.height / 2;
     this.body.center = this.getCenter();
+  }
+
+  public getDestiny(){
+    return this.destiny;
   }
 }
