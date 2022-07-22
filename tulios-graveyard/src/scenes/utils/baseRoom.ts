@@ -18,7 +18,6 @@ import {
   RoomSize,
 } from "../../types";
 import Bullet from "../../weapons/bullet";
-import { WeaponType } from "../../weapons/weapon";
 import Background from "../utils/background";
 import { allGraveyardProps, graveyardPropBuilder } from "../utils/graveyard";
 import {
@@ -58,6 +57,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected nextRoomArrowsPosition: NextRoomArrowPosition;
   protected customBorders?: CustomBorder[];
   protected customBorderGroup?: Phaser.Physics.Arcade.StaticGroup;
+  protected playerInitialPos?: { x: number; y: number };
 
   abstract verticalPadding: number;
   abstract horizontalPadding: number;
@@ -70,7 +70,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
     difficulty: RoomDifficulty,
     roomSize?: RoomSize,
     nextRoomArrowsPosition?: NextRoomArrowPosition,
-    customBorders?: CustomBorder[]
+    customBorders?: CustomBorder[],
+    playerInitialPos?: { x: number; y: number }
   ) {
     super(key);
 
@@ -82,6 +83,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.roomSize = roomSize;
     this.nextRoomArrowsPosition = nextRoomArrowsPosition ?? {};
     this.customBorders = customBorders;
+
+    this.playerInitialPos = playerInitialPos;
   }
 
   init(coordinate: PlayerCoordinate) {
@@ -149,10 +152,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.data.set("bullets", this.bulletsInScene);
 
-    this.player = new Tulio(this);
-    this.player.pickupWeapon(WeaponType.shovel);
-    this.player.pickupWeapon(WeaponType.pistol);
-    this.player.pickupWeapon(WeaponType.shotgun);
+    this.player = new Tulio(this, this.playerInitialPos?.x, this.playerInitialPos?.y);
+
     this.player.sprite.body.setCollideWorldBounds(true, undefined, undefined, true);
     this.data.set("player", this.player);
 

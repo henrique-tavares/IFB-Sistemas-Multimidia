@@ -84,16 +84,13 @@ export default class Preloader extends Phaser.Scene {
       frameHeight: 17,
     });
 
-    this.load.image("weapon:shovel", "assets/items/shovel.png");
-    this.load.image("weapon:item:pistol", "assets/items/pistol.png");
-    this.load.image("weapon:item:shotgun", "assets/items/shotgun.png");
-
+    this.load.image("weapon:shovel", "assets/weapons/shovel.png");
     this.load.image("weapon:pistol", "assets/weapons/pistol.png");
     this.load.image("weapon:shotgun", "assets/weapons/shotgun.png");
     this.load.image("weapon:bullet", "assets/weapons/bullet.png");
 
     this.load.image("graveyard:mausoleum:bg", "assets/graveyard/Mausoleum.png");
-    this.load.image("graveyard:tool_shed:bg", "assets/graveyard/Tool Shed.png");
+    this.load.image("graveyard:toolshed:bg", "assets/graveyard/Tool Shed.png");
     this.load.image("graveyard:house:bg", "assets/graveyard/Tulios House.png");
     this.load.image("graveyard:room_00:bg", "assets/graveyard/Room - [0,0]_ House.png");
     this.load.image("graveyard:room_01:bg", "assets/graveyard/Room - [0,1].png");
@@ -166,15 +163,36 @@ export default class Preloader extends Phaser.Scene {
     this.load.image("dungeon:room_17:bg", "assets/dungeon/Room 17.png");
     this.load.image("dungeon:room_18:bg", "assets/dungeon/Room 18.png");
 
-    this.load.image("prop:graveyard:tombstone-1", "assets/props/graveyard/tombstone-1.png");
-    this.load.image("prop:graveyard:tombstone-2", "assets/props/graveyard/tombstone-2.png");
-    this.load.image("prop:graveyard:tombstone-3", "assets/props/graveyard/tombstone-3.png");
-    this.load.image("prop:graveyard:tree-1", "assets/props/graveyard/Tree-1.png");
-    this.load.image("prop:graveyard:tree-2", "assets/props/graveyard/Tree-2.png");
-    this.load.image("prop:graveyard:tree-3", "assets/props/graveyard/Tree-3.png");
-    this.load.image("prop:graveyard:house", "assets/props/graveyard/House.png");
-    this.load.image("prop:graveyard:cabin", "assets/props/graveyard/Cabin.png");
-    this.load.image("prop:graveyard:mausoleum", "assets/props/graveyard/Mausoleum.png");
+    this.load.image("prop:graveyard:tombstone-1", "assets/props/graveyard/outside/tombstone-1.png");
+    this.load.image("prop:graveyard:tombstone-2", "assets/props/graveyard/outside/tombstone-2.png");
+    this.load.image("prop:graveyard:tombstone-3", "assets/props/graveyard/outside/tombstone-3.png");
+    this.load.image("prop:graveyard:tree-1", "assets/props/graveyard/outside/Tree-1.png");
+    this.load.image("prop:graveyard:tree-2", "assets/props/graveyard/outside/Tree-2.png");
+    this.load.image("prop:graveyard:tree-3", "assets/props/graveyard/outside/Tree-3.png");
+    this.load.image("prop:graveyard:house", "assets/props/graveyard/outside/House.png");
+    this.load.image("prop:graveyard:cabin", "assets/props/graveyard/outside/Cabin.png");
+    this.load.image("prop:graveyard:mausoleum", "assets/props/graveyard/outside/Mausoleum.png");
+
+    this.load.image("prop:graveyard:home-lamp", "assets/props/graveyard/interior/home-lamp.png");
+    this.load.image("prop:graveyard:trashcan", "assets/props/graveyard/interior/trashcan.png");
+    this.load.image("prop:graveyard:sofa", "assets/props/graveyard/interior/sofa.png");
+    this.load.image("prop:graveyard:blue-chest", "assets/props/graveyard/interior/blue-chest.png");
+    this.load.image("prop:graveyard:hanging-light", "assets/props/graveyard/interior/hanging-light.png");
+    this.load.image("prop:graveyard:stone-coffin", "assets/props/graveyard/interior/stone-coffin.png");
+    this.load.image("prop:graveyard:stairs", "assets/props/graveyard/interior/stairs.png");
+    this.load.image("prop:graveyard:box", "assets/props/graveyard/interior/box.png");
+    this.load.image("prop:graveyard:door-1", "assets/props/graveyard/interior/door-1.png");
+    this.load.image("prop:graveyard:door-2", "assets/props/graveyard/interior/door-2.png");
+    this.load.image("prop:graveyard:door-3", "assets/props/graveyard/interior/door-3.png");
+    
+    this.load.spritesheet("prop:dungeon:door-4", "assets/props/dungeon/door_anim.png", {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet("prop:dungeon:candlestick", "assets/props/dungeon/candlestick_anim.png", {
+      frameWidth: 9,
+      frameHeight: 16,
+    });
 
     this.load.image("loot:pistol-bullet", "assets/loot/loot-pistol.png");
     this.load.image("loot:shotgun-bullet", "assets/loot/loot-shotgun.png");

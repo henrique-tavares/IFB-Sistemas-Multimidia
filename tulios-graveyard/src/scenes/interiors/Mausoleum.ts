@@ -1,48 +1,60 @@
-import Zombie from "../../entities/zombie";
-import House from "../../props/house";
-import { GraveyardProp, RoomDifficulty, RoomSize } from "../../types";
-import Direction from "../gui/direction";
-import { generateNextRoomData } from "../utils/graveyard";
+
+import { GameObjects, Scene } from "phaser";
+import PlayerHandler from "../../handlers/playerHandler";
+import Box from "../../props/box";
+import Door from "../../props/door";
+import Stairs from "../../props/stairs";
+import StoneCoffin from "../../props/stone-coffin";
+import WeaponProp from "../../props/weapon";
+import { RoomDifficulty } from "../../types";
+import { WeaponType } from "../../weapons/weapon";
 import BaseRoom from "./baseRoom";
 
-export default class Room_00 extends BaseRoom {
-  static key = "graveyard:room_00";
-
-  staticProps: Phaser.Physics.Arcade.StaticGroup;
-  dynamicSprites: Phaser.Physics.Arcade.Sprite[];
-  line: Phaser.GameObjects.Line;
-  cursor: Phaser.Input.Pointer;
-  zombie: Zombie;
+export default class Mausoleum extends BaseRoom {
+  static key = "graveyard:mausoleum";
+  private stairs: Stairs;
 
   constructor() {
     super(
-      Room_00.key,
+      Mausoleum.key,
       {
         hasTop: true,
         hasLeft: true,
+        hasBottom: true,
+        hasRight: true
       },
-      {
-        right: "graveyard:room_01",
-        down: "graveyard:room_10",
-      },
-      generateNextRoomData({
-        right: {
-          mode: "single",
-        },
-        down: {
-          mode: "single",
-        },
-      }),
-      RoomSize["1x1"],
-      RoomDifficulty.Easy
+      {},
+      {},
+      RoomDifficulty.Peaceful,
+      {top: 16, bottom: 16},
+      8.7
     );
   }
 
   create() {
     super.create();
 
-    super.addFixedProps(new House(this, this.screen.relativeX(28), this.screen.relativeY(32)));
-    super.generateRandomProps(5, [GraveyardProp.Tree1, GraveyardProp.Tree2, GraveyardProp.Tree3]);
+    super.addFixedProps(new StoneCoffin(this, this.screen.relativeX(71), this.screen.relativeY(32)));
+    super.addFixedProps(new Box(this, this.screen.relativeX(75), this.screen.relativeY(80)));
+    super.addFixedProps(new Box(this, this.screen.relativeX(81.5), this.screen.relativeY(80)));
+
+    const playerHandler = this.scene.scene.cache.custom["handlers"].get("playerHandler") as PlayerHandler;
+    if(!playerHandler.playerData.weapons[2].picked){
+      super.addFixedProps(new WeaponProp(this, this.screen.relativeX(86.5), this.screen.relativeY(82), WeaponType.shotgun));
+    }
+
+    this.stairs = new Stairs(this, this.screen.relativeX(71), this.screen.relativeY(50));
+    super.addFixedProps(this.stairs);
+
+    this.doors = [new Door(this, this.screen.relativeX(4.9), this.screen.relativeY(48.35), 3, "graveyard:room_56_57")];
+    this.doors.forEach(door => super.addFixedProps(door));
+    
+    const rects = [
+      new GameObjects.Rectangle(this, this.screen.relativeX(88), this.screen.relativeY(17), this.screen.relativeX(4), this.screen.relativeX(4)),
+    ];
+    rects.forEach(rect => {
+      super.addColliderBox(rect);
+    });
   }
 
   update() {
