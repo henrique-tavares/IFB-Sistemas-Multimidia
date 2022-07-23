@@ -61,11 +61,8 @@ export default class Dialog extends Phaser.Scene {
       }
     );
 
-    console.log(data);
     if (data.characters) {
-      console.log("buceta");
       const handleNextCharacter = (id: number, last: boolean = false) => {
-        console.log("pinto");
         this.characterBoxText.setText(data.characters![id]);
         if (last) {
           return;

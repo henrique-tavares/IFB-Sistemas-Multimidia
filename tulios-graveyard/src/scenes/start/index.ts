@@ -92,8 +92,7 @@ export default class Start extends Phaser.Scene {
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.time.delayedCall(500, () => {
           this.scene.run("gui-scene");
-          // this.scene.start("graveyard:room_56_57");
-          this.scene.start("dungeon:room_16");
+          this.scene.start("graveyard:house");
         });
       });
 
@@ -122,8 +121,6 @@ export default class Start extends Phaser.Scene {
         this.audioHandler.playSfx(this, "click-button", 0.2);
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.time.delayedCall(500, () => {
-          // this.scene.run("gui-scene");
-          // this.scene.start("dungeon:room_18");
           this.scene.start("credits");
         });
       });

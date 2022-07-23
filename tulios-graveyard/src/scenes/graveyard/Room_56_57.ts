@@ -37,8 +37,6 @@ export default class Room_56_57 extends BaseRoomGraveyard {
   create() {
     super.create();
 
-    // this.player.pickupWeapon(WeaponType.pistol);
-
     this.doors = [
       new Door(
         this,
@@ -55,12 +53,6 @@ export default class Room_56_57 extends BaseRoomGraveyard {
     super.generateRandomProps(10);
 
     this.events.once("room-concluded", () => {
-      console.log(
-        this.cameras.main.getBounds(),
-        mausoleum.getBounds(),
-        Phaser.Geom.Rectangle.ContainsRect(this.cameras.main.getBounds(), mausoleum.getBounds()),
-        this.cameras.main.cull([mausoleum])
-      );
       const timeEvent = this.time.addEvent({
         callback: () => {
           if (_.isEmpty(this.cameras.main.cull([mausoleum]))) {

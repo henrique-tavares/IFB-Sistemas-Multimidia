@@ -1,7 +1,6 @@
 import "phaser";
 import Door from "../../props/door";
 import { RoomDifficulty } from "../../types";
-import { WeaponType } from "../../weapons/weapon";
 import { generateNextRoomData } from "../utils/dungeon";
 import BaseRoomDungeon from "./baseRoomDungeon";
 
@@ -32,8 +31,6 @@ export default class Room_16 extends BaseRoomDungeon {
 
   create() {
     super.create();
-
-    this.player.pickupWeapon(WeaponType.pistol);
 
     const door = new Door(
       this,
