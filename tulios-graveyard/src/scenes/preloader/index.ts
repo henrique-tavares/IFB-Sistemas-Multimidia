@@ -184,8 +184,12 @@ export default class Preloader extends Phaser.Scene {
     this.load.image("prop:graveyard:door-1", "assets/props/graveyard/interior/door-1.png");
     this.load.image("prop:graveyard:door-2", "assets/props/graveyard/interior/door-2.png");
     this.load.image("prop:graveyard:door-3", "assets/props/graveyard/interior/door-3.png");
+    this.load.spritesheet("prop:graveyard:door-4", "assets/props/graveyard/outside/mausoleum_door_anim.png", {
+      frameWidth: 31,
+      frameHeight: 45,
+    });
     
-    this.load.spritesheet("prop:dungeon:door-4", "assets/props/dungeon/door_anim.png", {
+    this.load.spritesheet("prop:dungeon:door-5", "assets/props/dungeon/jorge_door_anim.png", {
       frameWidth: 32,
       frameHeight: 32,
     });

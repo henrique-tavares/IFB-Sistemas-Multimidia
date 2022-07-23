@@ -43,7 +43,12 @@ export default class TuliosHouse extends BaseRoom {
       this.player.setPosition(365, 470);
     }
 
+    
     this.doors = [new Door(this, this.screen.relativeX(46.75), this.screen.relativeY(91.75), 1, "graveyard:room_00")];
+
+    // this.doors.push(new Door(this, this.screen.relativeX(50), this.screen.relativeY(50), 4, "graveyard:room_00"));
+    // this.doors.push(new Door(this, this.screen.relativeX(65), this.screen.relativeY(50), 5, "graveyard:room_00"));
+
     this.doors.forEach(door => super.addFixedProps(door));
 
     const rects = [

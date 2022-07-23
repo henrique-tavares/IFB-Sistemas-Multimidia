@@ -17,9 +17,10 @@ export default abstract class BaseRoomGraveyard extends BaseRoom {
     nextRoom: NextRoom,
     nextRoomData: NextRoomData,
     roomSize: RoomSize,
-    difficulty: RoomDifficulty
+    difficulty: RoomDifficulty,
+    playerInitialPos?: { x: number; y: number }
   ) {
-    super(key, borderConfig, nextRoom, nextRoomData, difficulty, roomSize);
+    super(key, borderConfig, nextRoom, nextRoomData, difficulty, roomSize, undefined, undefined, playerInitialPos);
   }
 
   create() {

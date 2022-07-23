@@ -3,6 +3,7 @@ import Tulio from "../../entities/tulio";
 import Zombie from "../../entities/zombie";
 import AudioHandler from "../../handlers/audioHandler";
 import BaseProp from "../../props/baseProp";
+import Door from "../../props/door";
 import {
   BackgroundBorder,
   BackgroundBorderConfig,
@@ -58,9 +59,11 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected customBorders?: CustomBorder[];
   protected customBorderGroup?: Phaser.Physics.Arcade.StaticGroup;
   protected playerInitialPos?: { x: number; y: number };
+  protected doors: Door[];
 
   abstract verticalPadding: number;
   abstract horizontalPadding: number;
+
 
   constructor(
     key: string,
@@ -166,7 +169,19 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.events.on("add-extra-area", this.addExtraArea, this);
 
-    this.physics.add.collider(this.player.sprite, this.staticProps);
+    this.physics.add.collider(
+      this.player.sprite, 
+      this.staticProps,
+      (_player, collidedProp: BaseProp) => {
+        if (collidedProp.name.includes("door")){
+          console.log(collidedProp.anims);
+          collidedProp.play("open"); 
+          collidedProp.on("animationcomplete", () => {
+            this.scene.start(collidedProp.getDestiny());
+          })
+        }
+      }
+    );
 
     this.enemiesGroup = this.physics.add.group();
     this.physics.add.collider(this.enemiesGroup, this.enemiesGroup);

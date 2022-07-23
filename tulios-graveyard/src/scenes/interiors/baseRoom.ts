@@ -142,8 +142,10 @@ export default abstract class BaseRoom extends Phaser.Scene {
       this.player.sprite, 
       this.staticProps,
       (_player, _collidedProp: BaseProp) => {
-        if(_collidedProp.name.includes("stairs") || _collidedProp.name.includes("door")){
+        if(_collidedProp.name.includes("stairs")){
           this.scene.start(_collidedProp.getDestiny());
+        } else if (_collidedProp.name.includes("door")){
+          // this.scene.start(_collidedProp.getDestiny());
         } else if (_collidedProp.name.includes("shovel")){
           this.player.pickupWeapon(WeaponType.shovel);
           _collidedProp.destroy();

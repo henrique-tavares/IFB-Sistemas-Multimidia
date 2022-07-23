@@ -19,7 +19,8 @@ export default abstract class BaseRoomDungeon extends BaseRoom {
     nextRoomData: NextRoomData,
     difficulty: RoomDifficulty,
     nextRoomArrowsPosition?: NextRoomArrowPosition,
-    customBorders?: CustomBorder[]
+    customBorders?: CustomBorder[],
+    playerInitialPos?: { x: number; y: number }
   ) {
     super(
       key,
@@ -29,7 +30,8 @@ export default abstract class BaseRoomDungeon extends BaseRoom {
       difficulty,
       undefined,
       nextRoomArrowsPosition,
-      customBorders
+      customBorders,
+      playerInitialPos
     );
   }
 

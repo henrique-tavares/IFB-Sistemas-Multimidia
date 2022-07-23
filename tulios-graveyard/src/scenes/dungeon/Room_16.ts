@@ -1,4 +1,5 @@
 import "phaser";
+import Door from "../../props/door";
 import { RoomSize, RoomDifficulty } from "../../types";
 import { generateNextRoomData, handleNextRoomArrows } from "../utils/dungeon";
 import BaseRoomDungeon from "./baseRoomDungeon";
@@ -30,6 +31,9 @@ export default class Room_16 extends BaseRoomDungeon {
 
   create() {
     super.create();
+    
+    this.doors = [new Door(this, this.screen.relativeX(50), this.screen.relativeY(6), 5, "dungeon:room_18")];
+    this.doors.forEach(door => super.addFixedProps(door));
   }
 
   update() {

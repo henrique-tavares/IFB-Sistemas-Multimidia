@@ -31,10 +31,7 @@ export default class Mausoleum extends BaseProp {
         this.relativeY(100),
         0x000,
         0
-      ).setOrigin(0.5, 0.1),
-      (_player, _door) => {
-        this.scene.scene.start("graveyard:mausoleum");
-      }
+      ).setOrigin(0.5, 0.1)
     );
   }
 }

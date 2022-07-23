@@ -1,6 +1,8 @@
 import "phaser";
+import Door from "../../props/door";
 import Mausoleum from "../../props/mausoleum";
 import { RoomDifficulty, RoomSize } from "../../types";
+import { WeaponType } from "../../weapons/weapon";
 import { generateNextRoomData } from "../utils/graveyard";
 import BaseRoomGraveyard from "./baseRoomGraveyard";
 
@@ -36,7 +38,10 @@ export default class Room_56_57 extends BaseRoomGraveyard {
   create() {
     super.create();
 
+    this.doors = [new Door(this, this.screen.relativeX(90.05), this.screen.relativeY(35), 4, "graveyard:mausoleum")];
+    this.doors.forEach(door => super.addFixedProps(door));
     super.addFixedProps(new Mausoleum(this, this.screen.relativeX(90), this.screen.relativeY(30)));
+    
     super.generateRandomProps(10);
   }
 

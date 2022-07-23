@@ -1,6 +1,6 @@
 export default abstract class BaseProp extends Phaser.Physics.Arcade.Sprite {
   protected destiny: string;
-
+  
   constructor(scene: Phaser.Scene, x: number, y: number, texture: string, destiny?: string) {
     super(scene, x, y, texture.includes("weapon") ? texture : `prop:${texture}`);
     super.name = texture;
