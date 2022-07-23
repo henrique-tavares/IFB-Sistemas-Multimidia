@@ -1,3 +1,4 @@
+import { PlayerCoordinate } from "../types";
 import BaseProp from "./baseProp";
 
 export default class Cabin extends BaseProp {
@@ -28,25 +29,25 @@ export default class Cabin extends BaseProp {
         this.relativeY(100),
         0x000,
         0
-      ).setOrigin(0.5, 0.05)
-      // (_player, _door) => {
-      //   if (!this.scene.data.get("concluded")) {
-      //     return;
-      //   }
+      ).setOrigin(0.5, 0.05),
+      (_player, _door) => {
+        if (!this.scene.data.get("concluded")) {
+          return;
+        }
 
-      //   const initialPos: PlayerCoordinate = {
-      //     x: {
-      //       relative: false,
-      //       value: 400,
-      //     },
-      //     y: {
-      //       relative: false,
-      //       value: 480,
-      //     },
-      //   };
+        const initialPos: PlayerCoordinate = {
+          x: {
+            relative: false,
+            value: 400,
+          },
+          y: {
+            relative: false,
+            value: 480,
+          },
+        };
 
-      //   this.scene.events.emit("go-to-interior", "graveyard:toolshed", initialPos);
-      // }
+        this.scene.events.emit("go-to-interior", "graveyard:toolshed", initialPos);
+      }
     );
   }
 }

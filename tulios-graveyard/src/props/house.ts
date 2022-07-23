@@ -1,3 +1,4 @@
+import { PlayerCoordinate } from "../types";
 import BaseProp from "./baseProp";
 
 export default class House extends BaseProp {
@@ -19,7 +20,7 @@ export default class House extends BaseProp {
         this.relativeX(15),
         this.relativeY(5),
         0x000,
-        0.5
+        0
       ),
       new Phaser.GameObjects.Rectangle(
         scene,
@@ -29,25 +30,25 @@ export default class House extends BaseProp {
         this.relativeY(50),
         0x000,
         0
-      ).setOrigin(0.5, 0.05)
-      // (_player, _door) => {
-      //   if (!this.scene.data.get("concluded")) {
-      //     return;
-      //   }
+      ).setOrigin(0.5, 0.05),
+      (_player, _door) => {
+        if (!this.scene.data.get("concluded")) {
+          return;
+        }
 
-      //   const initialPos: PlayerCoordinate = {
-      //     x: {
-      //       relative: false,
-      //       value: 375,
-      //     },
-      //     y: {
-      //       relative: false,
-      //       value: 470,
-      //     },
-      //   };
+        const initialPos: PlayerCoordinate = {
+          x: {
+            relative: false,
+            value: 375,
+          },
+          y: {
+            relative: false,
+            value: 470,
+          },
+        };
 
-      //   this.scene.events.emit("go-to-interior", "graveyard:house", initialPos);
-      // }
+        this.scene.events.emit("go-to-interior", "graveyard:house", initialPos);
+      }
     );
 
     this.addExtraArea(

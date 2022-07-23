@@ -158,7 +158,7 @@ export default class Room_18 extends BaseRoomDungeon {
         this.jorge.sprite.setTint(0xff0000);
       }
 
-      this.wave(1);
+      this.wave(5 + num * 5);
     });
   }
 
