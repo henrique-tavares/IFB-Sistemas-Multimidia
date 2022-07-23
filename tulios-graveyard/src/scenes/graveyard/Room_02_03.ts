@@ -32,8 +32,7 @@ export default class Room_02_03 extends BaseRoomGraveyard {
         },
       }),
       RoomSize["1x2"],
-      RoomDifficulty.Easy,
-      {x: 245, y: 250}
+      RoomDifficulty.Easy
     );
   }
 

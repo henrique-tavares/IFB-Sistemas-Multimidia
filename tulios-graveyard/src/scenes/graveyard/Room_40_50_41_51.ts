@@ -1,4 +1,5 @@
 import "phaser";
+import MausoleumKey from "../../props/mausoleumKey";
 import { RoomDifficulty, RoomSize } from "../../types";
 import { generateNextRoomData } from "../utils/graveyard";
 import BaseRoomGraveyard from "./baseRoomGraveyard";
@@ -36,6 +37,16 @@ export default class Room_40_50_41_51 extends BaseRoomGraveyard {
     super.create();
 
     super.generateRandomProps(20);
+
+    if (!this.progressHandler.hasKey) {
+      const key = new MausoleumKey(this, this.screen.relativeX(75), this.screen.relativeY(25));
+      super.addFixedProps(key);
+
+      key.once("collide", () => {
+        this.progressHandler.hasKey = true;
+        key.emit("picked", this.progressHandler.searchingForKey);
+      });
+    }
   }
 
   update() {

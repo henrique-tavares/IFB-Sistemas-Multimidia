@@ -2,8 +2,8 @@ import _ from "lodash";
 import "phaser";
 import Jorge from "../../entities/jorge";
 import Zombie from "../../entities/zombie";
-import { RoomSize, RoomDifficulty } from "../../types";
-import { generateNextRoomData, handleNextRoomArrows } from "../utils/dungeon";
+import { fadeDuration } from "../../game";
+import { RoomDifficulty } from "../../types";
 import BaseRoomDungeon from "./baseRoomDungeon";
 
 export default class Room_18 extends BaseRoomDungeon {
@@ -63,7 +63,70 @@ export default class Room_18 extends BaseRoomDungeon {
 
     this.jorge = new Jorge(this, this.screen.relativeX(50), this.screen.relativeY(50));
 
-    // this.jorge.die();
+    this.time.delayedCall(fadeDuration, () => {
+      const timeEvent = this.time.addEvent({
+        callback: () => {
+          if (
+            !Phaser.Geom.Rectangle.ContainsRect(
+              this.cameras.main.getBounds(),
+              this.jorge.sprite.getBounds()
+            )
+          ) {
+            return;
+          }
+          timeEvent.destroy();
+
+          this.scene.run("dialog", {
+            characters: [
+              "???",
+              "Túlio",
+              "Túlio",
+              "Túlio",
+              "???",
+              "???",
+              "Túlio",
+              "Túlio",
+              "Jorge",
+              "Jorge",
+              "Túlio",
+            ],
+            dialogs: [
+              "O que você está fazendo aqui em baixo?",
+              "Eu que te pergunto isso, e mais, quem é você?",
+              "Por que está acordando os mortos desse jeito?",
+              "Meu cemitério virou uma bagunça, e já não sei mais quantas vezes eu quase morri hoje.",
+              "Tulio, me desculpe... Não era essa minha intenção.",
+              "Mas eu não vou descansar até ver ela mais uma vez!",
+              "Ela... Um momento... Jorge é você?",
+              "Se bem que faz tempo desde a última vez que te vi deixar flores no túmulo da Mariana.",
+              "Chega dessa conversa!",
+              "Túlio, eu te peço, saia daqui e finja que nunca me viu aqui.",
+              "Jorge, você sabe muito bem que eu não posso fazer isso.",
+            ],
+          });
+        },
+        loop: true,
+        delay: 500,
+      });
+    });
+
+    this.events.on("jorge-die", () => {
+      this.time.delayedCall(3000, () => {
+        this.scene.run("dialog", {
+          character: "Túlio",
+          dialogs: [
+            "...",
+            "Finalmente acabou...",
+            "Jorge, por que você teve que ir tão longe...",
+            "O mínimo que tenho que fazer agora é enterra-lo ao lado da Mariana, talvez isso traga paz à eles.",
+          ],
+        });
+
+        this.time.delayedCall(100, () => {
+          this.scene.start("end");
+        });
+      });
+    });
 
     let waveNum = 1;
     this.dispatchWave(waveNum);
@@ -72,6 +135,7 @@ export default class Room_18 extends BaseRoomDungeon {
       if (waveNum == 3) {
         this.events.off("wave-concluded", waveCallback);
         this.jorge.sprite.clearTint();
+        this.events.emit("jorge-die");
         this.jorge.die();
         return;
       }
@@ -94,7 +158,7 @@ export default class Room_18 extends BaseRoomDungeon {
         this.jorge.sprite.setTint(0xff0000);
       }
 
-      this.wave(5 + num * 5);
+      this.wave(1);
     });
   }
 

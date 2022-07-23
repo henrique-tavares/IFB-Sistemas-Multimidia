@@ -6,16 +6,26 @@ body {
 
 @font-face {
   font-family: MinimalPixel;
-  src: url('../fonts/MinimalPixel\ v2.ttf');
+  src: url("../fonts/MinimalPixel\ v2.ttf");
 }
 
 @font-face {
   font-family: ZillaSlab;
-  src: url('../fonts/ZillaSlab-Regular.ttf');
+  src: url("../fonts/ZillaSlab-Regular.ttf");
 }
 
 @font-face {
   font-family: ZillaSlab;
-  src: url('../fonts/ZillaSlab-SemiBold.ttf');
+  src: url("../fonts/ZillaSlab-SemiBold.ttf");
   font-weight: bold;
+}
+
+@font-face {
+  font-family: PixeloidSans;
+  src: url("../fonts/PixeloidSans.ttf");
+}
+
+@font-face {
+  font-family: PixeloidSansBold;
+  src: url("../fonts/PixeloidSansBold.ttf");
 }

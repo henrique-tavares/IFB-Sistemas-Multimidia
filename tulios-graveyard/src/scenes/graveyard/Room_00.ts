@@ -1,7 +1,5 @@
-import Zombie from "../../entities/zombie";
 import House from "../../props/house";
 import { GraveyardProp, RoomDifficulty, RoomSize } from "../../types";
-import Direction from "../gui/direction";
 import { generateNextRoomData } from "../utils/graveyard";
 import BaseRoomGraveyard from "./baseRoomGraveyard";
 
@@ -28,8 +26,7 @@ export default class Room_00 extends BaseRoomGraveyard {
         },
       }),
       RoomSize["1x1"],
-      RoomDifficulty.Easy,
-      {x: 210, y: 270}
+      RoomDifficulty.Easy
     );
   }
 
@@ -38,6 +35,17 @@ export default class Room_00 extends BaseRoomGraveyard {
 
     super.addFixedProps(new House(this, this.screen.relativeX(28), this.screen.relativeY(32)));
     super.generateRandomProps(5, [GraveyardProp.Tree1, GraveyardProp.Tree2, GraveyardProp.Tree3]);
+
+    this.events.on("room-concluded", () => {
+      this.scene.run("dialog", {
+        character: "Túlio",
+        dialogs: [
+          "Pu@! %$#&!, O que tá rolando no meu cemitério?",
+          "Pelo jeito vou precisar da ajuda da minha velha companheira Bala Mansa.",
+          "Eu tenho quase certeza que a deixei na cabana, que fica aqui à direita",
+        ],
+      });
+    });
   }
 
   update() {

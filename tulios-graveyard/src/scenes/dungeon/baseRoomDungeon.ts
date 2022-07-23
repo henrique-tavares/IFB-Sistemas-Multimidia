@@ -1,10 +1,10 @@
 import {
   BackgroundBorderConfig,
+  CustomBorder,
   NextRoom,
+  NextRoomArrowPosition,
   NextRoomData,
   RoomDifficulty,
-  NextRoomArrowPosition,
-  CustomBorder,
 } from "../../types";
 import BaseRoom from "../utils/baseRoom";
 
@@ -19,8 +19,7 @@ export default abstract class BaseRoomDungeon extends BaseRoom {
     nextRoomData: NextRoomData,
     difficulty: RoomDifficulty,
     nextRoomArrowsPosition?: NextRoomArrowPosition,
-    customBorders?: CustomBorder[],
-    playerInitialPos?: { x: number; y: number }
+    customBorders?: CustomBorder[]
   ) {
     super(
       key,
@@ -30,8 +29,7 @@ export default abstract class BaseRoomDungeon extends BaseRoom {
       difficulty,
       undefined,
       nextRoomArrowsPosition,
-      customBorders,
-      playerInitialPos
+      customBorders
     );
   }
 

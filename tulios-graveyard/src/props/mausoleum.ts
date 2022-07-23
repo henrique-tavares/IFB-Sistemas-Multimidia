@@ -1,8 +1,8 @@
-import BaseProp from './baseProp';
+import BaseProp from "./baseProp";
 
 export default class Mausoleum extends BaseProp {
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'graveyard:mausoleum');
+    super(scene, x, y, "graveyard:mausoleum");
 
     this.rescale(1.25);
 
@@ -32,6 +32,24 @@ export default class Mausoleum extends BaseProp {
         0x000,
         0
       ).setOrigin(0.5, 0.1)
+      // (_player, _door) => {
+      //   if (!this.scene.data.get("concluded")) {
+      //     return;
+      //   }
+
+      //   const initialPos: PlayerCoordinate = {
+      //     x: {
+      //       relative: false,
+      //       value: 100,
+      //     },
+      //     y: {
+      //       relative: false,
+      //       value: 300,
+      //     },
+      //   };
+
+      //   this.scene.events.emit("go-to-interior", "graveyard:mausoleum", initialPos);
+      // }
     );
   }
 }

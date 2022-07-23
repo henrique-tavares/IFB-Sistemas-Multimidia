@@ -1,4 +1,4 @@
-import BaseProp from './baseProp';
+import BaseProp from "./baseProp";
 
 export default class BlueChest extends BaseProp {
   constructor(scene: Phaser.Scene, x: number, y: number) {

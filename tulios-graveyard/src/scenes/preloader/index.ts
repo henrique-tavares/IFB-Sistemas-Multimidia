@@ -1,5 +1,6 @@
 import AudioHandler from "../../handlers/audioHandler";
 import PlayerHandler from "../../handlers/playerHandler";
+import ProgressHandler from "../../handlers/progressHandler";
 import Screen from "../utils/screen";
 
 export default class Preloader extends Phaser.Scene {
@@ -172,26 +173,37 @@ export default class Preloader extends Phaser.Scene {
     this.load.image("prop:graveyard:house", "assets/props/graveyard/outside/House.png");
     this.load.image("prop:graveyard:cabin", "assets/props/graveyard/outside/Cabin.png");
     this.load.image("prop:graveyard:mausoleum", "assets/props/graveyard/outside/Mausoleum.png");
+    this.load.image("prop:graveyard:key", "assets/props/graveyard/outside/mausoleum-key.png");
 
     this.load.image("prop:graveyard:home-lamp", "assets/props/graveyard/interior/home-lamp.png");
     this.load.image("prop:graveyard:trashcan", "assets/props/graveyard/interior/trashcan.png");
     this.load.image("prop:graveyard:sofa", "assets/props/graveyard/interior/sofa.png");
     this.load.image("prop:graveyard:blue-chest", "assets/props/graveyard/interior/blue-chest.png");
-    this.load.image("prop:graveyard:hanging-light", "assets/props/graveyard/interior/hanging-light.png");
-    this.load.image("prop:graveyard:stone-coffin", "assets/props/graveyard/interior/stone-coffin.png");
+    this.load.image(
+      "prop:graveyard:hanging-light",
+      "assets/props/graveyard/interior/hanging-light.png"
+    );
+    this.load.image(
+      "prop:graveyard:stone-coffin",
+      "assets/props/graveyard/interior/stone-coffin.png"
+    );
     this.load.image("prop:graveyard:stairs", "assets/props/graveyard/interior/stairs.png");
     this.load.image("prop:graveyard:box", "assets/props/graveyard/interior/box.png");
     this.load.image("prop:graveyard:door-1", "assets/props/graveyard/interior/door-1.png");
     this.load.image("prop:graveyard:door-2", "assets/props/graveyard/interior/door-2.png");
     this.load.image("prop:graveyard:door-3", "assets/props/graveyard/interior/door-3.png");
-    this.load.spritesheet("prop:graveyard:door-4", "assets/props/graveyard/outside/mausoleum_door_anim.png", {
-      frameWidth: 31,
-      frameHeight: 45,
-    });
-    
+    this.load.spritesheet(
+      "prop:graveyard:door-4",
+      "assets/props/graveyard/outside/mausoleum_door_anim.png",
+      {
+        frameWidth: 31,
+        frameHeight: 45,
+      }
+    );
+
     this.load.spritesheet("prop:dungeon:door-5", "assets/props/dungeon/jorge_door_anim.png", {
       frameWidth: 32,
-      frameHeight: 32,
+      frameHeight: 28,
     });
     this.load.spritesheet("prop:dungeon:candlestick", "assets/props/dungeon/candlestick_anim.png", {
       frameWidth: 9,
@@ -243,7 +255,8 @@ export default class Preloader extends Phaser.Scene {
     this.cache
       .addCustom("handlers")
       .add("audioHandler", new AudioHandler())
-      .add("playerHandler", new PlayerHandler());
+      .add("playerHandler", new PlayerHandler())
+      .add("progressHandler", new ProgressHandler());
   }
 
   create() {}

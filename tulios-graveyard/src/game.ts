@@ -1,12 +1,16 @@
 import "phaser";
 import Credits from "./scenes/credits";
 import Death from "./scenes/death";
+import Dialog from "./scenes/dialog";
 import Dungeon from "./scenes/dungeon";
+import End from "./scenes/end/end";
 import Graveyard from "./scenes/graveyard";
 import GUIScene from "./scenes/gui";
 import Interiors from "./scenes/interiors";
 import Preloader from "./scenes/preloader";
 import Start from "./scenes/start";
+
+export const fadeDuration = 500;
 
 const scenesList = [
   Preloader,
@@ -14,6 +18,8 @@ const scenesList = [
   Credits,
   GUIScene,
   Death,
+  Dialog,
+  End,
   ...Interiors,
   ...Graveyard,
   ...Dungeon,

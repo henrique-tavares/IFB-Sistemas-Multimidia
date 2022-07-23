@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { GameObjects } from "phaser";
 import Tulio from "../../entities/tulio";
+import { fadeDuration } from "../../game";
 import AudioHandler from "../../handlers/audioHandler";
 import BaseProp from "../../props/baseProp";
 import Door from "../../props/door";
@@ -10,16 +11,14 @@ import {
   BorderSideArea,
   NextRoom,
   NextRoomData,
-  Orientation,
   PlayerCoordinate,
   RoomDifficulty,
 } from "../../types";
 import { WeaponType } from "../../weapons/weapon";
 import Background from "../utils/background";
-import { clamp, isEmpty } from "../utils/misc";
 import Screen from "../utils/screen";
 
-export default abstract class BaseRoom extends Phaser.Scene {
+export default abstract class BaseRoomInterior extends Phaser.Scene {
   protected key: string;
   protected player: Tulio;
   protected screen: Screen;
@@ -30,12 +29,11 @@ export default abstract class BaseRoom extends Phaser.Scene {
   };
   protected nextRoom: NextRoom;
   protected nextRoomData: NextRoomData;
-  protected fadeDuration = 500;
-  private isThereNextRoom: boolean;  
+  private isThereNextRoom: boolean;
   protected staticProps: Phaser.Physics.Arcade.StaticGroup;
   protected staticColliderBoxes: Phaser.Physics.Arcade.StaticGroup;
   readonly difficulty: RoomDifficulty;
-  protected verticalPadding: {top: number, bottom: number};
+  protected verticalPadding: { top: number; bottom: number };
   protected horizontalPadding: number;
   protected doors: Door[];
 
@@ -45,8 +43,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
     nextRoom: NextRoom,
     nextRoomData: NextRoomData,
     difficulty: RoomDifficulty,
-    verticalPadding: {top: number, bottom: number} = {top: 15, bottom: 15},
-    horizontalPadding: number = 6.5,
+    verticalPadding: { top: number; bottom: number } = { top: 15, bottom: 15 },
+    horizontalPadding: number = 6.5
   ) {
     super(key);
 
@@ -99,17 +97,16 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
   init(coordinate: PlayerCoordinate) {
     // console.log(this.constructor.name);
-    this.fadeIn(this.fadeDuration);
-    if (isEmpty(coordinate)) {
-      this.physics.world.once("worldbounds", this.onWorldBounds, this);
+    this.fadeIn(fadeDuration);
+    if (_.isEmpty(coordinate)) {
+      // this.physics.world.once("worldbounds", this.onWorldBounds, this);
       return;
     }
-
     this.events.on("reposition-player", () => {
       const { x, y } = this.repositionPlayer(coordinate);
       this.player.setPosition(x, y);
 
-      this.physics.world.once("worldbounds", this.onWorldBounds, this);
+      // this.physics.world.once("worldbounds", this.onWorldBounds, this);
     });
   }
 
@@ -117,15 +114,15 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.bg = new Background(this, `${this.key}:bg`, this.bgBorder);
     this.screen = new Screen(this.bg.image.width, this.bg.image.height);
 
-    switch(this.key){
+    switch (this.key) {
       case "graveyard:house":
         this.player = new Tulio(this, 635, 490);
         break;
       case "graveyard:toolshed":
-        this.player = new Tulio(this, 400, 480);    
+        this.player = new Tulio(this, 400, 480);
         break;
       case "graveyard:mausoleum":
-        this.player = new Tulio(this, 100, 300);    
+        this.player = new Tulio(this, 100, 300);
         break;
     }
 
@@ -134,28 +131,46 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.events.emit("reposition-player");
 
+    this.events.on("wake", this.wake, this);
+
     this.cameras.main.startFollow(this.player.sprite);
-    this.bg.applyBoundsOnSprite(this.player.sprite);  
-    
+    this.bg.applyBoundsOnSprite(this.player.sprite);
+
+    this.data.set("type", "interior");
+
     this.staticProps = this.physics.add.staticGroup();
     this.physics.add.collider(
-      this.player.sprite, 
+      this.player.sprite,
       this.staticProps,
-      (_player, _collidedProp: BaseProp) => {
-        if(_collidedProp.name.includes("stairs")){
-          this.scene.start(_collidedProp.getDestiny());
-        } else if (_collidedProp.name.includes("door")){
-          // this.scene.start(_collidedProp.getDestiny());
-        } else if (_collidedProp.name.includes("shovel")){
-          this.player.pickupWeapon(WeaponType.shovel);
-          _collidedProp.destroy();
-        } else if (_collidedProp.name.includes("chest")){
-          this.player.pickupWeapon(WeaponType.pistol);
-          this.player.weapon?.sprite.setScale(2.5);
-          this.children.getByName("weapon:pistol")?.destroy();
-        } else if (_collidedProp.name.includes("shotgun")){
-          this.player.pickupWeapon(WeaponType.shotgun);
-          _collidedProp.destroy();
+      (_player, collidedProp: BaseProp) => {
+        const propHandler = {
+          stairs: () => {
+            this.handleTransition(collidedProp.getDestiny());
+          },
+          door: () => {
+            this.handleTransition(collidedProp.getDestiny());
+          },
+          shovel: () => {
+            this.player.pickupWeapon(WeaponType.shovel);
+            collidedProp.destroy();
+          },
+          chest: () => {
+            this.player.pickupWeapon(WeaponType.pistol);
+            this.player.weapon?.sprite.setScale(2.5);
+          },
+          shotgun: () => {
+            this.player.pickupWeapon(WeaponType.shotgun);
+            collidedProp.destroy();
+          },
+        };
+
+        for (const [key, callback] of Object.entries(propHandler)) {
+          if (!collidedProp.name.includes(key)) {
+            continue;
+          }
+
+          callback();
+          break;
         }
       }
     );
@@ -191,78 +206,58 @@ export default abstract class BaseRoom extends Phaser.Scene {
     });
   }
 
-  onWorldBounds(body: Phaser.Physics.Arcade.Body) {
-    if (!this.data.get("concluded")) {
-      this.physics.world.once("worldbounds", this.onWorldBounds, this);
-      return;
-    }
-
-    ["up", "right", "left", "down"].forEach((orientation: Orientation) => {
-      if (
-        !(body.blocked[orientation] && this.nextRoom[orientation] && this.nextRoomData[orientation])
-      ) {
-        this.isThereNextRoom = false;
-        return;
-      }
-      this.isThereNextRoom = true;
-      this.handleTransition(orientation);
-    });
-    if (!this.isThereNextRoom) {
-      this.physics.world.once("worldbounds", this.onWorldBounds, this);
-    }
-  }
-
-  handleTransition(orientation: Orientation) {
-    let playerCoordinate = this.nextRoomData[orientation]!;
-    const nextRoom = this.nextRoom[orientation]!;
-
-    const half =
-      (["up", "down"].includes(orientation) && this.player.sprite.x < this.screen.relativeX(50)) ||
-      (["left", "right"].includes(orientation) && this.player.sprite.y < this.screen.relativeY(50))
-        ? "first"
-        : "second";
-
-    if (Array.isArray(playerCoordinate)) {
-      playerCoordinate = half == "first" ? playerCoordinate[0] : playerCoordinate[1];
-    }
-
-    const parsedData: PlayerCoordinate = {
-      x: {
-        relative: playerCoordinate.x.relative,
-        value: playerCoordinate.x.value ?? this.player.sprite.x,
-        offset: playerCoordinate.x.offset,
+  handleTransition(dest: string) {
+    const initialPos: { [key: string]: PlayerCoordinate } = {
+      "graveyard:room_00": {
+        x: {
+          relative: false,
+          value: 210,
+        },
+        y: {
+          relative: false,
+          value: 270,
+        },
       },
-      y: {
-        relative: playerCoordinate.y.relative,
-        value: playerCoordinate.y.value ?? this.player.sprite.y,
-        offset: playerCoordinate.y.offset,
+      "graveyard:room_02_03": {
+        x: {
+          relative: false,
+          value: 245,
+        },
+        y: {
+          relative: false,
+          value: 250,
+        },
+      },
+      "graveyard:room_56_57": {
+        x: {
+          relative: false,
+          value: 1440,
+        },
+        y: {
+          relative: false,
+          value: 260,
+        },
       },
     };
 
-    this.fadeOut(this.fadeDuration);
+    this.fadeOut(fadeDuration);
     this.player.freeze();
-    this.time.delayedCall(this.fadeDuration, () => {
+    this.time.delayedCall(fadeDuration, () => {
       this.player.sprite.disableBody();
       this.scene.transition({
-        target: Array.isArray(nextRoom)
-          ? half == "first"
-            ? nextRoom[0]
-            : nextRoom[1]
-          : (nextRoom as string),
-        data: parsedData,
+        target: dest,
         sleep: true,
         duration: 0,
+        data: initialPos[dest] ?? {},
       });
     });
   }
 
   wake(sys: Phaser.Scenes.Systems, data: PlayerCoordinate) {
-    // console.log(this.constructor.name);
-    this.fadeIn(this.fadeDuration);
+    this.fadeIn(fadeDuration);
     const { x: newX, y: newY } = this.repositionPlayer(data);
     this.player.sprite.enableBody(true, newX, newY, true, true);
     this.player.unfreeze();
-    this.physics.world.once("worldbounds", this.onWorldBounds, this);
   }
 
   repositionPlayer({ x, y }: PlayerCoordinate) {
@@ -280,8 +275,8 @@ export default abstract class BaseRoom extends Phaser.Scene {
       : y.value! + this.screen.relativeY(y.offset ?? 0);
 
     return {
-      x: clamp(newX, minX, maxX),
-      y: clamp(newY, minY, maxY),
+      x: _.clamp(newX, minX, maxX),
+      y: _.clamp(newY, minY, maxY),
     };
   }
 

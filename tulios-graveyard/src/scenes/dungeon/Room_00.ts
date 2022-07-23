@@ -1,7 +1,7 @@
 import "phaser";
 import { GameObjects } from "phaser";
-import { RoomDifficulty, RoomSize } from "../../types";
-import { handleNextRoomArrows, generateNextRoomData } from "../utils/dungeon";
+import { PlayerCoordinate, RoomDifficulty } from "../../types";
+import { generateNextRoomData } from "../utils/dungeon";
 import BaseRoomDungeon from "./baseRoomDungeon";
 
 export default class Room_00 extends BaseRoomDungeon {
@@ -37,7 +37,30 @@ export default class Room_00 extends BaseRoomDungeon {
     );
     this.add.existing(area);
     this.physics.add.existing(area, true);
-    this.physics.add.overlap(this.player.sprite, area, ()=>{this.scene.start("graveyard:mausoleum")}, undefined, this);
+    this.physics.add.overlap(
+      this.player.sprite,
+      area,
+      () => {
+        if (!this.data.get("concluded")) {
+          return;
+        }
+
+        const initialPos: PlayerCoordinate = {
+          x: {
+            relative: false,
+            value: 100,
+          },
+          y: {
+            relative: false,
+            value: 300,
+          },
+        };
+
+        this.events.emit("go-to-interior", "graveyard:mausoleum", initialPos);
+      },
+      undefined,
+      this
+    );
   }
 
   update() {

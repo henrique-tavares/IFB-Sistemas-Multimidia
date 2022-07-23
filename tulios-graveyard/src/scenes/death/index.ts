@@ -91,7 +91,7 @@ export default class Death extends Phaser.Scene {
         this.audioHandler.playSfx(this, "click-button", 0.2);
         this.time.delayedCall(500, () => {
           this.scene.run("gui-scene");
-          this.scene.start("graveyard:room_00");
+          this.scene.start("graveyard:house");
         });
       });
 

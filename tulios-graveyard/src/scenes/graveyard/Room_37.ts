@@ -35,6 +35,8 @@ export default class Room_37 extends BaseRoomGraveyard {
 
   create() {
     super.create();
+
+    super.generateRandomProps(6);
   }
 
   update() {

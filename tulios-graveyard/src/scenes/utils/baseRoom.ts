@@ -1,7 +1,9 @@
 import _ from "lodash";
 import Tulio from "../../entities/tulio";
 import Zombie from "../../entities/zombie";
+import { fadeDuration } from "../../game";
 import AudioHandler from "../../handlers/audioHandler";
+import ProgressHandler from "../../handlers/progressHandler";
 import BaseProp from "../../props/baseProp";
 import Door from "../../props/door";
 import {
@@ -44,7 +46,6 @@ export default abstract class BaseRoom extends Phaser.Scene {
   };
   protected nextRoom: NextRoom;
   protected nextRoomData: NextRoomData;
-  protected fadeDuration = 500;
   protected audioHandler: AudioHandler;
   private isThereNextRoom: boolean;
   protected enemiesGroup: Phaser.Physics.Arcade.Group;
@@ -58,12 +59,10 @@ export default abstract class BaseRoom extends Phaser.Scene {
   protected nextRoomArrowsPosition: NextRoomArrowPosition;
   protected customBorders?: CustomBorder[];
   protected customBorderGroup?: Phaser.Physics.Arcade.StaticGroup;
-  protected playerInitialPos?: { x: number; y: number };
   protected doors: Door[];
 
   abstract verticalPadding: number;
   abstract horizontalPadding: number;
-
 
   constructor(
     key: string,
@@ -73,8 +72,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
     difficulty: RoomDifficulty,
     roomSize?: RoomSize,
     nextRoomArrowsPosition?: NextRoomArrowPosition,
-    customBorders?: CustomBorder[],
-    playerInitialPos?: { x: number; y: number }
+    customBorders?: CustomBorder[]
   ) {
     super(key);
 
@@ -86,13 +84,11 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.roomSize = roomSize;
     this.nextRoomArrowsPosition = nextRoomArrowsPosition ?? {};
     this.customBorders = customBorders;
-
-    this.playerInitialPos = playerInitialPos;
   }
 
   init(coordinate: PlayerCoordinate) {
-    // console.log(this.constructor.name);
-    this.fadeIn(this.fadeDuration);
+    console.log(this.constructor.name);
+    this.fadeIn(fadeDuration);
     if (isEmpty(coordinate)) {
       this.physics.world.once("worldbounds", this.onWorldBounds, this);
       return;
@@ -155,7 +151,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.data.set("bullets", this.bulletsInScene);
 
-    this.player = new Tulio(this, this.playerInitialPos?.x, this.playerInitialPos?.y);
+    this.player = new Tulio(this);
 
     this.player.sprite.body.setCollideWorldBounds(true, undefined, undefined, true);
     this.data.set("player", this.player);
@@ -169,19 +165,10 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.events.on("add-extra-area", this.addExtraArea, this);
 
-    this.physics.add.collider(
-      this.player.sprite, 
-      this.staticProps,
-      (_player, collidedProp: BaseProp) => {
-        if (collidedProp.name.includes("door")){
-          console.log(collidedProp.anims);
-          collidedProp.play("open"); 
-          collidedProp.on("animationcomplete", () => {
-            this.scene.start(collidedProp.getDestiny());
-          })
-        }
-      }
-    );
+    this.physics.add.collider(this.player.sprite, this.staticProps, (_player, prop) => {
+      prop.emit("collide");
+    });
+    this.physics.add.collider(this.player.sprite, this.staticProps, (_player, prop) => {});
 
     this.enemiesGroup = this.physics.add.group();
     this.physics.add.collider(this.enemiesGroup, this.enemiesGroup);
@@ -295,7 +282,7 @@ export default abstract class BaseRoom extends Phaser.Scene {
 
     this.events.on("wake", this.wake, this);
 
-    this.time.delayedCall(3000, () => {
+    this.time.delayedCall(this.difficulty == RoomDifficulty.Peaceful ? 0 : 3000, () => {
       const verifyConcluded = this.time.addEvent({
         callback: () => {
           if (this.enemiesGroup.getChildren().every(enemy => !enemy.active)) {
@@ -314,6 +301,23 @@ export default abstract class BaseRoom extends Phaser.Scene {
         });
       });
     });
+
+    const goToInterior = (target: string, data: PlayerCoordinate) => {
+      this.fadeOut(fadeDuration);
+      this.player.freeze();
+      this.time.delayedCall(fadeDuration, () => {
+        this.player.sprite.disableBody();
+        this.scene.transition({
+          target,
+          data,
+          sleep: true,
+          duration: 0,
+        });
+        this.events.once("go-to-interior", goToInterior);
+      });
+    };
+
+    this.events.once("go-to-interior", goToInterior);
   }
 
   update() {
@@ -328,6 +332,10 @@ export default abstract class BaseRoom extends Phaser.Scene {
     this.bulletsInScene.forEach(bullet => {
       bullet.update();
     });
+  }
+
+  get progressHandler() {
+    return this.cache.custom["handlers"].get("progressHandler") as ProgressHandler;
   }
 
   addFixedProps(...props: BaseProp[]) {
@@ -833,9 +841,9 @@ export default abstract class BaseRoom extends Phaser.Scene {
       },
     };
 
-    this.fadeOut(this.fadeDuration);
+    this.fadeOut(fadeDuration);
     this.player.freeze();
-    this.time.delayedCall(this.fadeDuration, () => {
+    this.time.delayedCall(fadeDuration, () => {
       this.player.sprite.disableBody();
       this.scene.transition({
         target: Array.isArray(nextRoom)
@@ -851,11 +859,12 @@ export default abstract class BaseRoom extends Phaser.Scene {
   }
 
   wake(sys: Phaser.Scenes.Systems, data: PlayerCoordinate) {
-    // console.log(this.constructor.name);
-    this.fadeIn(this.fadeDuration);
+    console.log(this.constructor.name);
+    this.fadeIn(fadeDuration);
     const { x: newX, y: newY } = this.repositionPlayer(data);
     this.player.sprite.enableBody(true, newX, newY, true, true);
     this.player.unfreeze();
+    this.player.refreshWeapon();
     this.physics.world.once("worldbounds", this.onWorldBounds, this);
   }
 

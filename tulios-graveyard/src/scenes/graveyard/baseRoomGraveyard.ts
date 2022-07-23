@@ -2,8 +2,8 @@ import {
   BackgroundBorderConfig,
   NextRoom,
   NextRoomData,
-  RoomSize,
   RoomDifficulty,
+  RoomSize,
 } from "../../types";
 import BaseRoom from "../utils/baseRoom";
 
@@ -17,10 +17,9 @@ export default abstract class BaseRoomGraveyard extends BaseRoom {
     nextRoom: NextRoom,
     nextRoomData: NextRoomData,
     roomSize: RoomSize,
-    difficulty: RoomDifficulty,
-    playerInitialPos?: { x: number; y: number }
+    difficulty: RoomDifficulty
   ) {
-    super(key, borderConfig, nextRoom, nextRoomData, difficulty, roomSize, undefined, undefined, playerInitialPos);
+    super(key, borderConfig, nextRoom, nextRoomData, difficulty, roomSize, undefined, undefined);
   }
 
   create() {

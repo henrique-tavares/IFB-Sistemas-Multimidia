@@ -1,7 +1,9 @@
+import { scenesMap } from "../../game";
 import AudioHandler from "../../handlers/audioHandler";
 import PlayerHandler from "../../handlers/playerHandler";
 import { TulioData } from "../../types";
-import Weapon, { WeaponType } from "../../weapons/weapon";
+import { WeaponType } from "../../weapons/weapon";
+import Preloader from "../preloader";
 import Screen from "../utils/screen";
 import Direction from "./direction";
 
@@ -279,6 +281,13 @@ export default class GUIScene extends Phaser.Scene {
 
     if (key === "menu") {
       this.scene.stop(this.currSceneKey);
+      this.scene.manager.scenes
+        .map(scene => scene.scene.key)
+        .filter(sceneKey => ![GUIScene.key, Preloader.key].includes(sceneKey))
+        .forEach(sceneKey => {
+          this.scene.manager.remove(sceneKey);
+          this.scene.manager.add(sceneKey, scenesMap[sceneKey]);
+        });
       this.scene.start("start");
     } else {
       this.scene.manager.getScene(this.currSceneKey).scene.resume();

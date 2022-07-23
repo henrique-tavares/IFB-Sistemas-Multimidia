@@ -1,8 +1,8 @@
-import BaseProp from './baseProp';
+import BaseProp from "./baseProp";
 
 export default class Cabin extends BaseProp {
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'graveyard:cabin');
+    super(scene, x, y, "graveyard:cabin");
 
     this.resize({
       height: 0.4,
@@ -28,10 +28,25 @@ export default class Cabin extends BaseProp {
         this.relativeY(100),
         0x000,
         0
-      ).setOrigin(0.5, 0.05),
-      (_player, _door) => {
-        this.scene.scene.start("graveyard:cabin");
-      }
+      ).setOrigin(0.5, 0.05)
+      // (_player, _door) => {
+      //   if (!this.scene.data.get("concluded")) {
+      //     return;
+      //   }
+
+      //   const initialPos: PlayerCoordinate = {
+      //     x: {
+      //       relative: false,
+      //       value: 400,
+      //     },
+      //     y: {
+      //       relative: false,
+      //       value: 480,
+      //     },
+      //   };
+
+      //   this.scene.events.emit("go-to-interior", "graveyard:toolshed", initialPos);
+      // }
     );
   }
 }

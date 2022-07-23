@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { Geom, Scene } from "phaser";
 import AudioHandler from "../handlers/audioHandler";
 import PlayerHandler from "../handlers/playerHandler";
@@ -16,7 +17,7 @@ import Entity from "./entity";
 export default class Tulio extends Entity {
   private direction: Direction;
   private frozen = false;
-  private baseVelocity = 120;
+  private baseVelocity = 150;
   private _weapon?: Weapon;
 
   public isAttacking = false;
@@ -53,7 +54,7 @@ export default class Tulio extends Entity {
       scene.scene.get("gui-scene").events.emit("refresh-player-data", playerHandler.playerData);
     });
 
-    if (playerData.selectedWeapon) {
+    if (!_.isNil(playerData.selectedWeapon)) {
       this.pickupWeapon(playerData.selectedWeapon);
     }
 
@@ -256,10 +257,34 @@ export default class Tulio extends Entity {
         continue;
       }
 
-      console.log(this.scene.data.get("bullets"));
       this.pickupWeapon(newWeapon.type);
-      console.log(this.scene.data.get("bullets"));
       break;
+    }
+  }
+
+  refreshWeapon() {
+    const { playerData } = this.playerHandler;
+
+    if (_.isNil(playerData.selectedWeapon)) {
+      return;
+    }
+
+    if (this.weapon && this.weapon.type != WeaponType.shovel) {
+      this.weapon.sprite.destroy(true);
+    }
+
+    const playerDataWeapon = playerData.weapons[playerData.selectedWeapon];
+
+    switch (playerData.selectedWeapon) {
+      case WeaponType.shovel:
+        this.weapon = new Shovel(this.scene, this, playerDataWeapon.ammo);
+        break;
+      case WeaponType.pistol:
+        this.weapon = new Pistol(this.scene, this, playerDataWeapon.ammo);
+        break;
+      case WeaponType.shotgun:
+        this.weapon = new Shotgun(this.scene, this, playerDataWeapon.ammo);
+        break;
     }
   }
 
@@ -335,7 +360,7 @@ export default class Tulio extends Entity {
 
   unfreeze() {
     this.frozen = false;
-    this.sprite.body.velocity.limit(120);
+    this.sprite.body.velocity.limit(this.baseVelocity);
   }
 
   update() {
@@ -363,7 +388,7 @@ export default class Tulio extends Entity {
       this.sprite.body.velocity.limit(this.baseVelocity * 2);
     }
 
-    if (this.direction.pointer.leftButtonDown()) {
+    if (this.direction.pointer.leftButtonDown() && this.scene.data.get("type") != "interior") {
       this.handleAttack(anim);
     }
   }
